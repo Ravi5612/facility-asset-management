@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 /* ─── NAV DATA ─── */
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Sub Admins", href: "/dashboard/sub-admins", icon: Shield },
   {
     label: "Assets",
     icon: Package,
@@ -45,14 +46,6 @@ const navItems = [
 ];
 
 const adminItems = [
-  {
-    label: "Super Admin",
-    icon: Shield,
-    children: [
-      { label: "Sub Admins", href: "/dashboard/sub-admins" },
-      { label: "Manage Roles", href: "/dashboard/roles" },
-    ],
-  },
   {
     label: "Departments",
     icon: Building2,
