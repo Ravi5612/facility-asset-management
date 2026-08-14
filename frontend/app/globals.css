@@ -1,26 +1,137 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* ===================== */
+  /* GATE2DESK CUSTOM TOKENS */
+  /* ===================== */
+  --color-brand-sidebar: var(--brand-sidebar);
+  --color-brand-sidebar-hover: var(--brand-sidebar-hover);
+  --color-brand-sidebar-active: var(--brand-sidebar-active);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-primary-light: var(--brand-primary-light);
+  --color-brand-success: var(--brand-success);
+  --color-brand-warning: var(--brand-warning);
+  --color-brand-danger: var(--brand-danger);
+  --color-brand-info: var(--brand-info);
+  --color-brand-orange: var(--brand-orange);
+  --color-brand-pink: var(--brand-pink);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* ===================== */
+  /* GATE2DESK BRAND COLORS */
+  /* ===================== */
+
+  /* Sidebar: Royal Blue (matching login panel) */
+  --brand-sidebar: #1240a8;
+  --brand-sidebar-hover: rgba(255, 255, 255, 0.07);
+  --brand-sidebar-active: #1553cc;
+
+  /* Primary accent: Royal Blue (buttons, highlights) */
+  --brand-primary: #1553cc;
+  --brand-primary-light: rgba(21, 83, 204, 0.12);
+
+  /* Status Colors (used in badges, metric cards) */
+  --brand-success: #22c55e;
+  --brand-warning: #f59e0b;
+  --brand-danger: #ef4444;
+  --brand-info: #3b82f6;
+  --brand-orange: #f97316;
+  --brand-pink: #ec4899;
+
+  /* ===================== */
+  /* SHADCN BASE TOKENS    */
+  /* ===================== */
+  --background: oklch(0.975 0.003 250);      /* Light gray-blue page bg */
+  --foreground: oklch(0.145 0 0);            /* Near black text */
+  --card: oklch(1 0 0);                      /* Pure white cards */
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.47 0.2 255);            /* Royal Blue primary */
+  --primary-foreground: oklch(0.985 0 0);    /* White text on primary */
+  --secondary: oklch(0.96 0.003 250);
+  --secondary-foreground: oklch(0.3 0 0);
+  --muted: oklch(0.96 0.003 250);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.47 0.2 255);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.918 0.003 250);
+  --input: oklch(0.918 0.003 250);
+  --ring: oklch(0.47 0.2 255);
+  --chart-1: oklch(0.47 0.2 255);            /* Royal Blue */
+  --chart-2: oklch(0.72 0.19 142);           /* Green */
+  --chart-3: oklch(0.73 0.17 54);            /* Orange */
+  --chart-4: oklch(0.62 0.18 256);           /* Blue */
+  --chart-5: oklch(0.63 0.24 330);           /* Pink */
+  --radius: 0.625rem;
+
+  /* Sidebar CSS vars (kept for Shadcn compat) */
+  --sidebar: #1240a8;
+  --sidebar-foreground: rgba(255, 255, 255, 0.75);
+  --sidebar-primary: #1553cc;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(255, 255, 255, 0.07);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #1553cc;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }
