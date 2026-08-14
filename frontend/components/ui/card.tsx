@@ -88,6 +88,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
         className
       )}
       {...props}
+      {...props}
     />
   )
 }

@@ -3,8 +3,8 @@ import Image from "next/image";
 import LoginForm from "@/components/features/auth/LoginForm";
 
 export const metadata: Metadata = {
-  title: "Login | Gate2Desk",
-  description: "Login to the Gate2Desk Facility Asset & Visitor Management System",
+  title: "Login | DR IT GROUP",
+  description: "Login to the DR IT GROUP Facility Asset & Visitor Management System",
 };
 
 export default function LoginPage() {
@@ -68,11 +68,9 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="relative z-10">
-            <p className="text-[10px] text-white/30">
-              © 2025 Gate2Desk. All rights reserved.
-            </p>
+          {/* Copyright */}
+          <div className="relative z-10 text-xs text-white/50">
+            © 2026 Dr IT GROUP. All rights reserved.
           </div>
         </div>
 

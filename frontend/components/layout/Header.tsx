@@ -1,13 +1,30 @@
 "use client";
 
-import { Bell, HelpCircle, Search, ChevronDown } from "lucide-react";
+import { Bell, HelpCircle, Search, ChevronDown, Menu } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { SidebarContent } from "@/components/layout/Sidebar";
 
 export default function Header() {
   return (
-    <header className="fixed top-0 right-0 left-56 z-40 h-16 flex items-center justify-between gap-4 border-b border-border bg-card px-6">
+    <header className="fixed top-0 right-0 left-0 md:left-56 z-40 h-16 flex items-center justify-between gap-4 border-b border-border bg-card px-4 md:px-6">
+      <div className="flex items-center gap-2 md:hidden">
+        <Sheet>
+          <SheetTrigger asChild>
+            <button className="flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted transition-colors">
+              <Menu className="h-5 w-5 text-foreground" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64 p-0 border-r-0" style={{ backgroundColor: "var(--brand-sidebar)" }}>
+            <div className="flex flex-col h-full">
+              <SidebarContent />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
       {/* Search Bar */}
-      <div className="relative flex-1 max-w-md">
+      <div className="relative flex-1 max-w-md hidden sm:block">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search anything..."

@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -76,20 +77,27 @@ type NavItemType = SimpleItem | GroupItem;
 /* ─── NAV ITEM COMPONENT ─── */
 function NavItem({ item }: { item: NavItemType }) {
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if ("children" in item && item.children.some((c) => pathname.startsWith(c.href))) {
+      setIsOpen(true);
+    }
+  }, [pathname, item]);
 
   if ("children" in item) {
-    const isOpen = item.children.some((c) => pathname.startsWith(c.href));
     return (
       <div>
         <div
+          onClick={() => setIsOpen(!isOpen)}
           className={cn(
-            "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium cursor-pointer transition-colors select-none",
+            "flex items-center gap-3 rounded-lg px-3 py-3 text-base font-semibold cursor-pointer transition-colors select-none",
             isOpen
               ? "text-white bg-white/10"
-              : "text-white/65 hover:text-white hover:bg-white/8"
+              : "text-white/70 hover:text-white hover:bg-white/8"
           )}
         >
-          <item.icon className="h-[15px] w-[15px] shrink-0" />
+          <item.icon className="h-[18px] w-[18px] shrink-0" />
           <span className="flex-1 truncate">{item.label}</span>
           <ChevronRight
             className={cn(
@@ -105,10 +113,10 @@ function NavItem({ item }: { item: NavItemType }) {
                 key={child.href}
                 href={child.href}
                 className={cn(
-                  "block rounded-md px-2.5 py-1.5 text-xs transition-colors",
+                  "block rounded-md px-3 py-2 text-sm transition-colors",
                   pathname === child.href
-                    ? "text-white font-semibold bg-white/10"
-                    : "text-white/55 hover:text-white hover:bg-white/5"
+                    ? "text-white font-bold bg-white/10"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
                 )}
               >
                 {child.label}
@@ -125,52 +133,49 @@ function NavItem({ item }: { item: NavItemType }) {
     <Link
       href={(item as SimpleItem).href}
       className={cn(
-        "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+        "flex items-center gap-3 rounded-lg px-3 py-3 text-base font-semibold transition-all",
         isActive
           ? "bg-[var(--brand-primary)] text-white shadow-md shadow-purple-900/30"
-          : "text-white/65 hover:text-white hover:bg-white/8"
+          : "text-white/70 hover:text-white hover:bg-white/8"
       )}
     >
-      <item.icon className="h-[15px] w-[15px] shrink-0" />
+      <item.icon className="h-[18px] w-[18px] shrink-0" />
       <span className="truncate">{item.label}</span>
     </Link>
   );
 }
 
-/* ─── SIDEBAR ─── */
-export default function Sidebar() {
+/* ─── SIDEBAR CONTENT ─── */
+export function SidebarContent() {
   return (
-    <aside
-      className="fixed inset-y-0 left-0 z-50 flex w-56 flex-col"
-      style={{ backgroundColor: "var(--brand-sidebar)" }}
-    >
+    <>
       {/* Logo */}
-      <div className="flex h-16 shrink-0 items-center gap-2.5 px-4 border-b border-white/10">
+      <div className="flex h-20 shrink-0 items-center gap-3 px-5 border-b border-white/10">
         <Image
           src="/dr-it-logo.jpg"
           alt="DR IT GROUP"
-          width={34}
-          height={34}
+          width={48}
+          height={48}
           className="rounded-lg object-contain bg-white p-0.5 shrink-0"
         />
         <div className="min-w-0">
-          <p className="text-sm font-bold text-white leading-tight truncate">Dr IT GROUP</p>
-          <p className="text-[9px] text-white/45 leading-tight uppercase tracking-wide truncate">
+          <p className="text-lg font-extrabold text-white leading-tight truncate tracking-wide">Dr IT GROUP</p>
+          <p className="text-[10px] text-white/55 leading-tight uppercase tracking-[0.15em] truncate mt-0.5">
             Asset Management
           </p>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5 scrollbar-none">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1 custom-scrollbar">
         {/* Main Nav */}
         {navItems.map((item) => (
           <NavItem key={item.label} item={item} />
         ))}
 
         {/* Administration Section Label */}
-        <div className="pt-4 pb-1.5">
-          <p className="px-3 text-[9px] font-bold uppercase tracking-[0.12em] text-white/30">
+        <div className="pt-5 pb-2">
+          <p className="px-3 text-[10px] font-extrabold uppercase tracking-[0.12em] text-white/40">
             Administration
           </p>
         </div>
@@ -203,6 +208,18 @@ export default function Sidebar() {
           Contact Support
         </button>
       </div>
+    </>
+  );
+}
+
+/* ─── DESKTOP SIDEBAR ─── */
+export default function Sidebar() {
+  return (
+    <aside
+      className="hidden md:flex fixed inset-y-0 left-0 z-50 w-56 flex-col"
+      style={{ backgroundColor: "var(--brand-sidebar)" }}
+    >
+      <SidebarContent />
     </aside>
   );
 }
