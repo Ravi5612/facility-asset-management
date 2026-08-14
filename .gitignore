@@ -1,0 +1,102 @@
+# ==============================================
+# FACILITY ASSET MANAGEMENT - .gitignore
+# ==============================================
+
+# -----------------------------------------------
+# 📁 Project Specific (Local Only)
+# -----------------------------------------------
+System_Design/
+
+# -----------------------------------------------
+# 🔐 Environment Variables (NEVER push to GitHub)
+# -----------------------------------------------
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env.staging
+
+# -----------------------------------------------
+# 📦 Dependencies (Auto-installed via npm/yarn)
+# -----------------------------------------------
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# -----------------------------------------------
+# 🏗️ Build Outputs (Generated files)
+# -----------------------------------------------
+# Next.js
+.next/
+out/
+
+# NestJS
+dist/
+build/
+
+# -----------------------------------------------
+# 🗄️ Database
+# -----------------------------------------------
+*.sqlite
+*.db
+prisma/migrations/dev/
+
+# -----------------------------------------------
+# 📋 Logs
+# -----------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# -----------------------------------------------
+# 🧪 Testing & Coverage
+# -----------------------------------------------
+coverage/
+*.lcov
+.nyc_output/
+
+# -----------------------------------------------
+# 💻 IDE & Editor Files
+# -----------------------------------------------
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# -----------------------------------------------
+# 🖥️ OS Generated Files
+# -----------------------------------------------
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+# -----------------------------------------------
+# 🔑 Secrets & Keys (Extra Safety)
+# -----------------------------------------------
+*.pem
+*.key
+*.cert
+*.p12
+secrets/
