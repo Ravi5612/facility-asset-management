@@ -25,35 +25,14 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Sub Admins", href: "/dashboard/sub-admins", icon: Shield },
-  {
-    label: "Assets",
-    icon: Package,
-    children: [
-      { label: "All Assets", href: "/dashboard/assets" },
-      { label: "Asset Requests", href: "/dashboard/asset-requests" },
-    ],
-  },
-  {
-    label: "Tickets",
-    icon: Ticket,
-    children: [
-      { label: "All Tickets", href: "/dashboard/tickets" },
-      { label: "Create Ticket", href: "/dashboard/tickets/create" },
-    ],
-  },
+  { label: "Assets", href: "/dashboard/assets", icon: Package },
+  { label: "Tickets", href: "/dashboard/tickets", icon: Ticket },
   { label: "Visitors", href: "/dashboard/visitors", icon: UserPlus },
   { label: "Users", href: "/dashboard/users", icon: Users },
 ];
 
 const adminItems = [
-  {
-    label: "Departments",
-    icon: Building2,
-    children: [
-      { label: "All Departments", href: "/dashboard/departments" },
-      { label: "+ Add Department", href: "/dashboard/departments/create" },
-    ],
-  },
+  { label: "Departments", href: "/dashboard/departments", icon: Building2 },
 ];
 
 const bottomItems = [

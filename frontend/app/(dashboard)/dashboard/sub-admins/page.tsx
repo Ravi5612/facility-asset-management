@@ -41,7 +41,7 @@ export default function SubAdminsPage() {
           name: formData.name,
           email: formData.email,
           departments: formData.departments,
-          status: formData.status as "Active" | "Suspend",
+          status: formData.status as "Active" | "Inactive",
         });
         setData((prev) =>
           prev.map((admin) => (admin.id === editingAdmin.id ? updatedAdmin : admin))
@@ -53,7 +53,7 @@ export default function SubAdminsPage() {
           name: formData.name,
           email: formData.email,
           departments: formData.departments,
-          status: formData.status as "Active" | "Suspend",
+          status: formData.status as "Active" | "Inactive",
         });
         setData((prev) => [newAdmin, ...prev]);
       }
@@ -119,9 +119,9 @@ export default function SubAdminsPage() {
           {
             label: "Suspended",
             value: suspendedSubAdmins.toString(),
-            icon: "🚫",
-            color: "bg-red-100 text-red-600",
-            line: "bg-red-500",
+            icon: "⏸️",
+            color: "bg-orange-100 text-orange-600",
+            line: "bg-orange-500",
           },
         ].map((stat) => (
           <div
@@ -177,3 +177,4 @@ export default function SubAdminsPage() {
       )}
     </div>
   );
+}

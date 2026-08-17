@@ -36,7 +36,7 @@ export default function LoginPage() {
               height={44}
               className="rounded-lg object-contain bg-white p-0.5"
             />
-            <div>
+            <div className="flex flex-col gap-2.5">
               <p className="text-base font-bold text-white leading-tight tracking-wide">Dr IT GROUP</p>
               <p className="text-[9px] uppercase tracking-widest text-white/55 leading-tight">
                 Facility & Asset Management
@@ -45,7 +45,7 @@ export default function LoginPage() {
           </div>
 
           {/* Welcome Text */}
-          <div className="relative z-10 space-y-4">
+          <div className="relative z-10 space-y-5 mt-8">
             <div>
               <h2 className="text-3xl font-extrabold text-white leading-tight">
                 Welcome Back!
@@ -69,7 +69,7 @@ export default function LoginPage() {
           </div>
 
           {/* Copyright */}
-          <div className="relative z-10 text-xs text-white/50">
+          <div className="relative z-10 text-xs text-white/70 font-medium mt-8">
             © 2026 Dr IT GROUP. All rights reserved.
           </div>
         </div>

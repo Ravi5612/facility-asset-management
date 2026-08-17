@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("SUB_ADMIN") // SUPER_ADMIN or SUB_ADMIN
+  status    String   @default("Active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Department {
+  id            String   @id @default(uuid()) // Can use DPT-001 style externally
+  name          String   @unique
+  hod           String
+  hodEmail      String?
+  employeeCount Int      @default(0)
+  status        String   @default("Active")
+  description   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  employees Employee[]
+}
+
+model Employee {
+  id           String   @id @default(uuid()) // EMP-IT-001 style
+  name         String
+  email        String   @unique
+  role         String
+  status       String   @default("Active")
+  departmentId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  department Department @relation(fields: [departmentId], references: [id])
+  assets     Asset[]
+}
+
+model Asset {
+  id           String    @id @default(uuid())
+  name         String
+  category     String
+  serialNumber String    @unique
+  purchaseDate DateTime
+  warranty     Int       // In months
+  status       String    @default("Available")
+  employeeId   String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  assignedTo Employee? @relation(fields: [employeeId], references: [id])
+}
+
+model Ticket {
+  id               String   @id @default(uuid())
+  subject          String
+  raisedByDept     String
+  assignedToDept   String
+  handlerName      String?
+  status           String   @default("Pending")
+  priority         String   @default("Medium")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

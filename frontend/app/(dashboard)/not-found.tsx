@@ -1,31 +1,11 @@
-import { notFound } from "next/navigation";
+import { Construction, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
-interface CatchAllPageProps {
-  params: Promise<{
-    slug: string[];
-  }>;
-}
-
-export default async function CatchAllPage(props: CatchAllPageProps) {
-  const params = await props.params;
-  const firstSegment = params.slug?.[0];
-  
-  // List of implemented routes that should NOT trigger this page
-  const implementedRoutes = [
-    "dashboard",
-    "sub-admins",
-  ];
-  
-  // If trying to access an implemented route, return 404 to let Next.js find the specific page
-  if (implementedRoutes.includes(firstSegment)) {
-    notFound();
-  }
-
-  // For unimplemented routes, show coming soon
+export default function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
       <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-[var(--brand-primary-light)]">
-        <span className="text-4xl">🚀</span>
+        <Construction className="h-12 w-12 text-[var(--brand-primary)]" />
       </div>
       
       <h1 className="text-3xl font-extrabold text-foreground mb-3">
@@ -36,12 +16,13 @@ export default async function CatchAllPage(props: CatchAllPageProps) {
         We are actively working on this module. This feature will be available in the upcoming release of the DR IT GROUP platform.
       </p>
 
-      <a 
+      <Link 
         href="/dashboard"
         className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-primary)] px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-[var(--brand-primary)]/90 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-900/20"
       >
-        ← Back to Dashboard
-      </a>
+        <ArrowLeft className="h-4 w-4" />
+        Back to Dashboard
+      </Link>
     </div>
   );
 }
