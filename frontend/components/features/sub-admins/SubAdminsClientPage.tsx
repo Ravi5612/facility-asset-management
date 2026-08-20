@@ -66,6 +66,7 @@ export function SubAdminsClientPage() {
         email: formData.email,
         password: formData.password || "",
         departmentIds: formData.departments,
+        profileImage: formData.profileImage,
       });
     }
   };
