@@ -1,11 +1,15 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSubAdminDto } from './dto/create-sub-admin.dto';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private cloudinary: CloudinaryService
+  ) {}
 
   // ─── Get My Departments (for Sub Admin) ─────────────────────────────────────
   async getMyDepartments(userId: string, organizationId: string) {
@@ -21,13 +25,29 @@ export class UsersService {
   }
 
   // ─── Create Sub Admin ───────────────────────────────────────────────────────
-  async createSubAdmin(dto: CreateSubAdminDto, createdById: string, organizationId: string) {
+  async createSubAdmin(
+    dto: CreateSubAdminDto, 
+    createdById: string, 
+    organizationId: string,
+    profileImageFile?: Express.Multer.File
+  ) {
     // Check if email already exists
     const existing = await this.prisma.user.findFirst({
       where: { email: dto.email },
     });
     if (existing) {
       throw new ConflictException('A user with this email already exists');
+    }
+
+    // Upload image to Cloudinary if provided
+    let profileImageUrl = null;
+    if (profileImageFile) {
+      try {
+        const uploadResult = await this.cloudinary.uploadImage(profileImageFile);
+        profileImageUrl = uploadResult.secure_url;
+      } catch (error) {
+        console.error('Image upload failed:', error);
+      }
     }
 
     // Get or create SUB_ADMIN role
@@ -117,6 +137,7 @@ export class UsersService {
             accessibleDepartments: true,
             status: true,
             createdAt: true,
+            profileImage: true,
           },
         },
       },
@@ -131,6 +152,7 @@ export class UsersService {
       status: ur.user.status,
       role: 'SUB_ADMIN',
       createdAt: ur.user.createdAt,
+      profileImage: ur.user.profileImage,
     }));
   }
 

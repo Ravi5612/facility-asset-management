@@ -7,9 +7,10 @@ import { UsersModule } from './users/users.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { AssetsModule } from './assets/assets.module';
 import { TicketsModule } from './tickets/tickets.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, DepartmentsModule, AssetsModule, TicketsModule],
+  imports: [PrismaModule, AuthModule, UsersModule, DepartmentsModule, AssetsModule, TicketsModule, CloudinaryModule],
   controllers: [AppController],
   providers: [AppService],
 })

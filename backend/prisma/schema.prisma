@@ -187,6 +187,7 @@ model User {
   departmentName String? // Which department this HOD belongs to
   accessibleDepartments String[] @default([]) // Added for Sub-Admin multiple departments
   designation  String? // Added for employee designation
+  profileImage String? // Cloudinary URL for profile picture
   email        String
   passwordHash String
   status       UserStatus @default(ACTIVE)

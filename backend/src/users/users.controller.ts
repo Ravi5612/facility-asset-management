@@ -10,7 +10,10 @@ import {
   Req,
   HttpCode,
   HttpStatus,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
 import { UsersService } from './users.service';
 import { CreateSubAdminDto } from './dto/create-sub-admin.dto';
@@ -34,10 +37,15 @@ export class UsersController {
   // POST /users/sub-admins → Only SUPER_ADMIN can create
   @Post('sub-admins')
   @Roles('SUPER_ADMIN')
+  @UseInterceptors(FileInterceptor('profileImage'))
   @HttpCode(HttpStatus.CREATED)
-  createSubAdmin(@Body() dto: CreateSubAdminDto, @Req() req: Request) {
+  createSubAdmin(
+    @Body() dto: CreateSubAdminDto,
+    @Req() req: Request,
+    @UploadedFile() profileImage?: Express.Multer.File,
+  ) {
     const user = req['user'] as { userId: string; organizationId: string };
-    return this.usersService.createSubAdmin(dto, user.userId, user.organizationId);
+    return this.usersService.createSubAdmin(dto, user.userId, user.organizationId, profileImage);
   }
 
   // GET /users/sub-admins  → Only SUPER_ADMIN

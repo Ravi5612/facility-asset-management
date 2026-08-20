@@ -39,12 +39,21 @@ export const subAdminApiService = {
     email: string;
     password: string;
     departmentIds: string[];
+    profileImage?: File | null;
   }): Promise<SubAdminUser> {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+    data.departmentIds.forEach((id) => formData.append("departmentIds", id));
+    if (data.profileImage) {
+      formData.append("profileImage", data.profileImage);
+    }
+
     const res = await fetch(`${API_URL}/users/sub-admins`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify(data),
+      body: formData,
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
