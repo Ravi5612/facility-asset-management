@@ -11,9 +11,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { UserPlus, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import SubAdminForm from "./SubAdminForm";
 import { SubAdminFormValues } from "@/lib/validations/subadmin";
-import { SubAdmin } from "@/services/subAdmin.service";
+import { SubAdmin } from "@/types";
 
 interface SubAdminModalProps {
   isEdit?: boolean;
@@ -43,7 +44,7 @@ export default function SubAdminModal({
       await onSuccess(data);
       setOpen(false);
     } catch (error) {
-      console.error(error);
+      // Error is handled by the parent component (e.g., setting a global/page error state)
     } finally {
       setIsSubmitting(false);
     }
@@ -59,12 +60,13 @@ export default function SubAdminModal({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       {!isEdit && (
-        <DialogTrigger asChild>
-          <button className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-primary)] px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-[var(--brand-primary)]/90 hover:shadow-md">
-            <UserPlus className="h-4 w-4" />
-            Add Sub Admin
-          </button>
-        </DialogTrigger>
+        <DialogTrigger
+          render={
+            <Button className="gap-2 rounded-lg bg-[var(--brand-primary)] text-sm font-semibold text-white hover:bg-[var(--brand-primary)]/90 hover:shadow-md">
+              <UserPlus className="h-4 w-4" /> Add Sub Admin
+            </Button>
+          }
+        />
       )}
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[550px]">
         <DialogHeader>

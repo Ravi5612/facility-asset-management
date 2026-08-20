@@ -1,0 +1,126 @@
+"use client";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
+import { X, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { hodApi } from "@/services/hodApi.service";
+
+const hodFormSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Confirm password is required"),
+  profilePic: z.any().optional(), // We'll just accept a URL or file optionally for now
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+type HodFormValues = z.infer<typeof hodFormSchema>;
+
+interface CreateHodModalProps {
+  departmentName: string;
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+export default function CreateHodModal({ departmentName, onClose, onSuccess }: CreateHodModalProps) {
+  const { register, handleSubmit, formState: { errors } } = useForm<HodFormValues>({
+    resolver: zodResolver(hodFormSchema),
+  });
+
+  const mutation = useMutation({
+    mutationFn: (data: HodFormValues) => hodApi.createHod({ ...data, departmentName }),
+    onSuccess,
+  });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in duration-200">
+      <div className="bg-card w-full max-w-md rounded-xl shadow-xl overflow-hidden flex flex-col">
+        <div className="flex justify-between items-center px-6 py-4 border-b border-border bg-muted/30">
+          <h2 className="text-lg font-bold text-foreground">
+            Create HOD - {departmentName}
+          </h2>
+          <button onClick={onClose} className="p-1 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit((d) => mutation.mutate(d))} className="p-6 space-y-4">
+          {mutation.isError && (
+            <div className="p-3 bg-brand-danger/10 text-brand-danger text-sm rounded-md border border-brand-danger/20">
+              {mutation.error instanceof Error ? mutation.error.message : "Failed to create HOD"}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Full Name</label>
+            <input
+              {...register("name")}
+              placeholder="e.g. John Doe"
+              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+            />
+            {errors.name && <p className="text-xs text-brand-danger mt-1">{errors.name.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Email</label>
+            <input
+              {...register("email")}
+              type="email"
+              placeholder="john@example.com"
+              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+            />
+            {errors.email && <p className="text-xs text-brand-danger mt-1">{errors.email.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Password</label>
+            <input
+              {...register("password")}
+              type="password"
+              placeholder="••••••••"
+              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+            />
+            {errors.password && <p className="text-xs text-brand-danger mt-1">{errors.password.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Confirm Password</label>
+            <input
+              {...register("confirmPassword")}
+              type="password"
+              placeholder="••••••••"
+              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+            />
+            {errors.confirmPassword && <p className="text-xs text-brand-danger mt-1">{errors.confirmPassword.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Profile Picture</label>
+            <input
+              {...register("profilePic")}
+              type="file"
+              accept="image/*"
+              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[var(--brand-primary)]/10 file:text-[var(--brand-primary)] hover:file:bg-[var(--brand-primary)]/20 focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+            />
+            {errors.profilePic && <p className="text-xs text-brand-danger mt-1">{errors.profilePic?.message?.toString()}</p>}
+          </div>
+
+          <div className="pt-4 flex justify-end gap-3">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={mutation.isPending} className="bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] text-white">
+              {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Create HOD
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

@@ -21,24 +21,22 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { ROUTES } from "@/lib/constants";
+
 /* ─── NAV DATA ─── */
 const navItems = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Sub Admins", href: "/dashboard/sub-admins", icon: Shield },
-  { label: "Assets", href: "/dashboard/assets", icon: Package },
-  { label: "Tickets", href: "/dashboard/tickets", icon: Ticket },
-  { label: "Visitors", href: "/dashboard/visitors", icon: UserPlus },
-  { label: "Users", href: "/dashboard/users", icon: Users },
-];
-
-const adminItems = [
-  { label: "Departments", href: "/dashboard/departments", icon: Building2 },
+  { label: "Dashboard", href: ROUTES.DASHBOARD, icon: LayoutDashboard },
+  { label: "Sub Admins", href: ROUTES.SUB_ADMINS, icon: Shield },
+  { label: "Assets", href: ROUTES.ASSETS, icon: Package },
+  { label: "Tickets", href: ROUTES.TICKETS, icon: Ticket },
+  { label: "Visitors", href: "/superadmin/visitors", icon: UserPlus },
+  { label: "Departments", href: "/superadmin/users", icon: Building2 },
 ];
 
 const bottomItems = [
-  { label: "Reports", href: "/dashboard/reports", icon: BarChart2 },
-  { label: "History / Audit Logs", href: "/dashboard/audit-logs", icon: History },
-  { label: "Settings", href: "/dashboard/settings", icon: Settings },
+  { label: "Reports", href: "/superadmin/reports", icon: BarChart2 },
+  { label: "History / Audit Logs", href: "/superadmin/audit-logs", icon: History },
+  { label: "Settings", href: "/superadmin/settings", icon: Settings },
 ];
 
 /* ─── TYPES ─── */
@@ -123,13 +121,9 @@ export function SidebarContent() {
     <>
       {/* Logo */}
       <div className="flex h-20 shrink-0 items-center gap-3 px-5 border-b border-white/10">
-        <Image
-          src="/dr-it-logo.jpg"
-          alt="DR IT GROUP"
-          width={48}
-          height={48}
-          className="rounded-lg object-contain bg-white p-0.5 shrink-0"
-        />
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white">
+          <LayoutDashboard className="h-6 w-6" />
+        </div>
         <div className="min-w-0">
           <p className="text-lg font-extrabold text-white leading-tight truncate tracking-wide">Dr IT GROUP</p>
           <p className="text-[10px] text-white/55 leading-tight uppercase tracking-[0.15em] truncate mt-0.5">
@@ -141,21 +135,11 @@ export function SidebarContent() {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1 custom-scrollbar">
         {/* Main Nav */}
-        {navItems.map((item) => (
-          <NavItem key={item.label} item={item} />
-        ))}
-
-        {/* Administration Section Label */}
-        <div className="pt-5 pb-2">
-          <p className="px-3 text-[10px] font-extrabold uppercase tracking-[0.12em] text-white/40">
-            Administration
-          </p>
+        <div className="space-y-1 mb-2">
+          {navItems.map((item) => (
+            <NavItem key={item.label} item={item} />
+          ))}
         </div>
-
-        {/* Admin Nav */}
-        {adminItems.map((item) => (
-          <NavItem key={item.label} item={item} />
-        ))}
 
         {/* Bottom Nav */}
         <div className="pt-3 space-y-0.5">

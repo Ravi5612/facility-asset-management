@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginSchema, LoginFormData } from "@/lib/validations/auth";
 import { authService } from "@/services/auth.service";
+import { ErrorAlert } from "@/components/ui/alert-box";
 import { cn } from "@/lib/utils";
 
 export default function LoginForm() {
@@ -42,10 +43,25 @@ export default function LoginForm() {
     try {
       const response = await authService.login(data);
       if (response.success) {
-        router.push("/dashboard");
+        // Cookie is set by Next.js API route (/api/auth/login) as httpOnly
+        // No localStorage, no document.cookie needed here — Rule #20 ✅
+        // Save user profile for UI (Header) - No secrets/tokens stored here
+        localStorage.setItem("auth_user", JSON.stringify(response.user));
+
+        const role = response.user.role;
+        if (role === "SUB_ADMIN") {
+          router.push("/sub-admin/dashboard");
+        } else if (role === "HOD") {
+          const deptSlug = response.user.departmentName 
+            ? response.user.departmentName.toLowerCase().replace(/\s+/g, '-')
+            : "general";
+          router.push(`/hod/${deptSlug}/dashboard`);
+        } else {
+          router.push("/superadmin");
+        }
       }
-    } catch (err: any) {
-      setError(err.message || "Invalid email or password. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Invalid email or password. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -55,12 +71,8 @@ export default function LoginForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
     
       {/* Error Message */}
-      {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-          <span className="shrink-0">⚠️</span>
-          <span>{error}</span>
-        </div>
-      )}
+      {/* Error Message */}
+      {error && <ErrorAlert message={error} />}
 
       {/* Email Field */}
       <div className="space-y-1.5">
@@ -113,6 +125,7 @@ export default function LoginForm() {
             onClick={() => setShowPassword(!showPassword)}
             disabled={isLoading}
             className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+            aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>

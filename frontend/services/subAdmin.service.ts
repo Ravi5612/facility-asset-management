@@ -1,14 +1,4 @@
-export interface SubAdmin {
-  id: string;
-  name: string;
-  email: string;
-  status: "Active" | "Inactive";
-  departments: string[];
-  createdAt: string;
-  profileImage?: string;
-  assignedAssets: number;
-}
-
+import { SubAdmin } from "@/types";
 // Initial Mock Data
 let mockSubAdmins: SubAdmin[] = [
   {

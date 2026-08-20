@@ -14,8 +14,8 @@ export function SummaryCard({
   label,
   value,
   icon,
-  iconClassName = "bg-blue-100 text-blue-600",
-  lineClassName = "bg-blue-500",
+  iconClassName = "bg-brand-primary-light text-brand-primary",
+  lineClassName = "bg-brand-primary",
   className,
 }: SummaryCardProps) {
   return (
@@ -29,8 +29,8 @@ export function SummaryCard({
       <div className={cn("inline-flex h-12 w-12 items-center justify-center rounded-full text-xl", iconClassName)}>
         {icon}
       </div>
-      <p className="mt-5 text-3xl font-extrabold text-slate-800">{value}</p>
-      <p className="mt-2.5 text-sm font-semibold text-slate-600">{label}</p>
+      <p className="mt-5 text-3xl font-extrabold text-foreground">{value}</p>
+      <p className="mt-2.5 text-sm font-semibold text-muted-foreground">{label}</p>
     </div>
   );
 }

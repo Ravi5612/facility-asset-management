@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Upload, Eye, EyeOff } from "lucide-react";
+import { Check, ChevronsUpDown, Loader2, Upload, Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { subAdminSchema, SubAdminFormValues } from "@/lib/validations/subadmin";
+import { createSubAdminSchema, updateSubAdminSchema, SubAdminFormValues } from "@/lib/validations/subadmin";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { SubAdmin } from "@/services/subAdmin.service";
-
-const AVAILABLE_DEPARTMENTS = ["IT", "HR", "Finance", "Operations", "Security"];
+import { SubAdmin } from "@/types";
+import { useQuery } from "@tanstack/react-query";
+import { departmentService } from "@/services/department.service";
 
 interface SubAdminFormProps {
   onSubmit: (data: SubAdminFormValues) => void;
@@ -25,6 +26,13 @@ export default function SubAdminForm({
 }: SubAdminFormProps) {
   const isEditMode = !!initialData;
 
+  const { data: departmentsData, isLoading: isLoadingDepartments } = useQuery({
+    queryKey: ["departments"],
+    queryFn: departmentService.getDepartments,
+  });
+
+  const AVAILABLE_DEPARTMENTS = departmentsData?.map(d => d.name) || [];
+
   const {
     register,
     handleSubmit,
@@ -32,39 +40,29 @@ export default function SubAdminForm({
     setError,
     clearErrors,
     watch,
-    reset,
     formState: { errors },
   } = useForm<SubAdminFormValues>({
-    resolver: zodResolver(subAdminSchema),
-    defaultValues: {
-      departments: initialData?.departments || [],
-      status: initialData?.status || "Active",
-      name: initialData?.name || "",
-      email: initialData?.email || "",
-      profileImage: initialData?.profileImage || undefined,
+    resolver: zodResolver(isEditMode ? updateSubAdminSchema : createSubAdminSchema),
+    values: initialData ? {
+      name: initialData.name,
+      email: initialData.email,
+      status: initialData.status,
+      departments: initialData.departments,
+      profileImage: initialData.profileImage,
+    } : {
+      name: "",
+      email: "",
+      status: "Active",
+      departments: [],
     },
   });
 
   const [imagePreview, setImagePreview] = useState<string | null>(
     initialData?.profileImage || null
   );
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  useEffect(() => {
-    if (initialData) {
-      reset({
-        name: initialData.name,
-        email: initialData.email,
-        departments: initialData.departments,
-        status: initialData.status,
-        profileImage: initialData.profileImage,
-      });
-      if (initialData.profileImage) {
-        setImagePreview(initialData.profileImage);
-      }
-    }
-  }, [initialData, reset]);
 
   const selectedDepartments = watch("departments");
   const selectedStatus = watch("status");
@@ -100,7 +98,7 @@ export default function SubAdminForm({
       <div className="flex flex-col items-center justify-center space-y-3 pb-2">
         <div className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-muted-foreground/25 bg-muted transition-all hover:bg-muted/80">
           {imagePreview ? (
-            <img src={imagePreview} alt="Profile" className="h-full w-full object-cover" />
+            <Image src={imagePreview} alt="Profile" fill className="object-cover" sizes="96px" />
           ) : (
             <Upload className="h-8 w-8 text-muted-foreground/50" />
           )}
@@ -127,7 +125,7 @@ export default function SubAdminForm({
           disabled={isLoading}
         />
         {errors.name && (
-          <p className="text-xs text-red-500 font-medium">{errors.name.message}</p>
+          <p className="text-xs text-brand-danger font-medium">{errors.name.message}</p>
         )}
       </div>
 
@@ -141,7 +139,7 @@ export default function SubAdminForm({
           disabled={isLoading || isEditMode}
         />
         {errors.email && (
-          <p className="text-xs text-red-500 font-medium">{errors.email.message}</p>
+          <p className="text-xs text-brand-danger font-medium">{errors.email.message}</p>
         )}
       </div>
 
@@ -162,12 +160,13 @@ export default function SubAdminForm({
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-xs text-red-500 font-medium">{errors.password.message}</p>
+              <p className="text-xs text-brand-danger font-medium">{errors.password.message}</p>
             )}
           </div>
           <div className="space-y-2">
@@ -196,12 +195,13 @@ export default function SubAdminForm({
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
               >
                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
             {errors.confirmPassword && (
-              <p className="text-xs text-red-500 font-medium">{errors.confirmPassword.message}</p>
+              <p className="text-xs text-brand-danger font-medium">{errors.confirmPassword.message}</p>
             )}
           </div>
         </div>
@@ -213,41 +213,52 @@ export default function SubAdminForm({
           <select
             id="status"
             value={selectedStatus}
-            onChange={(e) => setValue("status", e.target.value as "Active" | "Suspend")}
+            onChange={(e) => setValue("status", e.target.value as "Active" | "Inactive")}
+            className="w-full px-3 py-2 border border-input rounded-md bg-background"
             disabled={isLoading}
-            className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >
             <option value="Active">Active</option>
-            <option value="Suspend">Suspend</option>
+            <option value="Inactive">Inactive</option>
           </select>
           {errors.status && (
-            <p className="text-xs text-red-500 font-medium">{errors.status.message}</p>
+            <p className="text-xs text-brand-danger font-medium">{errors.status.message}</p>
           )}
         </div>
       )}
 
       <div className="space-y-3 pt-2">
         <Label>Department Access *</Label>
-        <div className="grid grid-cols-2 gap-3">
-          {AVAILABLE_DEPARTMENTS.map((dept) => (
-            <div key={dept} className="flex items-center space-x-2">
-              <Checkbox
-                id={`dept-${dept}`}
-                checked={selectedDepartments.includes(dept)}
-                onCheckedChange={() => toggleDepartment(dept)}
-                disabled={isLoading}
-              />
-              <Label
-                htmlFor={`dept-${dept}`}
-                className="text-sm font-normal cursor-pointer leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                {dept}
-              </Label>
-            </div>
-          ))}
-        </div>
+        {isLoadingDepartments ? (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading departments...
+          </div>
+        ) : AVAILABLE_DEPARTMENTS.length === 0 ? (
+          <p className="text-sm text-muted-foreground italic bg-muted/30 p-3 rounded-md border">
+            No departments found. Super Admin needs to create departments first.
+          </p>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            {AVAILABLE_DEPARTMENTS.map((dept) => (
+              <div key={dept} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`dept-${dept}`}
+                  checked={selectedDepartments.includes(dept)}
+                  onCheckedChange={() => toggleDepartment(dept)}
+                  disabled={isLoading}
+                />
+                <Label
+                  htmlFor={`dept-${dept}`}
+                  className="text-sm font-normal cursor-pointer leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {dept}
+                </Label>
+              </div>
+            ))}
+          </div>
+        )}
         {errors.departments && (
-          <p className="text-xs text-red-500 font-medium">{errors.departments.message}</p>
+          <p className="text-xs text-brand-danger font-medium">{errors.departments.message}</p>
         )}
       </div>
     </form>
