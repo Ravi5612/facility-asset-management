@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3001";
 
-async function handleProxy(request: NextRequest, { params }: { params: { path: string[] } }) {
+async function handleProxy(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   try {
     const { path } = await params;
     const urlPath = path.join("/");
