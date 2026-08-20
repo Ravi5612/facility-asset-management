@@ -1,4 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength, IsArray, ArrayMinSize } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateSubAdminDto {
   @IsString()
@@ -14,6 +15,11 @@ export class CreateSubAdminDto {
   @MinLength(8, { message: 'Password must be at least 8 characters' })
   password: string;
 
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') return [value];
+    return value;
+  })
   @IsArray({ message: 'Departments must be an array' })
   @ArrayMinSize(1, { message: 'At least one department must be selected' })
   departmentIds: string[];

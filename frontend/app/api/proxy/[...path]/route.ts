@@ -26,7 +26,9 @@ async function handleProxy(request: NextRequest, { params }: { params: Promise<{
     };
 
     if (request.method !== "GET" && request.method !== "HEAD") {
-      init.body = await request.text();
+      init.body = request.body;
+      // @ts-ignore
+      init.duplex = "half"; // Required for Node.js fetch when streaming body
     }
 
     const response = await fetch(targetUrl, init);
