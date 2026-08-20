@@ -31,6 +31,7 @@ export function SubAdminsClientPage() {
     departments: u.departments || [],
     createdAt: u.createdAt,
     assignedAssets: u.assignedAssets || 0,
+    profileImage: u.profileImage || undefined,
   }));
 
   // ── 2. Mutations ──────────────────────────────────────────────────────────
