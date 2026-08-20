@@ -10,7 +10,8 @@ export class CloudinaryService {
         { folder: 'facility_assets' },
         (error, result) => {
           if (error) return reject(error);
-          resolve(result);
+          if (result) return resolve(result);
+          reject(new Error('Unknown upload error'));
         },
       );
       streamifier.createReadStream(file.buffer).pipe(uploadStream);
