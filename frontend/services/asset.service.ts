@@ -4,7 +4,7 @@ import { AssetCategoryArraySchema } from "@/lib/validations/asset";
 export const assetService = {
   async getCategories(): Promise<AssetCategory[]> {
     const isServer = typeof window === "undefined";
-    const baseUrl = isServer ? (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000") : "";
+    const baseUrl = isServer ? (process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")) : "";
     
     let fetchHeaders: any = {};
     if (isServer) {
@@ -30,7 +30,7 @@ export const assetService = {
 
   async getDepartmentAssets(): Promise<any[]> {
     const isServer = typeof window === "undefined";
-    const baseUrl = isServer ? (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000") : "";
+    const baseUrl = isServer ? (process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")) : "";
     
     let fetchHeaders: any = {};
     if (isServer) {
