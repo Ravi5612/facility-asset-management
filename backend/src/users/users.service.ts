@@ -89,6 +89,7 @@ export class UsersService {
         passwordHash,
         status: 'ACTIVE',
         createdById,
+        profileImage: profileImageUrl,
       },
     });
 
@@ -110,6 +111,7 @@ export class UsersService {
       status: 'ACTIVE',
       departments: user.accessibleDepartments,
       createdAt: user.createdAt,
+      profileImage: user.profileImage,
     };
   }
 
