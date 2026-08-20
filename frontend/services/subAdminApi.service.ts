@@ -13,7 +13,7 @@ export const subAdminSchema = z.object({
   departments: z.array(z.string()).optional().default([]),
   createdAt: z.string(),
   assignedAssets: z.number().optional().default(0),
-  profileImage: z.string().optional(),
+  profileImage: z.string().nullable().optional(),
 });
 
 export const subAdminListSchema = z.array(subAdminSchema);
