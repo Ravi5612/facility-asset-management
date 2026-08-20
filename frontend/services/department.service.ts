@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = "/api/proxy";
 
 // Schema to parse individual department from backend
 export const departmentSchema = z.object({

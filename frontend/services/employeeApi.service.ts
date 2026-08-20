@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = "/api/proxy";
 
 export const employeeSchema = z.object({
   id: z.string(),

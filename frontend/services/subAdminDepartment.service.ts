@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = "/api/proxy";
 
 // Rule #19 — Zod schema for API response validation
 export const myDepartmentsSchema = z.object({
