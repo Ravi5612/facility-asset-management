@@ -7,9 +7,14 @@ const cookieParser = require('cookie-parser') as typeof import('cookie-parser');
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS for Frontend (Next.js on port 3000)
+  // Enable CORS for Frontend (Local and Production)
+  const allowedOrigins = ['http://localhost:3000'];
+  if (process.env.FRONTEND_URL) {
+    allowedOrigins.push(process.env.FRONTEND_URL);
+  }
+
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: allowedOrigins,
     credentials: true, // Allow cookies
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
