@@ -53,17 +53,17 @@ export default function SubAdminTable({ data, onEdit, onDelete, onToggleStatus }
             <TableRow key={admin.id} className="hover:bg-muted/50 transition-colors border-b">
               <TableCell>
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-primary-light relative border">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-primary-light relative border">
                     {admin.profileImage ? (
                       <Image
                         src={admin.profileImage}
                         alt={admin.name}
                         fill
                         className="object-cover"
-                        sizes="36px"
+                        sizes="48px"
                       />
                     ) : (
-                      <span className="text-xs font-bold text-brand-primary">
+                      <span className="text-base font-bold text-brand-primary">
                         {admin.name.charAt(0).toUpperCase()}
                       </span>
                     )}
