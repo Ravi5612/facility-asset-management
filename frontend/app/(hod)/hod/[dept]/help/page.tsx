@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { HelpCircle, Mail, BookOpen, Ticket, Clock, Activity, CheckCircle2, PlusCircle } from "lucide-react";
 import { SummaryCard } from "@/components/ui/summary-card";
