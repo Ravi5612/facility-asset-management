@@ -29,14 +29,14 @@ const navItems = [
   { label: "Sub Admins", href: ROUTES.SUB_ADMINS, icon: Shield },
   { label: "Assets", href: ROUTES.ASSETS, icon: Package },
   { label: "Tickets", href: ROUTES.TICKETS, icon: Ticket },
-  { label: "Visitors", href: "/superadmin/visitors", icon: UserPlus },
-  { label: "Departments", href: "/superadmin/departments", icon: Building2 },
+  { label: "Visitors", href: ROUTES.VISITORS, icon: UserPlus },
+  { label: "Departments", href: ROUTES.DEPARTMENTS, icon: Building2 },
 ];
 
 const bottomItems = [
-  { label: "Reports", href: "/superadmin/reports", icon: BarChart2 },
-  { label: "History / Audit Logs", href: "/superadmin/audit-logs", icon: History },
-  { label: "Settings", href: "/superadmin/settings", icon: Settings },
+  { label: "Reports", href: ROUTES.REPORTS, icon: BarChart2 },
+  { label: "History / Audit Logs", href: ROUTES.AUDIT_LOGS, icon: History },
+  { label: "Settings", href: ROUTES.SETTINGS, icon: Settings },
 ];
 
 /* ─── TYPES ─── */

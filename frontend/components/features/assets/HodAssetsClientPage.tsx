@@ -10,7 +10,7 @@ import { AssignAssetModal } from "@/components/features/assets/AssignAssetModal"
 import { Button } from "@/components/ui/button";
 import { UserPlus } from "lucide-react";
 
-export function HodAssetsClientPage({ initialAssets }: { initialAssets: any[] }) {
+export function HodAssetsClientPage({ initialAssets }: { initialAssets: Record<string, unknown>[] }) {
   const [search, setSearch] = useState("");
   const [selectedAsset, setSelectedAsset] = useState<{ id: string; name: string } | null>(null);
 

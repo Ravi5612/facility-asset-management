@@ -47,3 +47,51 @@ Koi bhi developer apne tareeqe se folder ya component nahi banayega. Yeh structu
 33. **Strict Typing:** TypeScript use karo; `any` keyword bilkul allow nahi hai.
 34. **Accessibility (a11y):** Semantic HTML, keyboard navigation, proper labels, aur focus states follow karo. `<div>` ko unnecessarily clickable element mat banao.
 35. **Accessibility & SEO:** Public pages mein proper metadata, heading hierarchy, alt text aur accessible forms maintain karo.
+
+## 🚫 No Business Logic on Frontend (STRICT RULE)
+36. **Frontend Sirf UI Hai — Kuch Nahi:** Frontend ka ek hi kaam hai — data dikhana aur user ke actions ko backend tak pohunchana. Frontend ek **dumb display layer** hai. Yeh rule sabse important hai aur isko kabhi break nahi kiya jayega.
+
+37. **Business Logic Backend Ka Kaam Hai:** Koi bhi calculation, decision, permission check, pricing logic, discount calculation, role-based access control (RBAC), data transformation ya business rule **sirf NestJS Backend mein likhni hai**. Frontend mein yeh sab likhna **strictly forbidden** hai.
+    - ❌ **Galat:** `if (user.role === 'admin' && asset.price > 10000) { showDiscount() }`
+    - ✅ **Sahi:** Backend se `{ showDiscount: true }` receive karo aur sirf condition-free render karo.
+
+38. **Frontend Validation ≠ Business Validation:** Frontend par Zod/form validation sirf **UX ke liye** hai (e.g., "email field empty hai"). Yeh kabhi backend business validation ki jagah nahi legi. Actual rules hamesha backend enforce karega.
+
+39. **No Data Calculation on Frontend:** Totals, averages, summaries, asset valuations — koi bhi number crunch karna backend ka kaam hai. Frontend sirf backend ka diya hua number display karega.
+
+40. **No Permission Logic on Frontend:** `user.permissions.includes('can_delete')` jaisa check frontend mein **UI hide/show ke liye** kar sakte ho, lekin actual enforcement backend karega. Frontend ka permission check sirf cosmetic hai — security ke liye kabhi rely mat karo.
+
+---
+
+## 🧱 Component & Code Structure
+41. **Component Props Typing:** Har component ke liye explicit `interface` ya `type` likho. Inline anonymous types ya `any` props bilkul allow nahi.
+
+42. **No Magic Numbers/Strings:** Code mein seedha `7`, `"admin"`, `"dashboard"` likhna band karo. Sab kuch named constants (`lib/constants.ts`) mein rakho.
+
+43. **Custom Hook for Complex Logic:** Agar component mein zyada logic aa rahi hai, use custom hook mein extract karo (e.g., `useTicketFilters`, `useAssetForm`).
+
+44. **Avoid Prop Drilling (3+ levels):** Agar prop 3 ya zyada levels tak pass ho rahi hai, to Context ya Redux use karo.
+
+45. **File Size Limit:** Ek file 300 lines se badi nahi honi chahiye. Badi files ko logical sub-files mein split karo.
+
+---
+
+## 🔄 UX & Reliability
+46. **Optimistic UI Updates:** TanStack Query ke saath `onMutate` callback use karke optimistic updates implement karo — better UX ke liye jahan suitable ho.
+
+47. **Error Boundaries:** Feature-level components ko `<ErrorBoundary>` mein wrap karo taaki ek component crash hone par poora page na tute.
+
+48. **Date/Time Handling:** Date manipulation ke liye seedha `new Date()` mat use karo. `date-fns` ya similar lightweight library use karo.
+
+---
+
+## ✅ Developer Checklist (PR se Pehle)
+49. **Consistent Export Style:** Component files mein `default export`; utility/helper files mein `named exports` use karo.
+
+50. **PR Checklist:** Code push karne se pehle mentally check karo:
+    - [ ] Koi `console.log` nahi
+    - [ ] Koi `any` type nahi
+    - [ ] Loading, Error, Empty states handle hain
+    - [ ] Koi business logic frontend mein nahi likhi
+    - [ ] Constants file mein hain, hardcoded nahi
+    - [ ] Props properly typed hain

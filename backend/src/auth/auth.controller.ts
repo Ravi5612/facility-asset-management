@@ -45,7 +45,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
-      path: '/auth',
+      path: '/',
     });
 
     return {
@@ -79,6 +79,7 @@ export class AuthController {
         accessibleDepartments: true,
         organizationId: true,
         status: true,
+        organization: { select: { themeColor: true } },
       }
     });
 
@@ -86,7 +87,8 @@ export class AuthController {
       success: true,
       user: {
         ...user,
-        role: userPayload.role // from JWT
+        role: userPayload.role, // from JWT
+        themeColor: user?.organization?.themeColor || "blue"
       },
     };
   }
@@ -99,4 +101,34 @@ export class AuthController {
     await this.authService.verifyPassword(userPayload.userId, password);
     return { success: true };
   }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(@Req() req: Request) {
+    const refreshToken = req.cookies['refresh_token'];
+    
+    if (!refreshToken) {
+      return { success: false, message: 'No refresh token found' };
+    }
+
+    const ipAddress = req.ip;
+    const userAgent = req.headers['user-agent'];
+
+    try {
+      const { accessToken, user } = await this.authService.refreshTokens(
+        refreshToken,
+        ipAddress,
+        userAgent,
+      );
+
+      return {
+        success: true,
+        accessToken,
+        user,
+      };
+    } catch (error) {
+      return { success: false, message: 'Invalid refresh token' };
+    }
+  }
+
 }

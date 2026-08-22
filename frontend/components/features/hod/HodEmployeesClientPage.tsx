@@ -31,7 +31,7 @@ export default function HodEmployeesClientPage() {
             }
           }
         }
-      } catch (e) {}
+      } catch (e) { console.error("Error occurred:", e); }
 
       // 2. Always fetch fresh profile to be safe (in case localStorage is stale)
       try {
@@ -57,7 +57,7 @@ export default function HodEmployeesClientPage() {
             setIsHr(false); // Make sure it's correct
           }
         }
-      } catch (e) {}
+      } catch (e) { console.error("Error occurred:", e); }
     }
 
     checkHrStatus();

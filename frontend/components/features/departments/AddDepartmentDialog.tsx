@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { departmentService } from "@/services/department.service";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -11,7 +13,6 @@ import {
   Dialog, DialogContent, DialogHeader,
   DialogTitle, DialogDescription, DialogTrigger,
 } from "@/components/ui/dialog";
-import { MOCK_API } from "@/lib/constants";
 import { SuccessAlert } from "@/components/ui/alert-box";
 import { AddDepartmentFormSchema, AddDepartmentFormValues } from "@/lib/validations/department";
 import { Spinner } from "@/components/ui/spinner";
@@ -19,8 +20,7 @@ import { Spinner } from "@/components/ui/spinner";
 
 export function AddDepartmentDialog() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+    const [success, setSuccess] = useState(false);
 
   const {
     register,
@@ -31,14 +31,24 @@ export function AddDepartmentDialog() {
     resolver: zodResolver(AddDepartmentFormSchema),
   });
 
-  const onSubmit = (data: AddDepartmentFormValues) => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: (data: AddDepartmentFormValues) => departmentService.createDepartment({
+      name: data.departmentName,
+      code: data.departmentCode,
+      description: data.description,
+      image: undefined // Wait, does the form handle image? We'll see.
+    }),
+    onSuccess: () => {
       setSuccess(true);
       reset();
+      queryClient.invalidateQueries({ queryKey: ["departments"] });
       setTimeout(() => { setSuccess(false); setIsOpen(false); }, 2000);
-    }, MOCK_API.DELAY_NORMAL);
+    }
+  });
+
+  const onSubmit = (data: AddDepartmentFormValues) => {
+    mutation.mutate(data);
   };
 
   return (
@@ -61,43 +71,43 @@ export function AddDepartmentDialog() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
           <div className="space-y-2">
             <Label htmlFor="deptName">Department Name *</Label>
-            <Input id="deptName" placeholder="e.g. Design Team" disabled={isLoading} {...register("deptName")} />
+            <Input id="deptName" placeholder="e.g. Design Team" disabled={mutation.isPending} {...register("deptName")} />
             {errors.deptName && <p className="text-xs text-brand-danger mt-1">{errors.deptName.message}</p>}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="hodName">HOD Name *</Label>
-              <Input id="hodName" placeholder="e.g. John Doe" disabled={isLoading} {...register("hodName")} />
+              <Input id="hodName" placeholder="e.g. John Doe" disabled={mutation.isPending} {...register("hodName")} />
               {errors.hodName && <p className="text-xs text-brand-danger mt-1">{errors.hodName.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="hodEmail">HOD Email *</Label>
-              <Input id="hodEmail" type="email" placeholder="john@company.com" disabled={isLoading} {...register("hodEmail")} />
+              <Input id="hodEmail" type="email" placeholder="john@company.com" disabled={mutation.isPending} {...register("hodEmail")} />
               {errors.hodEmail && <p className="text-xs text-brand-danger mt-1">{errors.hodEmail.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="hodPassword">Password *</Label>
-              <Input id="hodPassword" type="password" placeholder="••••••••" disabled={isLoading} {...register("hodPassword")} />
+              <Input id="hodPassword" type="password" placeholder="••••••••" disabled={mutation.isPending} {...register("hodPassword")} />
               {errors.hodPassword && <p className="text-xs text-brand-danger mt-1">{errors.hodPassword.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="hodConfirmPassword">Confirm Password *</Label>
-              <Input id="hodConfirmPassword" type="password" placeholder="••••••••" disabled={isLoading} {...register("hodConfirmPassword")} />
+              <Input id="hodConfirmPassword" type="password" placeholder="••••••••" disabled={mutation.isPending} {...register("hodConfirmPassword")} />
               {errors.hodConfirmPassword && <p className="text-xs text-brand-danger mt-1">{errors.hodConfirmPassword.message}</p>}
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
-            <textarea id="description" rows={3} disabled={isLoading}
+            <textarea id="description" rows={3} disabled={mutation.isPending}
               placeholder="Brief description of the department's role..."
               className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
               {...register("description")} />
           </div>
           {success && <SuccessAlert message="Department added successfully!" />}
           <div className="pt-4 flex justify-end gap-3 border-t">
-            <Button type="button" variant="ghost" onClick={() => setIsOpen(false)} disabled={isLoading}>Cancel</Button>
-            <Button type="submit" disabled={isLoading} className="bg-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/90 text-white">
-              {isLoading ? <><Spinner size="xs" className="mr-2" />Saving...</> : <><PlusCircle className="mr-2 h-4 w-4" />Save Department</>}
+            <Button type="button" variant="ghost" onClick={() => setIsOpen(false)} disabled={mutation.isPending}>Cancel</Button>
+            <Button type="submit" disabled={mutation.isPending} className="bg-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/90 text-white">
+              {mutation.isPending ? <><Spinner size="xs" className="mr-2" />Saving...</> : <><PlusCircle className="mr-2 h-4 w-4" />Save Department</>}
             </Button>
           </div>
         </form>

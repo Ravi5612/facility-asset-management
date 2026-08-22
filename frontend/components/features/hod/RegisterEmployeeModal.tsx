@@ -21,7 +21,7 @@ const employeeFormSchema = z.object({
   confirmPassword: z.string(),
   departmentName: z.string().min(1, "Department is required"),
   designation: z.string().min(2, "Designation is required"),
-  profilePic: z.any().optional(), // Can handle File or base64 later
+  profilePic: z.unknown().optional(), // Can handle File or base64 later
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -102,7 +102,7 @@ export default function RegisterEmployeeModal({ onClose, onSuccess }: RegisterEm
                 }}
                 onRemove={() => {
                   setImagePreview(null);
-                  setValue("profilePic", undefined as any);
+                  setValue("profilePic", undefined);
                 }}
                 label="Profile Picture (Optional)"
               />

@@ -19,6 +19,7 @@ const backendLoginSchema = z.object({
     organizationId: z.string(),
     role: z.string(),
     departmentName: z.string().optional().nullable(),
+    themeColor: z.string().optional(),
   }),
 });
 
@@ -61,13 +62,28 @@ export async function POST(request: NextRequest) {
 
     const { accessToken, user } = validated.data;
 
-    // 4. Set access token in httpOnly cookie (Rule #20)
-    // NO localStorage, NO document.cookie in client code
     const response = NextResponse.json({
       success: true,
-      user, // Return safe user data (no token in body)
+      user,
     });
 
+    // Forward the refresh_token cookie from NestJS to the Next.js response
+    if (backendRes.headers.getSetCookie) {
+      const setCookies = backendRes.headers.getSetCookie();
+      setCookies.forEach((cookieStr) => {
+        response.headers.append("Set-Cookie", cookieStr);
+      });
+    } else {
+      const rawCookie = backendRes.headers.get('set-cookie');
+      if (rawCookie) {
+        response.headers.append("Set-Cookie", rawCookie);
+      }
+    }
+
+    // Set access token in httpOnly cookie
+    if (user.themeColor) {
+      response.cookies.set("app-theme-color", user.themeColor, { path: "/", maxAge: 365 * 24 * 60 * 60 });
+    }
     response.cookies.set("auth_token", accessToken, {
       httpOnly: true,       // JS cannot read this — XSS safe ✅
       secure: process.env.NODE_ENV === "production",

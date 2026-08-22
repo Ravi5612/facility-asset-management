@@ -1,12 +1,22 @@
 import { AssetCategory } from "@/types";
 import { AssetCategoryArraySchema } from "@/lib/validations/asset";
 
+export interface CreateAssetPayload {
+  assetName: string;
+  categoryId: string;
+  departmentId: string;
+  serialNumber: string;
+  purchaseDate?: string;
+  warrantyExpiry?: string;
+  notes?: string;
+}
+
 export const assetService = {
   async getCategories(): Promise<AssetCategory[]> {
     const isServer = typeof window === "undefined";
-    const baseUrl = isServer ? (process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")) : "";
+    const baseUrl = isServer ? (process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : (process.env.NODE_ENV === "development" ? "http://localhost:3000" : ""))) : "";
     
-    let fetchHeaders: any = {};
+    let fetchHeaders: HeadersInit = {};
     if (isServer) {
       const { cookies } = await import("next/headers");
       const cookieStore = await cookies();
@@ -28,11 +38,11 @@ export const assetService = {
     return data as AssetCategory[];
   },
 
-  async getDepartmentAssets(): Promise<any[]> {
+  async getDepartmentAssets(): Promise<AssetCategory[]> {
     const isServer = typeof window === "undefined";
-    const baseUrl = isServer ? (process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")) : "";
+    const baseUrl = isServer ? (process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : (process.env.NODE_ENV === "development" ? "http://localhost:3000" : ""))) : "";
     
-    let fetchHeaders: any = {};
+    let fetchHeaders: HeadersInit = {};
     if (isServer) {
       const { cookies } = await import("next/headers");
       const cookieStore = await cookies();
@@ -65,7 +75,7 @@ export const assetService = {
     return res.json();
   },
 
-  async createAsset(data: any): Promise<any> {
+  async createAsset(data: CreateAssetPayload): Promise<AssetCategory> {
     const res = await fetch('/api/assets', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -77,7 +87,7 @@ export const assetService = {
     return res.json();
   },
 
-  async assignAsset(assetId: string, employeeId: string, condition?: string, notes?: string): Promise<any> {
+  async assignAsset(assetId: string, employeeId: string, condition?: string, notes?: string): Promise<AssetCategory> {
     const res = await fetch(`/api/assets/${assetId}/assign`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

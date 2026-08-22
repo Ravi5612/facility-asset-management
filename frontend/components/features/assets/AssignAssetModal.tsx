@@ -57,7 +57,7 @@ export function AssignAssetModal({ assetId, assetName, isOpen, setIsOpen }: Assi
         window.location.reload();
       }, 1500);
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       setError(err.message || "Failed to assign asset");
     }
   });
@@ -103,7 +103,7 @@ export function AssignAssetModal({ assetId, assetName, isOpen, setIsOpen }: Assi
               className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="">Select a department</option>
-              {departments.map((dept: any) => (
+              {departments.map((dept: Record<string, unknown>) => (
                 <option key={dept.id} value={dept.id}>
                   {dept.name}
                 </option>
@@ -121,7 +121,7 @@ export function AssignAssetModal({ assetId, assetName, isOpen, setIsOpen }: Assi
               className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="">{departmentId ? "Select an employee" : "Select a department first"}</option>
-              {employees.map((emp: any) => (
+              {employees.map((emp: Record<string, unknown>) => (
                 <option key={emp.id} value={emp.id}>
                   {emp.firstName} {emp.lastName} ({emp.employeeCode})
                 </option>

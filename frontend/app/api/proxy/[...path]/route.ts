@@ -40,7 +40,7 @@ async function handleProxy(request: NextRequest, { params }: { params: Promise<{
         "Content-Type": response.headers.get("Content-Type") || "application/json",
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

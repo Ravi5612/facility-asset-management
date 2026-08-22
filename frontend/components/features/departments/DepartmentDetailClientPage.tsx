@@ -12,7 +12,8 @@ import { EmployeeAssetsModal } from "./EmployeeAssetsModal";
 import { EmployeeAttendanceModal } from "./EmployeeAttendanceModal";
 import { useQuery } from "@tanstack/react-query";
 import { departmentService } from "@/services/department.service";
-import {} from "lucide-react";
+import type { Employee } from "@/types";
+import { EMPLOYEE_STATUS } from "@/lib/constants";
 import { TableSkeleton } from "@/components/ui/skeletons";
 
 
@@ -49,7 +50,7 @@ export function DepartmentDetailClientPage({ departmentId }: { departmentId: str
     );
   }
 
-  const filteredEmployees = department.employees.filter((emp: any) => {
+  const filteredEmployees = department.employees.filter((emp: Employee) => {
     const matchSearch = emp.name?.toLowerCase().includes(search.toLowerCase()) || 
                         emp.email?.toLowerCase().includes(search.toLowerCase()) ||
                         emp.id?.toLowerCase().includes(search.toLowerCase());
@@ -98,7 +99,7 @@ export function DepartmentDetailClientPage({ departmentId }: { departmentId: str
             <div className="bg-card border rounded-lg p-5 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
               <div>
                 <p className="text-sm text-muted-foreground font-semibold mb-1">Active Employees</p>
-                <p className="text-3xl font-bold text-brand-success">{department.employees.filter((e: any) => e.status === "ACTIVE" || e.status === "Active").length}</p>
+                <p className="text-3xl font-bold text-brand-success">{department.employees.filter((e: Employee) => e.status?.toLowerCase() === EMPLOYEE_STATUS.ACTIVE.toLowerCase()).length}</p>
               </div>
               <div className="bg-brand-success/10 text-brand-success p-3.5 rounded-xl border border-brand-success/20">
                 <Users className="h-6 w-6" />
@@ -107,7 +108,7 @@ export function DepartmentDetailClientPage({ departmentId }: { departmentId: str
             <div className="bg-card border rounded-lg p-5 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
               <div>
                 <p className="text-sm text-muted-foreground font-semibold mb-1">Inactive Employees</p>
-                <p className="text-3xl font-bold text-brand-danger">{department.employees.filter((e: any) => e.status === "INACTIVE" || e.status === "Inactive").length}</p>
+                <p className="text-3xl font-bold text-brand-danger">{department.employees.filter((e: Employee) => e.status?.toLowerCase() === EMPLOYEE_STATUS.INACTIVE.toLowerCase()).length}</p>
               </div>
               <div className="bg-brand-danger/10 text-brand-danger p-3.5 rounded-xl border border-brand-danger/20">
                 <UserX className="h-6 w-6" />
@@ -127,10 +128,9 @@ export function DepartmentDetailClientPage({ departmentId }: { departmentId: str
                 />
                 <select value={roleFilter} onChange={e => setRoleFilter(e.target.value)} className="px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none">
                   <option value="All">All Roles</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Developer">Developer</option>
-                  <option value="Designer">Designer</option>
-                  <option value="HR">HR</option>
+                  {Array.from(new Set(department.employees.map((e: Employee) => e.role).filter(Boolean))).map(role => (
+                    <option key={role as string} value={role as string}>{role as string}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -154,7 +154,7 @@ export function DepartmentDetailClientPage({ departmentId }: { departmentId: str
                       </td>
                     </tr>
                   ) : (
-                    filteredEmployees.map((emp: any) => (
+                    filteredEmployees.map((emp: Employee) => (
                       <tr key={emp.id} className="hover:bg-muted/20 transition-colors">
                         <td className="px-4 py-3">
                           <p className="font-bold text-foreground">{emp.name}</p>

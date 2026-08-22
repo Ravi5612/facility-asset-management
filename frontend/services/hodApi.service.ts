@@ -26,7 +26,7 @@ export const hodApi = {
     return z.array(hodSchema).parse(data);
   },
 
-  updateHod: async (id: string, data: Record<string, any>): Promise<void> => { const res = await fetch(`${API_URL}/users/hod/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data), credentials: "include" }); if (!res.ok) throw new Error("Failed to update HOD"); }, createHod: async (data: Record<string, any>): Promise<void> => {
+  updateHod: async (id: string, data: Record<string, unknown>): Promise<void> => { const res = await fetch(`${API_URL}/users/hod/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data), credentials: "include" }); if (!res.ok) throw new Error("Failed to update HOD"); }, createHod: async (data: Record<string, unknown>): Promise<void> => {
     const res = await fetch(`${API_URL}/users/hod`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

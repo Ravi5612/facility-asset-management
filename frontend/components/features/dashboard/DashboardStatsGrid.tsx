@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-export function DashboardStatsGrid({ statsData }: { statsData: any }) {
+export function DashboardStatsGrid({ statsData }: { statsData: Record<string, unknown> }) {
   const stats = [
     { label: "Total Assets",      value: statsData.totalAssets, icon: "📦", color: "bg-brand-primary/10 text-brand-primary", line: "bg-brand-primary", trend: "Total tracked" },
     { label: "Total Users",       value: statsData.totalUsers,   icon: "👥", color: "bg-brand-info/10 text-brand-info",     line: "bg-brand-info",   trend: "Active users" },

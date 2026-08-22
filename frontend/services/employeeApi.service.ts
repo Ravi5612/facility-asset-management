@@ -26,7 +26,7 @@ export const employeeApi = {
     return z.array(employeeSchema).parse(data);
   },
 
-  createEmployee: async (data: Record<string, any>): Promise<void> => {
+  createEmployee: async (data: Record<string, unknown>): Promise<void> => {
     const res = await fetch(`${API_URL}/users/employees`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

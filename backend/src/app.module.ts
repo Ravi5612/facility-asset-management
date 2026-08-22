@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { AttendanceModule } from './attendance/attendance.module';
+import { SettingsModule } from './settings/settings.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -12,7 +14,9 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { EmployeeDashboardModule } from './employee-dashboard/employee-dashboard.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, DepartmentsModule, AssetsModule, TicketsModule, CloudinaryModule, DashboardModule, EmployeeDashboardModule],
+  imports: [
+    AttendanceModule,
+    SettingsModule,PrismaModule, AuthModule, UsersModule, DepartmentsModule, AssetsModule, TicketsModule, CloudinaryModule, DashboardModule, EmployeeDashboardModule],
   controllers: [AppController],
   providers: [AppService],
 })

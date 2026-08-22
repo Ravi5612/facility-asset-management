@@ -1,5 +1,6 @@
 "use client";
 
+import { isPast } from "date-fns";
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +21,6 @@ import {
 import { AssetItem, AssetCategory } from "@/types";
 import { staticAssetsData } from "@/lib/mock-data/assets";
 import { AssetCategoryCard } from "@/components/features/assets/AssetCategoryCard";
-import { MOCK_API } from "@/lib/constants";
 import { SuccessAlert } from "@/components/ui/alert-box";
 import { AddAssetModal } from "@/components/features/assets/AddAssetModal";
 import { AssetDetailModal } from "@/components/features/assets/AssetDetailModal";
@@ -81,18 +81,11 @@ export function AssetsClientPage({ initialCategories, hideAddButton = false }: {
     ...customCategories,
   ], [initialCategories, customCategories]);
 
-  function handleAddCategory() {
-    const trimmed = newCatName.trim();
+  function handleAddCategory(name: string, prefixStr: string) {
+    const trimmed = name.trim();
     if (!trimmed) return;
-    const prefix = newCatPrefix.trim().toUpperCase() || generatePrefix(trimmed);
-    // avoid duplicate
-    if (allCategories.find(c => c.category.toLowerCase() === trimmed.toLowerCase())) {
-      alert("Category already exists!"); return;
-    }
+    const prefix = prefixStr.trim().toUpperCase() || generatePrefix(trimmed);
     setCustomCategories(prev => [...prev, { category: trimmed, name: trimmed, prefix, isCustom: true, items: [] }]);
-    setIsAddCatOpen(false);
-    setNewCatName(""); setNewCatPrefix("");
-    // Auto-select new cat in form
     setSelectedFormCat(trimmed);
   }
 
@@ -103,17 +96,7 @@ export function AssetsClientPage({ initialCategories, hideAddButton = false }: {
     return `${prefix}-${String(count).padStart(3, "0")}`;
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false); setSuccess(true);
-      (e.target as HTMLFormElement).reset();
-      setSelectedFormCat("");
-      setTimeout(() => setSuccess(false), 3000);
-    }, MOCK_API.DELAY_NORMAL);
-  };
-
+  
   const totalAssets   = allCategories.reduce((s, c) => s + c.items.length, 0);
   const totalAssigned = allCategories.reduce((s, c) => s + c.items.filter(i => i.status === "Assigned").length, 0);
   const totalDump     = allCategories.reduce((s, c) => s + c.items.filter(i => i.status === "Dump").length, 0);
@@ -250,7 +233,7 @@ export function AssetsClientPage({ initialCategories, hideAddButton = false }: {
                       <div className="flex items-center gap-3">
                         {item.assignedTo && <p className="text-xs text-muted-foreground hidden sm:block">{item.assignedTo}</p>}
                         <StatusBadge status={item.status} size="sm" />
-                        {item.warrantyExpiry && new Date(item.warrantyExpiry) < new Date() && (
+                        {item.warrantyExpiry && isPast(new Date(item.warrantyExpiry)) && (
                           <Badge variant="secondary" className="text-xs bg-brand-warning/10 text-brand-warning border-0">Warranty ⚠</Badge>
                         )}
                         <Eye className="h-4 w-4 text-muted-foreground" />

@@ -15,18 +15,19 @@ import {
   CalendarDays,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ROUTES } from "@/lib/constants";
 
 const navItems = [
-  { label: "Dashboard", href: "/employee/dashboard", icon: LayoutDashboard },
-  { label: "Attendance", href: "/employee/attendance", icon: CalendarDays },
-  { label: "My Assets", href: "/employee/assets", icon: Package },
-  { label: "My Tickets", href: "/employee/tickets", icon: Ticket },
-  { label: "Salary History", href: "/employee/salary", icon: Wallet },
+  { label: "Dashboard", href: ROUTES.EMPLOYEE_DASHBOARD, icon: LayoutDashboard },
+  { label: "Attendance", href: ROUTES.EMPLOYEE_ATTENDANCE, icon: CalendarDays },
+  { label: "My Assets", href: ROUTES.EMPLOYEE_ASSETS, icon: Package },
+  { label: "My Tickets", href: ROUTES.EMPLOYEE_TICKETS, icon: Ticket },
+  { label: "Salary History", href: ROUTES.EMPLOYEE_SALARY, icon: Wallet },
 ];
 
 const bottomItems = [
-  { label: "My Profile", href: "/employee/profile", icon: User },
-  { label: "Settings", href: "/employee/settings", icon: Settings },
+  { label: "My Profile", href: ROUTES.EMPLOYEE_PROFILE, icon: User },
+  { label: "Settings", href: ROUTES.EMPLOYEE_SETTINGS, icon: Settings },
 ];
 
 export function EmployeeSidebar() {

@@ -9,9 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PlusCircle, FolderPlus } from "lucide-react";
-import { SuccessAlert } from "@/components/ui/alert-box";
+import { SuccessAlert, ErrorAlert } from "@/components/ui/alert-box";
 import { AssetCategory } from "@/types";
-import { MOCK_API } from "@/lib/constants";
+import type { Department } from "@/types";
+
 import {
   AddAssetFormSchema,
   AddAssetFormValues,
@@ -37,6 +38,7 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [isAddCatOpen, setIsAddCatOpen] = useState(false);
+  const [catError, setCatError] = useState<string | null>(null);
 
   // Add Asset Form
   const {
@@ -117,6 +119,13 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
   const onSubmitCategory = (data: AddCategoryFormValues) => {
     const trimmed = data.categoryName.trim();
     if (!trimmed) return;
+    
+    if (allCategories.some(c => c.category.toLowerCase() === trimmed.toLowerCase())) {
+      setCatError("Category already exists!");
+      return;
+    }
+    setCatError(null);
+
     const prefix = (data.prefix || generatePrefix(trimmed)).trim().toUpperCase();
     
     // Fallback UI callback for immediate visual update if needed
@@ -156,7 +165,7 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
                 {...registerAsset("departmentId")}
                 className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="">Select Department</option>
-                {departments.map((d: any) => (
+                {departments.map((d: Department) => (
                   <option key={d.id} value={d.id}>{d.name}</option>
                 ))}
               </select>
@@ -217,6 +226,7 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
                         </div>
                         {catErrors.prefix && <p className="text-xs text-brand-danger">{catErrors.prefix.message}</p>}
                       </div>
+                      {catError && <ErrorAlert message={catError} />}
                       <div className="flex justify-end gap-2 pt-2 border-t">
                         <Button variant="ghost" type="button" onClick={() => setIsAddCatOpen(false)}>Cancel</Button>
                         <Button type="button" onClick={handleSubmitCat(onSubmitCategory)} className="bg-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/90 text-white">

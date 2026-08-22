@@ -22,6 +22,7 @@ export class AuthService {
         userRoles: {
           include: { role: true },
         },
+        organization: { select: { themeColor: true } },
       },
     });
 
@@ -55,7 +56,7 @@ export class AuthService {
     
     // Generate secure random refresh token
     const refreshToken = crypto.randomBytes(40).toString('hex');
-    const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
+    const refreshTokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
 
     // Save refresh token to DB
     const expiresAt = new Date();
@@ -98,4 +99,61 @@ export class AuthService {
     if (!isPasswordValid) throw new UnauthorizedException('Incorrect password');
     return true;
   }
+
+  async refreshTokens(refreshToken: string, ipAddress?: string, userAgent?: string) {
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token missing');
+    }
+
+    const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+
+    const tokenRecord = await this.prisma.refreshToken.findFirst({
+      where: {
+        tokenHash,
+        revokedAt: null,
+        expiresAt: { gt: new Date() }, // Not expired
+      },
+      include: {
+        user: {
+          include: {
+            userRoles: { include: { role: true } },
+            organization: { select: { themeColor: true } },
+          },
+        },
+      },
+    });
+
+    if (!tokenRecord) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    const user = tokenRecord.user;
+
+    if (user.status !== 'ACTIVE') {
+      throw new UnauthorizedException('Account disabled');
+    }
+
+    // Generate new access token
+    const primaryRole = user.userRoles[0]?.role?.name || 'USER';
+    const payload = {
+      sub: user.id,
+      organizationId: user.organizationId,
+      role: primaryRole,
+    };
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+
+    // Optional: Refresh Token Rotation (Revoke old, create new)
+    // For simplicity, we just return a new access token and keep the old refresh token
+    // If you want full rotation:
+    /*
+    await this.prisma.refreshToken.update({
+      where: { id: tokenRecord.id },
+      data: { revokedAt: new Date() },
+    });
+    // Create new refresh token...
+    */
+
+    return { accessToken, user: { ...user, themeColor: user.organization?.themeColor || "blue" } };
+  }
+
 }

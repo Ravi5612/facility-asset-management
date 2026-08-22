@@ -1,5 +1,5 @@
 "use client";
-
+import { isPast } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -43,7 +43,7 @@ export function AssetDetailModal({ selectedItem, setSelectedItem }: AssetDetailM
               { label: "Status", content: <StatusBadge status={selectedItem.status} /> },
               { label: "Assigned To", content: <p className="font-semibold">{selectedItem.assignedTo ?? "Nobody"}</p> },
               { label: "Purchase Date", content: <p className="font-semibold">{selectedItem.purchaseDate}</p> },
-              { label: "Warranty Expiry", content: <p className={`font-semibold ${selectedItem.warrantyExpiry && new Date(selectedItem.warrantyExpiry) < new Date() ? "text-brand-danger" : ""}`}>{selectedItem.warrantyExpiry ? `${selectedItem.warrantyExpiry}${new Date(selectedItem.warrantyExpiry) < new Date() ? " (Expired ⚠)" : " (Valid ✓)"}` : "No Warranty"}</p> },
+              { label: "Warranty Expiry", content: <p className={`font-semibold ${selectedItem.warrantyExpiry && isPast(new Date(selectedItem.warrantyExpiry)) ? "text-brand-danger" : ""}`}>{selectedItem.warrantyExpiry ? `${selectedItem.warrantyExpiry}${isPast(new Date(selectedItem.warrantyExpiry)) ? " (Expired ⚠)" : " (Valid ✓)"}` : "No Warranty"}</p> },
               ...(selectedItem.assignedOn ? [{ label: "Assigned On", content: <p className="font-semibold">{selectedItem.assignedOn}</p> }] : []),
               ...(selectedItem.dumpedOn ? [{ label: "Dumped On", content: <p className="font-semibold text-brand-danger">{selectedItem.dumpedOn}</p> }] : []),
             ].map((field) => (

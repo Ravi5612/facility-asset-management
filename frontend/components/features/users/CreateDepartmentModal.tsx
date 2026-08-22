@@ -7,6 +7,7 @@ import { z } from "zod";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { X, Upload, Building } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ErrorAlert } from "@/components/ui/alert-box";
 import { departmentService } from "@/services/department.service";
 import { Spinner } from "@/components/ui/spinner";
 import { ImageUpload } from "@/components/ui/image-upload";
@@ -67,8 +68,8 @@ export default function CreateDepartmentModal({ onClose, editDepartmentId }: Cre
       queryClient.invalidateQueries({ queryKey: ["departments"] });
       onClose();
     },
-    onError: (err: any) => {
-      alert("Failed to save department: " + err.message);
+    onError: (err: Error) => {
+      setSubmitError("Failed to save department: " + err.message);
     }
   });
 
@@ -78,8 +79,8 @@ export default function CreateDepartmentModal({ onClose, editDepartmentId }: Cre
       queryClient.invalidateQueries({ queryKey: ["departments"] });
       onClose();
     },
-    onError: (err: any) => {
-      alert("Failed to update department: " + err.message);
+    onError: (err: Error) => {
+      setSubmitError("Failed to update department: " + err.message);
     }
   });
 

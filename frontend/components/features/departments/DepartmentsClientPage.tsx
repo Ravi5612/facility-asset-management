@@ -67,7 +67,7 @@ export function DepartmentsClientPage() {
       {isLoading ? (
         <GridSkeleton />
       ) : (
-        <DepartmentGrid departments={filteredData as any} />
+        <DepartmentGrid departments={filteredData as Department[]} />
       )}
 
       {isAddOpen && <CreateDepartmentModal onClose={() => setIsAddOpen(false)} />}

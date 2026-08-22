@@ -18,9 +18,9 @@ export default function HelpPage() {
 
   // Calculate real stats
   const totalTickets = outboundTickets.length;
-  const pendingTickets = outboundTickets.filter((t: any) => t.status === "OPEN").length;
-  const inProgressTickets = outboundTickets.filter((t: any) => t.status === "IN_PROGRESS").length;
-  const completedTickets = outboundTickets.filter((t: any) => t.status === "RESOLVED" || t.status === "CLOSED").length;
+  const pendingTickets = outboundTickets.filter((t: Record<string, unknown>) => t.status === "OPEN").length;
+  const inProgressTickets = outboundTickets.filter((t: Record<string, unknown>) => t.status === "IN_PROGRESS").length;
+  const completedTickets = outboundTickets.filter((t: Record<string, unknown>) => t.status === "RESOLVED" || t.status === "CLOSED").length;
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">

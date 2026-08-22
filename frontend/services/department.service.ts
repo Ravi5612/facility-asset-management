@@ -24,7 +24,7 @@ export const departmentSchema = z.object({
 export type Department = z.infer<typeof departmentSchema>;
 
 export const departmentService = {
-  getDepartments: async (): Promise<any[]> => {
+  getDepartments: async (): Promise<Record<string, unknown>[]> => {
     const res = await fetch(`${API_URL}/departments`, {
       credentials: "include",
     });
@@ -41,7 +41,7 @@ export const departmentService = {
 
   createDepartment: async (data: { name: string; code: string; description?: string; image?: File }): Promise<Department> => {
     let headers: Record<string, string> = {};
-    let body: any;
+    let body: unknown;
 
     if (data.image) {
       const formData = new FormData();
@@ -71,7 +71,7 @@ export const departmentService = {
     return departmentSchema.parse(result);
   },
 
-  getDepartmentById: async (id: string): Promise<any> => {
+  getDepartmentById: async (id: string): Promise<Record<string, unknown>> => {
     const res = await fetch(`${API_URL}/departments/${id}`, {
       credentials: "include",
     });
@@ -87,7 +87,7 @@ export const departmentService = {
 
   updateDepartment: async (id: string, data: { name?: string; code?: string; description?: string; image?: File }): Promise<void> => {
     let headers: Record<string, string> = {};
-    let body: any;
+    let body: unknown;
 
     if (data.image) {
       const formData = new FormData();

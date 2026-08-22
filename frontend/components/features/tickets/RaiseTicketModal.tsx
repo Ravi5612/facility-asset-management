@@ -40,10 +40,10 @@ export function RaiseTicketModal({ isOpen, setIsOpen }: RaiseTicketModalProps) {
       setDepartmentId("");
       setAttachment(null);
       queryClient.invalidateQueries({ queryKey: ["department-tickets"] });
-      alert("Ticket raised successfully!");
+      // Handled by mutation onSuccess
     },
-    onError: (err: any) => {
-      alert(err.message || "Failed to raise ticket");
+    onError: (err: Error) => {
+      setSubmitError(err.message || "Failed to raise ticket");
     }
   });
 
@@ -87,7 +87,7 @@ export function RaiseTicketModal({ isOpen, setIsOpen }: RaiseTicketModalProps) {
               className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
             >
               <option value="" disabled>Select the department</option>
-              {departments.map((dept: any) => (
+              {departments.map((dept: Record<string, unknown>) => (
                 <option key={dept.id} value={dept.id}>
                   {dept.name}
                 </option>

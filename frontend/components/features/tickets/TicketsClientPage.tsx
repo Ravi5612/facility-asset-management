@@ -26,7 +26,7 @@ export function TicketsClientPage() {
   });
 
   const formattedTickets: InterDeptTicket[] = useMemo(() => {
-    return rawTickets.map((t: any) => ({
+    return rawTickets.map((t: Record<string, unknown>) => ({
       id: t.ticketCode || t.id,
       subject: t.subject,
       description: t.description,

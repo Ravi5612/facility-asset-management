@@ -1,7 +1,7 @@
 import { InterDeptTicket } from "@/types";
 
 export const ticketService = {
-  async getTickets(): Promise<any[]> {
+  async getTickets(): Promise<Record<string, unknown>[]> {
     const res = await fetch("/api/tickets/all", {
       cache: "no-store",
     });
@@ -13,7 +13,7 @@ export const ticketService = {
     return res.json();
   },
 
-  async getOutboundTickets(): Promise<any[]> {
+  async getOutboundTickets(): Promise<Record<string, unknown>[]> {
     const res = await fetch("/api/tickets/outbound", {
       cache: "no-store",
     });
@@ -25,7 +25,7 @@ export const ticketService = {
     return res.json();
   },
 
-  async createTicket(data: any): Promise<any> {
+  async createTicket(data: Record<string, unknown>): Promise<Record<string, unknown>> {
     const res = await fetch("/api/tickets/all", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

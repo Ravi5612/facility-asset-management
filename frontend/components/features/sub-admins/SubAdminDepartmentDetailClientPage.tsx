@@ -19,7 +19,7 @@ export default function SubAdminDepartmentDetailClientPage({ departmentName }: {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingHod, setEditingHod] = useState<any>(null);
+  const [editingHod, setEditingHod] = useState<Record<string, unknown>>(null);
 
   // Capitalize name for display
   const displayName = departmentName.charAt(0).toUpperCase() + departmentName.slice(1);

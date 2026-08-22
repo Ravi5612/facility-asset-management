@@ -192,8 +192,8 @@ export function EmployeeDashboardClient() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50">
-                  {salaryHistory.map((salary, idx) => (
-                    <tr key={idx} className="hover:bg-muted/30 transition-colors">
+                  {salaryHistory.map((salary) => (
+                    <tr key={salary.month} className="hover:bg-muted/30 transition-colors">
                       <td className="px-4 py-4 font-medium text-foreground">{salary.month}</td>
                       <td className="px-4 py-4 font-bold">{salary.amount}</td>
                       <td className="px-4 py-4">

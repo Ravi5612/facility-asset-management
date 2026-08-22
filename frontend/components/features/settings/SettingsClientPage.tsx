@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Check, Palette, Save, Sparkles, Wand2, Plus, X, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import { FestivalThemes } from "./FestivalThemes";
+import { APP_CONFIG } from "@/lib/constants";
 
 export function SettingsClientPage() {
   const { themeColor, setThemeColor } = useTheme();
@@ -13,7 +15,13 @@ export function SettingsClientPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   // Gradient builder state (dynamic array of colors)
-  const [gradColors, setGradColors] = useState<string[]>(["#4f46e5", "#db2777"]);
+  const [gradColors, setGradColors] = useState<string[]>(() => {
+    if (themeColor.startsWith("gradient:")) {
+      const parts = themeColor.replace("gradient:", "").split(",");
+      if (parts.length > 0) return parts;
+    }
+    return ["#4f46e5", "#db2777"];
+  });
   const [newFestName, setNewFestName] = useState("");
   
   // Custom saved festivals
@@ -25,16 +33,11 @@ export function SettingsClientPage() {
     if (saved) {
       try {
         setCustomFestivals(JSON.parse(saved));
-      } catch (e) {}
-    }
-
-    if (selectedTheme.startsWith("gradient:")) {
-      const parts = selectedTheme.replace("gradient:", "").split(",");
-      if (parts.length > 0) {
-        setGradColors(parts);
+      } catch (e) {
+        console.error("Failed to parse saved custom festivals:", e);
       }
     }
-  }, [selectedTheme]);
+  }, []);
 
   const baseColors = [
     { name: "blue", bgClass: "bg-[#1553cc]", label: "Ocean Blue" },
@@ -49,10 +52,20 @@ export function SettingsClientPage() {
 
   const handleSave = () => {
     setIsSaving(true);
-    setTimeout(() => {
-      setThemeColor(selectedTheme);
-      setIsSaving(false);
-    }, 800);
+    fetch('/api/proxy/settings/theme', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ themeColor: selectedTheme })
+    }).then(res => res.json())
+      .then(data => {
+        // Update cookie manually for client
+        document.cookie = `app-theme-color=${selectedTheme}; path=/; max-age=31536000`;
+        setThemeColor(selectedTheme);
+        setIsSaving(false);
+      }).catch(err => {
+        console.error(err);
+        setIsSaving(false);
+      });
   };
 
   const isCustomHex = selectedTheme.startsWith("#");
@@ -107,12 +120,12 @@ export function SettingsClientPage() {
     setCustomFestivals(updated);
     localStorage.setItem("custom_festivals", JSON.stringify(updated));
     if (selectedTheme === festName) {
-      setSelectedTheme("blue"); // reset if deleting the active one
+      setSelectedTheme(APP_CONFIG.defaultTheme); // reset if deleting the active one
     }
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 w-full">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Global Settings</h1>
         <p className="text-sm text-muted-foreground mt-1">
@@ -193,18 +206,18 @@ export function SettingsClientPage() {
                </h3>
                <div className="flex flex-col gap-3">
                  <div className="flex flex-wrap items-center gap-2">
-                   {gradColors.map((color, index) => (
-                     <div key={index} className="flex items-center border rounded-md p-1 shadow-sm bg-white group">
+                   {gradColors.map((color, stopId) => (
+                     <div key={`grad-stop-${stopId}`} className="flex items-center border rounded-md p-1 shadow-sm bg-white group">
                        <input 
                          type="color" 
                          value={color} 
-                         onChange={(e) => updateColor(index, e.target.value)} 
+                         onChange={(e) => updateColor(stopId, e.target.value)} 
                          className="h-7 w-9 cursor-pointer border-0 p-0 rounded" 
                        />
                        {gradColors.length > 2 && (
                          <button 
                            type="button" 
-                           onClick={() => removeColor(index)}
+                           onClick={() => removeColor(stopId)}
                            className="ml-1 p-0.5 text-slate-400 hover:text-red-500 rounded-full hover:bg-slate-100 transition-colors"
                          >
                            <X className="h-3 w-3" />
@@ -247,48 +260,13 @@ export function SettingsClientPage() {
           </div>
 
           {/* Festival Themes */}
-          <div className="pt-6 border-t border-slate-100">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-amber-500" />
-                <h3 className="text-sm font-semibold text-slate-800">Festival & Special Themes</h3>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {customFestivals.map((fest, idx) => {
-                const isCustom = true;
-                return (
-                <button
-                  key={fest.name + idx}
-                  onClick={() => setSelectedTheme(fest.name)}
-                  className={`relative h-24 rounded-xl flex items-end p-3 transition-all overflow-hidden ${
-                    selectedTheme === fest.name ? "ring-4 ring-offset-2 ring-primary scale-[1.02] shadow-lg" : "hover:scale-[1.02] opacity-90 shadow"
-                  }`}
-                >
-                  <div className="absolute inset-0 opacity-80" style={{ background: fest.bg }}></div>
-                  <div className="relative z-10 w-full flex items-center justify-between">
-                    <span className="bg-black/40 backdrop-blur-sm text-white px-2 py-1 rounded text-xs font-bold shadow-sm">
-                      {fest.label}
-                    </span>
-                    {isCustom && (
-                      <div 
-                        onClick={(e) => handleDeleteCustomFestival(e, fest.name)}
-                        className="bg-black/40 hover:bg-red-500 backdrop-blur-sm text-white p-1.5 rounded cursor-pointer transition-colors"
-                        title="Delete Theme"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </div>
-                    )}
-                  </div>
-                  {selectedTheme === fest.name && (
-                    <div className="absolute top-2 right-2 bg-white/30 backdrop-blur-md rounded-full p-1 z-10">
-                       <Check className="h-4 w-4 text-white drop-shadow-md" />
-                    </div>
-                  )}
-                </button>
-              )})}
-            </div>
-          </div>
+          <FestivalThemes 
+            customFestivals={customFestivals}
+            selectedTheme={selectedTheme}
+            setSelectedTheme={setSelectedTheme}
+            setGradColors={setGradColors}
+            handleDeleteCustomFestival={handleDeleteCustomFestival}
+          />
           
           {/* Action Footer */}
           <div className="pt-6 border-t">

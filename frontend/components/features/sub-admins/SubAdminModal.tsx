@@ -47,7 +47,7 @@ export default function SubAdminModal({
     try {
       await onSuccess(data);
       setOpen(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       setModalError(error?.message || "Failed to save sub-admin");
     } finally {
       setIsSubmitting(false);

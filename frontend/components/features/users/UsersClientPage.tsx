@@ -28,7 +28,7 @@ export function UsersClientPage() {
       queryClient.invalidateQueries({ queryKey: ["departments"] });
     },
     onError: (err) => {
-      alert("Failed to delete department: " + err.message);
+      console.error("Failed to delete department: " + err.message);
     }
   });
 
@@ -96,7 +96,7 @@ export function UsersClientPage() {
                       <Shield className="h-3.5 w-3.5" /> HOD
                     </span>
                     <span className="font-semibold text-foreground truncate max-w-[150px] text-right">
-                      {(dept as any).hodName ? (dept as any).hodName : "Unassigned"}
+                      {dept.hodName ? String(dept.hodName) : "Unassigned"}
                     </span>
                   </div>
                   

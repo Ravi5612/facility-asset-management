@@ -15,18 +15,19 @@ import {
   ClipboardList, HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ROUTES } from "@/lib/constants";
 
 // Sub-Admin has limited nav options focusing on Department and HOD management
 const navItems = [
-  { label: "Dashboard", href: "/sub-admin/dashboard", icon: LayoutDashboard },
-  { label: "My Departments", href: "/sub-admin/department", icon: Building2 },
-  { label: "Assets", href: "/sub-admin/assets", icon: Package },
-  { label: "Tickets", href: "/sub-admin/tickets", icon: Ticket },
-  { label: "Help", href: "/sub-admin/help", icon: HelpCircle },
+  { label: "Dashboard", href: ROUTES.SUB_ADMIN_DASHBOARD, icon: LayoutDashboard },
+  { label: "My Departments", href: ROUTES.SUB_ADMIN_DEPARTMENTS, icon: Building2 },
+  { label: "Assets", href: ROUTES.SUB_ADMIN_ASSETS, icon: Package },
+  { label: "Tickets", href: ROUTES.SUB_ADMIN_TICKETS, icon: Ticket },
+  { label: "Help", href: ROUTES.SUB_ADMIN_HELP, icon: HelpCircle },
 ];
 
 const bottomItems = [
-  { label: "Settings", href: "/sub-admin/settings", icon: Settings },
+  { label: "Settings", href: ROUTES.SUB_ADMIN_SETTINGS, icon: Settings },
 ];
 
 type NavItemType = { label: string; href: string; icon: React.ElementType };

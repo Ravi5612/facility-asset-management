@@ -15,7 +15,7 @@ const hodFormSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(6, "Confirm password is required"),
-  profilePic: z.any().optional(), // We'll just accept a URL or file optionally for now
+  profilePic: z.unknown().optional(), // We'll just accept a URL or file optionally for now
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -72,7 +72,7 @@ export default function CreateHodModal({ departmentName, onClose, onSuccess }: C
               }}
               onRemove={() => {
                 setImagePreview(null);
-                setValue("profilePic", undefined as any);
+                setValue("profilePic", undefined);
               }}
             />
           </div>

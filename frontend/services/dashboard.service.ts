@@ -1,7 +1,7 @@
 export const dashboardService = {
   async getSuperadminDashboard(): Promise<any> {
     const isServer = typeof window === "undefined";
-    const baseUrl = isServer ? (process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")) : "";
+    const baseUrl = isServer ? (process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : (process.env.NODE_ENV === "development" ? "http://localhost:3000" : ""))) : "";
     
     let fetchHeaders: any = {};
     if (isServer) {

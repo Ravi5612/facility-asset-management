@@ -20,9 +20,9 @@ function getStatusIcon(status: TicketStatus) {
 }
 
 function getPriorityColor(priority: Priority) {
-  if (priority === "High") return "text-red-600 bg-red-50";
-  if (priority === "Medium") return "text-yellow-600 bg-yellow-50";
-  return "text-slate-600 bg-slate-100";
+  if (priority === "High") return "text-brand-danger bg-brand-danger/10 border-brand-danger/20 border";
+  if (priority === "Medium") return "text-brand-warning bg-brand-warning/10 border-brand-warning/20 border";
+  return "text-muted-foreground bg-muted/50 border-border border";
 }
 
 // ── Props ──

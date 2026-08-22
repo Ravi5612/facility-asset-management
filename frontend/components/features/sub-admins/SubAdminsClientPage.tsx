@@ -153,8 +153,8 @@ export function SubAdminsClientPage() {
             <Skeleton className="h-6 w-1/4" />
           </div>
           <div className="space-y-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex gap-4 items-center">
+            {[1, 2, 3, 4, 5].map((num) => (
+              <div key={`skeleton-${num}`} className="flex gap-4 items-center">
                 <Skeleton className="h-12 w-12 rounded-full" />
                 <Skeleton className="h-8 w-1/4" />
                 <Skeleton className="h-8 w-1/4" />

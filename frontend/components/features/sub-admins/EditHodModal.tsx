@@ -15,7 +15,7 @@ const hodFormSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(6, "Confirm password is required"),
-  profilePic: z.any().optional(), // We'll just accept a URL or file optionally for now
+  profilePic: z.unknown().optional(), // We'll just accept a URL or file optionally for now
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -24,7 +24,7 @@ const hodFormSchema = z.object({
 type HodFormValues = z.infer<typeof hodFormSchema>;
 
 interface EditHodModalProps {
-  hod: any;
+  hod: Record<string, unknown>;
   departmentName: string;
   onClose: () => void;
   onSuccess: () => void;
@@ -77,7 +77,7 @@ export default function EditHodModal({ hod, departmentName, onClose, onSuccess }
               }}
               onRemove={() => {
                 setImagePreview(null);
-                setValue("profilePic", undefined as any);
+                setValue("profilePic", undefined);
               }}
             />
           </div>
