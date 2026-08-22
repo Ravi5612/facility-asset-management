@@ -12,7 +12,10 @@ import { EmployeeAssetsModal } from "./EmployeeAssetsModal";
 import { EmployeeAttendanceModal } from "./EmployeeAttendanceModal";
 import { useQuery } from "@tanstack/react-query";
 import { departmentService } from "@/services/department.service";
-import { Loader2 } from "lucide-react";
+import {} from "lucide-react";
+import { TableSkeleton } from "@/components/ui/skeletons";
+
+
 
 export function DepartmentDetailClientPage({ departmentId }: { departmentId: string }) {
   const router = useRouter();
@@ -28,7 +31,7 @@ export function DepartmentDetailClientPage({ departmentId }: { departmentId: str
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64 border rounded-xl bg-card">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <TableSkeleton />
       </div>
     );
   }

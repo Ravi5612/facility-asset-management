@@ -90,4 +90,12 @@ export class AuthService {
       },
     };
   }
+
+  async verifyPassword(userId: string, passwordAttempt: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException('User not found');
+    const isPasswordValid = await bcrypt.compare(passwordAttempt, user.passwordHash);
+    if (!isPasswordValid) throw new UnauthorizedException('Incorrect password');
+    return true;
+  }
 }

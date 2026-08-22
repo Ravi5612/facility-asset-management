@@ -141,6 +141,7 @@ model Organization {
   ticketComments      TicketComment[]
   attachments         Attachment[]
   notifications       Notification[]
+  salaryHistories   SalaryHistory[]
 }
 
 model Permission {
@@ -246,6 +247,7 @@ model Department {
   code            String
   name            String
   description     String?
+  imageUrl        String?  // Optional image for the department
   hodId           String?
   status          RecordStatus @default(ACTIVE)
   createdById     String?
@@ -299,6 +301,7 @@ model Employee {
   departmentHOD    Department[] @relation("DepartmentHOD")
   raisedTickets    Ticket[] @relation("TicketRaisedByEmployee")
   assignedTickets  Ticket[] @relation("TicketAssignedToEmployee")
+  salaryHistories  SalaryHistory[]
 }
 
 model Attendance {
@@ -583,3 +586,21 @@ model AuditLog {
 // ON "AssetCategory" ("organizationId", "name")
 // WHERE "deletedAt" IS NULL;
 // ---------------------------------------------------
+
+
+model SalaryHistory {
+  id              String   @id @default(uuid())
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  organizationId  String
+  employee        Employee @relation(fields: [employeeId], references: [id])
+  employeeId      String
+  month           String
+  year            Int
+  amount          Decimal
+  status          String    @default("Processing")
+  datePaid        DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([organizationId, employeeId])
+}

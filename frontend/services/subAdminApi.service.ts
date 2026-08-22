@@ -80,4 +80,17 @@ export const subAdminApiService = {
     });
     if (!res.ok) throw new Error("Failed to delete sub-admin");
   },
+
+  async resetPassword(id: string, newPassword: string): Promise<void> {
+    const res = await fetch(`${API_URL}/users/${id}/reset-password`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ newPassword }),
+      credentials: "include",
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || "Failed to reset password");
+    }
+  },
 };

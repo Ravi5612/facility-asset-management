@@ -16,6 +16,7 @@ const loginResponseSchema = z.object({
 export type AuthUser = z.infer<typeof loginResponseSchema>["user"];
 export type LoginResponse = z.infer<typeof loginResponseSchema>;
 
+const API_URL = "/api/proxy";
 export const authService = {
   // Calls our Next.js API Route (/api/auth/login)
   // which sets the httpOnly cookie — Rule #20 compliant ✅
@@ -45,5 +46,18 @@ export const authService = {
     // Clear UI user data
     localStorage.removeItem("auth_user");
     await fetch("/api/auth/logout", { method: "POST" });
+  },
+
+  verifyPassword: async (password: string): Promise<boolean> => {
+    const res = await fetch(`${API_URL}/auth/verify-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+      credentials: "include",
+    });
+    if (!res.ok) {
+      throw new Error("Incorrect password");
+    }
+    return true;
   },
 };

@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Eye,
   EyeOff,
-  Loader2,
   Mail,
   Lock,
   LogIn,
@@ -20,6 +19,8 @@ import { loginSchema, LoginFormData } from "@/lib/validations/auth";
 import { authService } from "@/services/auth.service";
 import { ErrorAlert } from "@/components/ui/alert-box";
 import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
+
 
 export default function LoginForm() {
   const router = useRouter();
@@ -51,7 +52,9 @@ export default function LoginForm() {
         const role = response.user.role;
         if (role === "SUB_ADMIN") {
           router.push("/sub-admin/dashboard");
-        } else if (role === "HOD") {
+        } else if (role === "EMPLOYEE") {
+            router.push("/employee/dashboard");
+          } else if (role === "HOD") {
           const deptSlug = response.user.departmentName 
             ? response.user.departmentName.toLowerCase().replace(/\s+/g, '-')
             : "general";
@@ -145,7 +148,7 @@ export default function LoginForm() {
       >
         {isLoading ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Spinner size="xs" className="mr-2" />
             Signing in...
           </>
         ) : (

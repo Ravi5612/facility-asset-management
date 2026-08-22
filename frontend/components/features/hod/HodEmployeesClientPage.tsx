@@ -2,12 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Users, UserPlus, Loader2 } from "lucide-react";
+import { Users, UserPlus } from "lucide-react";
 import { employeeApi } from "@/services/employeeApi.service";
 import { Button } from "@/components/ui/button";
 import { ErrorAlert } from "@/components/ui/alert-box";
 import { StatusBadge } from "@/components/ui/status-badge";
 import RegisterEmployeeModal from "./RegisterEmployeeModal";
+import { TableSkeleton } from "@/components/ui/skeletons";
+
+
 
 export default function HodEmployeesClientPage() {
   const queryClient = useQueryClient();
@@ -88,7 +91,7 @@ export default function HodEmployeesClientPage() {
       {/* Content */}
       {isLoading ? (
         <div className="flex items-center justify-center h-48 border rounded-xl bg-card">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <TableSkeleton />
         </div>
       ) : error ? (
         <ErrorAlert message="Failed to load employees" />

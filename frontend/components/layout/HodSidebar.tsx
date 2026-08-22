@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Users, CalendarCheck, FileText, Monitor, Ticket, HelpCircle } from "lucide-react";
@@ -35,11 +36,17 @@ export function HodSidebar() {
   }, []);
 
   return (
-    <div className="flex h-full flex-col border-r border-border" style={{ backgroundColor: "var(--brand-sidebar)" }}>
+    <div className="flex h-full flex-col border-r border-border" style={{ background: "var(--brand-sidebar)" }}>
       <div className="flex h-16 shrink-0 items-center px-6 border-b border-white/10">
         <Link href={`/hod/${deptSegment}/dashboard`} className="flex items-center gap-2 font-bold text-xl tracking-tight text-white hover:opacity-90 transition-opacity">
-          <div className="bg-white/20 p-1.5 rounded-lg flex items-center justify-center">
-            <span className="text-white text-lg leading-none font-black drop-shadow-sm">DR</span>
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1">
+            <Image 
+              src="/sidebar-logo.webp" 
+              alt="Dr IT Logo" 
+              width={32} 
+              height={32} 
+              className="object-contain"
+            />
           </div>
           <span>IT GROUP</span>
         </Link>

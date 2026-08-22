@@ -9,6 +9,7 @@ export const departmentSchema = z.object({
   code: z.string(),
   name: z.string(),
   description: z.string().nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
   hodId: z.string().nullable().optional(),
   hodName: z.string().nullable().optional(),
   status: z.string().default("ACTIVE"),
@@ -38,11 +39,28 @@ export const departmentService = {
     }));
   },
 
-  createDepartment: async (data: { name: string; code: string; description?: string }): Promise<Department> => {
+  createDepartment: async (data: { name: string; code: string; description?: string; image?: File }): Promise<Department> => {
+    let headers: Record<string, string> = {};
+    let body: any;
+
+    if (data.image) {
+      const formData = new FormData();
+      formData.append('name', data.name);
+      formData.append('code', data.code);
+      if (data.description) formData.append('description', data.description);
+      formData.append('image', data.image);
+      
+      body = formData;
+    } else {
+      headers = { "Content-Type": "application/json" };
+      const { image, ...restData } = data;
+      body = JSON.stringify(restData);
+    }
+
     const res = await fetch(`${API_URL}/departments`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      headers,
+      body,
       credentials: "include",
     });
     if (!res.ok) {
@@ -67,11 +85,28 @@ export const departmentService = {
     };
   },
 
-  updateDepartment: async (id: string, data: { name?: string; code?: string; description?: string }): Promise<void> => {
+  updateDepartment: async (id: string, data: { name?: string; code?: string; description?: string; image?: File }): Promise<void> => {
+    let headers: Record<string, string> = {};
+    let body: any;
+
+    if (data.image) {
+      const formData = new FormData();
+      if (data.name) formData.append('name', data.name);
+      if (data.code) formData.append('code', data.code);
+      if (data.description !== undefined) formData.append('description', data.description);
+      formData.append('image', data.image);
+      
+      body = formData;
+    } else {
+      headers = { "Content-Type": "application/json" };
+      const { image, ...restData } = data;
+      body = JSON.stringify(restData);
+    }
+
     const res = await fetch(`${API_URL}/departments/${id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      headers,
+      body,
       credentials: "include",
     });
     if (!res.ok) {

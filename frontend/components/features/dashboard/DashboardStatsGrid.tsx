@@ -1,12 +1,12 @@
 import { ReactNode } from "react";
 
-export function DashboardStatsGrid() {
+export function DashboardStatsGrid({ statsData }: { statsData: any }) {
   const stats = [
-    { label: "Total Assets",      value: "1,248", icon: "📦", color: "bg-brand-primary/10 text-brand-primary", line: "bg-brand-primary", trend: "+12 from last month" },
-    { label: "Total Users",       value: "342",   icon: "👥", color: "bg-brand-info/10 text-brand-info",     line: "bg-brand-info",   trend: "+8 from last month" },
-    { label: "Open Tickets",      value: "28",    icon: "🎫", color: "bg-brand-warning/10 text-brand-warning", line: "bg-brand-warning", trend: "8 new today" },
-    { label: "Today's Visitors",  value: "16",    icon: "👤", color: "bg-brand-success/10 text-brand-success",   line: "bg-brand-success",  trend: "5 pending" },
-    { label: "Total Departments", value: "7",     icon: "🏢", color: "bg-brand-danger/10 text-brand-danger",     line: "bg-brand-danger",   trend: "View all departments" },
+    { label: "Total Assets",      value: statsData.totalAssets, icon: "📦", color: "bg-brand-primary/10 text-brand-primary", line: "bg-brand-primary", trend: "Total tracked" },
+    { label: "Total Users",       value: statsData.totalUsers,   icon: "👥", color: "bg-brand-info/10 text-brand-info",     line: "bg-brand-info",   trend: "Active users" },
+    { label: "Open Tickets",      value: statsData.openTickets,    icon: "🎫", color: "bg-brand-warning/10 text-brand-warning", line: "bg-brand-warning", trend: "Needs attention" },
+    { label: "Today's Visitors",  value: statsData.visitors,    icon: "🚶", color: "bg-brand-success/10 text-brand-success",   line: "bg-brand-success",  trend: "On premises" },
+    { label: "Total Departments", value: statsData.totalDepartments,     icon: "🏢", color: "bg-brand-danger/10 text-brand-danger",     line: "bg-brand-danger",   trend: "Across organization" },
   ];
 
   return (

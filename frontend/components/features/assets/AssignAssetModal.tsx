@@ -3,10 +3,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import {} from "lucide-react";
 import { assetService } from "@/services/asset.service";
 import { departmentService } from "@/services/department.service";
 import { ErrorAlert, SuccessAlert } from "@/components/ui/alert-box";
+import { Spinner } from "@/components/ui/spinner";
+
 
 interface AssignAssetModalProps {
   assetId: string;
@@ -164,7 +166,7 @@ export function AssignAssetModal({ assetId, assetName, isOpen, setIsOpen }: Assi
             <Button type="submit" disabled={assignMutation.isPending || !employeeId}>
               {assignMutation.isPending ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Spinner size="xs" className="mr-2" />
                   Assigning...
                 </>
               ) : (

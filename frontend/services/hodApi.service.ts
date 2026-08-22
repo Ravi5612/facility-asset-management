@@ -6,8 +6,9 @@ export const hodSchema = z.object({
   id: z.string(),
   employeeCode: z.string().nullable().optional(),
   name: z.string().nullable().optional(),
+  profileImage: z.string().nullable().optional(),
   email: z.string().email(),
-  departmentName: z.string().nullable().optional(),
+  departmentname: z.string().nullable().optional(),
   status: z.string(),
   role: z.string(),
   createdAt: z.string(),
@@ -25,7 +26,7 @@ export const hodApi = {
     return z.array(hodSchema).parse(data);
   },
 
-  createHod: async (data: Record<string, any>): Promise<void> => {
+  updateHod: async (id: string, data: Record<string, any>): Promise<void> => { const res = await fetch(`${API_URL}/users/hod/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data), credentials: "include" }); if (!res.ok) throw new Error("Failed to update HOD"); }, createHod: async (data: Record<string, any>): Promise<void> => {
     const res = await fetch(`${API_URL}/users/hod`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

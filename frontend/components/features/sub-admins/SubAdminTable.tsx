@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { SubAdmin } from "@/types";
-import { Edit2, Trash2, MoreHorizontal, Ban } from "lucide-react";
+import { Edit2, Trash2, MoreHorizontal, Ban, KeyRound } from "lucide-react";
 import Image from "next/image";
 import {
   DropdownMenu,
@@ -24,9 +24,10 @@ interface SubAdminTableProps {
   onEdit: (admin: SubAdmin) => void;
   onDelete: (id: string) => void;
   onToggleStatus?: (id: string, currentStatus: "Active" | "Inactive") => void;
+  onResetPassword?: (id: string) => void;
 }
 
-export default function SubAdminTable({ data, onEdit, onDelete, onToggleStatus }: SubAdminTableProps) {
+export default function SubAdminTable({ data, onEdit, onDelete, onToggleStatus, onResetPassword }: SubAdminTableProps) {
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-48 border rounded-lg bg-card text-muted-foreground">
@@ -43,7 +44,7 @@ export default function SubAdminTable({ data, onEdit, onDelete, onToggleStatus }
             <TableHead className="font-semibold text-foreground">Name</TableHead>
             <TableHead className="font-semibold text-foreground">Email</TableHead>
             <TableHead className="font-semibold text-foreground">Departments</TableHead>
-            <TableHead className="font-semibold text-foreground">Assigned Assets</TableHead>
+            
             <TableHead className="font-semibold text-foreground">Status</TableHead>
             <TableHead className="font-semibold text-foreground text-right">Actions</TableHead>
           </TableRow>
@@ -90,11 +91,7 @@ export default function SubAdminTable({ data, onEdit, onDelete, onToggleStatus }
                   ))}
                 </div>
               </TableCell>
-              <TableCell>
-                <Badge variant="outline" className="font-medium bg-muted/50">
-                  {admin.assignedAssets || 0}
-                </Badge>
-              </TableCell>
+              
               <TableCell>
                 <StatusBadge status={admin.status} />
               </TableCell>
@@ -112,6 +109,11 @@ export default function SubAdminTable({ data, onEdit, onDelete, onToggleStatus }
                     <DropdownMenuItem onClick={() => onEdit(admin)}>
                       <Edit2 className="mr-2 h-4 w-4" />
                       <span>Edit</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem onClick={() => onResetPassword?.(admin.id)}>
+                      <KeyRound className="mr-2 h-4 w-4" />
+                      <span>Forgot Password</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onToggleStatus?.(admin.id, admin.status)}>
                       <Ban className="mr-2 h-4 w-4" />

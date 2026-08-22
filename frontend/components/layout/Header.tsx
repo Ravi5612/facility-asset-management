@@ -53,7 +53,7 @@ export default function Header() {
           <SheetTrigger className="flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted transition-colors">
             <Menu className="h-5 w-5 text-foreground" />
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0 border-r-0" style={{ backgroundColor: "var(--brand-sidebar)" }}>
+          <SheetContent side="left" className="w-64 p-0 border-r-0" style={{ background: "var(--brand-sidebar)" }}>
             <div className="flex flex-col h-full">
               <SidebarContent />
             </div>

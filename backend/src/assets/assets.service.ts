@@ -6,12 +6,25 @@ import { CreateAssetCategoryDto, CreateAssetDto } from './dto/asset.dto';
 export class AssetsService {
   constructor(private prisma: PrismaService) {}
 
-  async getCategories(organizationId: string) {
-    // We fetch categories and include assets + assignments
+  async getCategories(organizationId: string, accessibleDepartments?: string[]) {
+    let allowedDeptIds: string[] | undefined = undefined;
+
+    if (accessibleDepartments && accessibleDepartments.length > 0) {
+      const depts = await this.prisma.department.findMany({
+        where: {
+          organizationId,
+          name: { in: accessibleDepartments }
+        },
+        select: { id: true }
+      });
+      allowedDeptIds = depts.map(d => d.id);
+    }
+
     const categories = await this.prisma.assetCategory.findMany({
       where: { organizationId, deletedAt: null },
       include: {
         assets: {
+          where: allowedDeptIds ? { ownerDepartmentId: { in: allowedDeptIds } } : undefined,
           include: {
             assignments: {
               include: { employee: true, asset: true },
@@ -22,14 +35,12 @@ export class AssetsService {
       }
     });
 
-    // Map to frontend expected format
-    return categories.map(cat => {
+    const result = categories.map(cat => {
       return {
-        category: cat.name, // Usually frontend checks this
+        category: cat.name,
         name: cat.name,
-        prefix: cat.name.slice(0, 3).toUpperCase(), // Naive prefix if DB doesn't have it
+        prefix: cat.name.slice(0, 3).toUpperCase(),
         items: cat.assets.map(asset => {
-          // Find active assignment
           const activeAssign = asset.assignments?.find(a => a.status === 'ACTIVE');
           
           return {
@@ -40,7 +51,7 @@ export class AssetsService {
             status: asset.status === 'AVAILABLE' ? 'Available' : asset.status === 'ASSIGNED' ? 'Assigned' : asset.status === 'IN_MAINTENANCE' ? 'Repair' : 'Dump',
             assignedTo: activeAssign ? `${activeAssign.employee.firstName} ${activeAssign.employee.lastName}` : null,
             assignedOn: activeAssign ? activeAssign.assignedAt.toISOString().split('T')[0] : null,
-            dumpedOn: null, // Hardcoded for now
+            dumpedOn: null,
             repairedOn: null,
             notes: asset.notes || "",
             history: asset.assignments?.map(a => ({
@@ -53,6 +64,12 @@ export class AssetsService {
         })
       };
     });
+
+    if (accessibleDepartments !== undefined) {
+      return result.filter(cat => cat.items.length > 0);
+    }
+
+    return result;
   }
 
   async getDepartmentAssets(organizationId: string, userId: string) {

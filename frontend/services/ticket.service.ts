@@ -2,7 +2,7 @@ import { InterDeptTicket } from "@/types";
 
 export const ticketService = {
   async getTickets(): Promise<any[]> {
-    const res = await fetch("/api/tickets", {
+    const res = await fetch("/api/tickets/all", {
       cache: "no-store",
     });
     
@@ -26,7 +26,7 @@ export const ticketService = {
   },
 
   async createTicket(data: any): Promise<any> {
-    const res = await fetch("/api/tickets", {
+    const res = await fetch("/api/tickets/all", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),

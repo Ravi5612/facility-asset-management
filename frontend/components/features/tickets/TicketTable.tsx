@@ -5,15 +5,17 @@ import { SearchInput } from "@/components/ui/search-input";
 import { StatusBadge } from "@/components/ui/status-badge";
 import {
   Filter, ChevronRight, Clock, CheckCircle2,
-  AlertTriangle, Loader2, Mail, Phone, X
+  AlertTriangle, Mail, Phone, X
 } from "lucide-react";
 import { InterDeptTicket, TicketStatus, Priority } from "@/types";
 import { TicketDetailsModal } from "./TicketDetailsModal";
+import { Spinner } from "@/components/ui/spinner";
+
 
 // ── Helpers ──
 function getStatusIcon(status: TicketStatus) {
   if (status === "Pending") return <Clock className="h-3 w-3 mr-1" />;
-  if (status === "In Progress") return <Loader2 className="h-3 w-3 mr-1 animate-spin" />;
+  if (status === "In Progress") return <Spinner size="xs" className="mr-1" />;
   return <CheckCircle2 className="h-3 w-3 mr-1" />;
 }
 

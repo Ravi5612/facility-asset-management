@@ -1,17 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, ChevronsUpDown, Loader2, Upload, Eye, EyeOff } from "lucide-react";
+import { Check, ChevronsUpDown, Upload, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createSubAdminSchema, updateSubAdminSchema, SubAdminFormValues } from "@/lib/validations/subadmin";
 import { Input } from "@/components/ui/input";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SubAdmin } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { departmentService } from "@/services/department.service";
+import { Spinner } from "@/components/ui/spinner";
+
 
 interface SubAdminFormProps {
   onSubmit: (data: SubAdminFormValues) => void;
@@ -95,25 +98,23 @@ export default function SubAdminForm({
 
   return (
     <form id="subadmin-form" onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-4">
-      <div className="flex flex-col items-center justify-center space-y-3 pb-2">
-        <div className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-muted-foreground/25 bg-muted transition-all hover:bg-muted/80">
-          {imagePreview ? (
-            <Image src={imagePreview} alt="Profile" fill className="object-cover" sizes="96px" />
-          ) : (
-            <Upload className="h-8 w-8 text-muted-foreground/50" />
-          )}
-          <input
-            type="file"
-            accept="image/*"
-            className="absolute inset-0 cursor-pointer opacity-0"
-            onChange={handleImageChange}
-            disabled={isLoading}
-          />
-        </div>
-        <div className="text-center">
-          <p className="text-sm font-medium">Profile Picture</p>
-          <p className="text-xs text-muted-foreground">Click to upload image</p>
-        </div>
+      <div className="flex justify-center pb-2">
+        <ImageUpload
+          value={imagePreview}
+          onChange={(file) => {
+            setValue("profileImage", file, { shouldValidate: true });
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+          }}
+          onRemove={() => {
+            setValue("profileImage", undefined);
+            setImagePreview(null);
+          }}
+          label="Profile Picture"
+        />
       </div>
 
       <div className="space-y-2">
@@ -230,7 +231,7 @@ export default function SubAdminForm({
         <Label>Department Access *</Label>
         {isLoadingDepartments ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Spinner size="xs" className="mr-2" />
             Loading departments...
           </div>
         ) : AVAILABLE_DEPARTMENTS.length === 0 ? (

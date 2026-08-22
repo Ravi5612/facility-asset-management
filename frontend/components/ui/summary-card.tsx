@@ -8,6 +8,7 @@ export interface SummaryCardProps {
   iconClassName?: string;
   lineClassName?: string;
   className?: string;
+
 }
 
 export function SummaryCard({
@@ -19,7 +20,7 @@ export function SummaryCard({
   className,
 }: SummaryCardProps) {
   return (
-    <div className={cn("group relative rounded-xl bg-card p-5 shadow-sm border overflow-hidden", className)}>
+    <div className={cn("group relative rounded-xl bg-card p-5 shadow-sm border overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md", className)}>
       <div
         className={cn(
           "absolute bottom-0 left-0 h-[3px] w-0 group-hover:w-full transition-all duration-300 rounded-b-xl",
@@ -32,5 +33,7 @@ export function SummaryCard({
       <p className="mt-5 text-3xl font-extrabold text-foreground">{value}</p>
       <p className="mt-2.5 text-sm font-semibold text-muted-foreground">{label}</p>
     </div>
+
+    
   );
 }

@@ -5,10 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { SummaryCard } from "@/components/ui/summary-card";
 import { SearchInput } from "@/components/ui/search-input";
-import { Building2, Users, Plus, Loader2 } from "lucide-react";
+import { Building2, Users, Plus } from "lucide-react";
 import { departmentService } from "@/services/department.service";
 import CreateDepartmentModal from "@/components/features/users/CreateDepartmentModal";
 import { DepartmentGrid } from "@/components/features/departments/DepartmentGrid";
+import { TableSkeleton, GridSkeleton } from "@/components/ui/skeletons";
+
+
 
 export function DepartmentsClientPage() {
   const [search, setSearch] = useState("");
@@ -62,9 +65,7 @@ export function DepartmentsClientPage() {
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center items-center h-48 border rounded-xl bg-card">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <GridSkeleton />
       ) : (
         <DepartmentGrid departments={filteredData as any} />
       )}

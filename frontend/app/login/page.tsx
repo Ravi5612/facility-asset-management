@@ -10,16 +10,16 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     /* Full-page background */
-    <div className="min-h-screen flex items-center justify-center bg-[#eef2ff] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
 
       {/* ── SINGLE CARD (Left + Right joined) ── */}
-      <div className="flex w-full max-w-[920px] rounded-2xl overflow-hidden shadow-2xl shadow-blue-200/60">
+      <div className="flex w-full max-w-[920px] rounded-2xl overflow-hidden shadow-2xl shadow-black/10">
 
         {/* ── LEFT PANEL ── */}
         <div
           className="hidden md:flex w-1/2 shrink-0 flex-col justify-between p-9 relative overflow-hidden"
           style={{
-            background: "linear-gradient(160deg, #1553cc 0%, #1240a8 50%, #0d2f80 100%)",
+            background: "var(--brand-sidebar)",
           }}
         >
           {/* Decorative background circles */}

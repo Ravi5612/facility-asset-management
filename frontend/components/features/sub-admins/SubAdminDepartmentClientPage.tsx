@@ -2,11 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Building2, Users, Loader2 } from "lucide-react";
+import { Building2, Users } from "lucide-react";
 import { SearchInput } from "@/components/ui/search-input";
 import { SummaryCard } from "@/components/ui/summary-card";
 import { ErrorAlert } from "@/components/ui/alert-box";
 import { subAdminDepartmentService } from "@/services/subAdminDepartment.service";
+import { Skeleton } from "@/components/ui/skeleton";
+
+
 
 // Department name → Icon color mapping
 const DEPT_COLORS: Record<string, { bg: string; text: string; border: string }> = {
@@ -49,9 +52,21 @@ export default function SubAdminDepartmentClientPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        <span className="ml-3 text-muted-foreground">Loading departments...</span>
+      <div className="space-y-6">
+        <div>
+          <Skeleton className="h-8 w-[250px] mb-2" />
+          <Skeleton className="h-4 w-[350px]" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-md">
+          <Skeleton className="h-[104px] w-full rounded-xl" />
+          <Skeleton className="h-[104px] w-full rounded-xl" />
+        </div>
+        <Skeleton className="h-10 w-full max-w-sm rounded-md" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-[120px] w-full rounded-xl" />
+          ))}
+        </div>
       </div>
     );
   }

@@ -10,10 +10,12 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { UserPlus, Loader2 } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VisitorForm } from "./VisitorForm";
 import { CreateVisitorFormValues } from "@/lib/validations/visitor";
+import { Spinner } from "@/components/ui/spinner";
+
 
 interface VisitorModalProps {
   onSuccess: (data: CreateVisitorFormValues) => Promise<void>;
@@ -71,7 +73,7 @@ export function VisitorModal({ onSuccess }: VisitorModalProps) {
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Spinner size="xs" className="mr-2" />
                 Saving...
               </>
             ) : (

@@ -219,19 +219,81 @@ export class UsersService {
       },
     });
 
-    // Also update the Department table to set hodId
-    await this.prisma.department.updateMany({
-      where: { 
-        name: { equals: dto.departmentName, mode: 'insensitive' },
-        organizationId 
-      },
-      data: { hodId: user.id }
-    });
+    const department = await this.prisma.department.findFirst({
+        where: { name: { equals: dto.departmentName, mode: 'insensitive' }, organizationId }
+      });
+
+      if (department) {
+        // Create the Employee record for the HOD so foreign keys work
+        await this.prisma.employee.create({
+          data: {
+            id: user.id, // Keep IDs same for consistency
+            organizationId,
+            firstName: dto.name.split(' ')[0],
+            lastName: dto.name.split(' ').slice(1).join(' ') || '',
+            email: dto.email,
+            designation: 'Head of Department',
+            departmentId: department.id,
+            joiningDate: new Date(),
+            employeeCode
+          }
+        });
+
+        // Now we can set hodId in Department
+        await this.prisma.department.update({
+          where: { id: department.id },
+          data: { hodId: user.id }
+        });
+      }
 
     return { id: user.id, email: user.email, name: user.fullName, departmentName: user.departmentName };
   }
 
   // ─── Get HODs ─────────────────────────────────────────────────────────────
+  async updateHod(id: string, organizationId: string, dto: { name?: string; email?: string; status?: string; profilePic?: string }) {
+    const existing = await this.prisma.user.findFirst({
+      where: { id, organizationId }
+    });
+
+    if (!existing) {
+      throw new NotFoundException('HOD not found');
+    }
+
+    if (dto.email && dto.email !== existing.email) {
+      const emailTaken = await this.prisma.user.findFirst({ where: { email: dto.email } });
+      if (emailTaken) throw new ConflictException('Email is already in use');
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id },
+      data: {
+        ...(dto.name && { fullName: dto.name }),
+        ...(dto.email && { email: dto.email }),
+        ...(dto.status && { status: dto.status as any }),
+        ...(dto.profilePic !== undefined && { profileImage: dto.profilePic })
+      }
+    });
+
+    // Update the Employee record too if name/email changed
+    if (dto.name || dto.email) {
+      const emp = await this.prisma.employee.findFirst({ where: { id } });
+      if (emp) {
+        await this.prisma.employee.update({
+          where: { id },
+          data: {
+            ...(dto.name && { 
+              firstName: dto.name.split(' ')[0],
+              lastName: dto.name.split(' ').slice(1).join(' ') || ''
+            }),
+            ...(dto.email && { email: dto.email })
+          }
+        });
+      }
+    }
+
+    return { success: true };
+  }
+
   async getHods(organizationId: string) {
     const hodRole = await this.prisma.role.findUnique({
       where: { organizationId_name: { organizationId, name: 'HOD' } },
@@ -241,7 +303,7 @@ export class UsersService {
     const userRoles = await this.prisma.userRole.findMany({
       where: { roleId: hodRole.id, revokedAt: null, user: { deletedAt: null } },
       include: {
-        user: { select: { id: true, email: true, fullName: true, employeeCode: true, departmentName: true, status: true, createdAt: true } },
+        user: { select: { id: true, email: true, fullName: true, employeeCode: true, departmentName: true, status: true, createdAt: true, profileImage: true } },
       },
     });
 
@@ -350,5 +412,25 @@ export class UsersService {
       role: 'EMPLOYEE',
       createdAt: ur.user.createdAt,
     }));
+  }
+
+  async resetPassword(userId: string, organizationId: string, newPassword: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, organizationId }
+    });
+    
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const bcrypt = require('bcrypt');
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash }
+    });
+    
+    return { success: true };
   }
 }

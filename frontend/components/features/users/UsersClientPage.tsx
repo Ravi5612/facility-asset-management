@@ -3,10 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Users, Shield, Eye, Plus, Loader2, Edit, Trash2 } from "lucide-react";
+import { Users, Shield, Eye, Plus, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { departmentService, Department } from "@/services/department.service";
 import CreateDepartmentModal from "./CreateDepartmentModal";
+import { TableSkeleton } from "@/components/ui/skeletons";
+
+
 
 export function UsersClientPage() {
   const router = useRouter();
@@ -51,7 +54,7 @@ export function UsersClientPage() {
 
       {isLoading ? (
         <div className="flex justify-center items-center h-48 border rounded-xl bg-card">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <TableSkeleton />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

@@ -8,9 +8,11 @@ import { DepartmentsModule } from './departments/departments.module';
 import { AssetsModule } from './assets/assets.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { EmployeeDashboardModule } from './employee-dashboard/employee-dashboard.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsersModule, DepartmentsModule, AssetsModule, TicketsModule, CloudinaryModule],
+  imports: [PrismaModule, AuthModule, UsersModule, DepartmentsModule, AssetsModule, TicketsModule, CloudinaryModule, DashboardModule, EmployeeDashboardModule],
   controllers: [AppController],
   providers: [AppService],
 })

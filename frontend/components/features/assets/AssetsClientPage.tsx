@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Loader2, PlusCircle, Laptop, Monitor, Mouse, Keyboard,
+  PlusCircle, Laptop, Monitor, Mouse, Keyboard, CheckCircle,
   Package, Eye, User, Calendar, Cable, ChevronLeft, ChevronRight, FolderPlus
 } from "lucide-react";
 import { SummaryCard } from "@/components/ui/summary-card";
@@ -56,7 +56,7 @@ function getActionColor(action: string) {
 const DETAIL_PAGE_SIZE = 8;
 
 /* ═══════════════════════════════════════════ */
-export function AssetsClientPage({ initialCategories }: { initialCategories: AssetCategory[] }) {
+export function AssetsClientPage({ initialCategories, hideAddButton = false }: { initialCategories: AssetCategory[], hideAddButton?: boolean }) {
   const [isAddOpen, setIsAddOpen]       = useState(false);
   const [isLoading, setIsLoading]       = useState(false);
   const [success, setSuccess]           = useState(false);
@@ -117,6 +117,7 @@ export function AssetsClientPage({ initialCategories }: { initialCategories: Ass
   const totalAssets   = allCategories.reduce((s, c) => s + c.items.length, 0);
   const totalAssigned = allCategories.reduce((s, c) => s + c.items.filter(i => i.status === "Assigned").length, 0);
   const totalDump     = allCategories.reduce((s, c) => s + c.items.filter(i => i.status === "Dump").length, 0);
+  const totalAvailable = allCategories.reduce((s, c) => s + c.items.filter(i => i.status === "Available").length, 0);
 
   const filteredItems = useMemo(() => {
     if (!selectedCategory) return [];
@@ -141,19 +142,21 @@ export function AssetsClientPage({ initialCategories }: { initialCategories: Ass
           <h1 className="text-2xl font-bold text-foreground">Assets Management</h1>
           <p className="text-sm text-muted-foreground mt-1">Track, manage and assign assets across your organization.</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className="gap-2 text-foreground">
-            <FolderPlus className="h-4 w-4" /> Import CSV
-          </Button>
-          <AddAssetModal
-            allCategories={allCategories}
-            onAddCategory={handleAddCategory}
-            getNextId={getNextId}
-            generatePrefix={generatePrefix}
-            isOpen={isAddOpen}
-            setIsOpen={setIsAddOpen}
-          />
-        </div>
+        {!hideAddButton && (
+          <div className="flex gap-2">
+            <Button variant="outline" className="gap-2 text-foreground">
+              <FolderPlus className="h-4 w-4" /> Import CSV
+            </Button>
+            <AddAssetModal
+              allCategories={allCategories}
+              onAddCategory={handleAddCategory}
+              getNextId={getNextId}
+              generatePrefix={generatePrefix}
+              isOpen={isAddOpen}
+              setIsOpen={setIsAddOpen}
+            />
+          </div>
+        )}
       </div>
 
       {/* ── Stats ── */}
@@ -162,6 +165,13 @@ export function AssetsClientPage({ initialCategories }: { initialCategories: Ass
           label="Total Assets"
           value={totalAssets}
           icon="💻"
+        />
+        <SummaryCard
+          label="Available Assets"
+          value={totalAvailable}
+          icon={<CheckCircle className="h-5 w-5" />}
+          iconClassName="bg-brand-info/10 text-brand-info"
+          lineClassName="bg-brand-info"
         />
         <SummaryCard
           label="Assigned Assets"

@@ -90,4 +90,13 @@ export class AuthController {
       },
     };
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('verify-password')
+  @HttpCode(HttpStatus.OK)
+  async verifyPassword(@Req() req: Request, @Body('password') password: string) {
+    const userPayload = req['user'] as { userId: string };
+    await this.authService.verifyPassword(userPayload.userId, password);
+    return { success: true };
+  }
 }

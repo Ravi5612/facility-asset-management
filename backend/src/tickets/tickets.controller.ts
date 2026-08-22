@@ -18,6 +18,13 @@ export class TicketsController {
     return this.ticketsService.create(user.userId, user.organizationId, createTicketDto);
   }
 
+  @Get()
+  @Roles('SUPER_ADMIN', 'SUB_ADMIN')
+  getAllTickets(@Req() req: Request) {
+    const user = req['user'] as any;
+    return this.ticketsService.getAllTickets(user.userId, user.organizationId, user.role);
+  }
+
   @Get('my-department')
   @Roles('SUPER_ADMIN', 'SUB_ADMIN', 'HOD', 'EMPLOYEE')
   getDepartmentTickets(@Req() req: Request) {

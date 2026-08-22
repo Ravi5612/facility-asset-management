@@ -82,6 +82,17 @@ export class UsersController {
   }
 
   // GET /users/hod → SUB_ADMIN views HODs
+  @Patch('hod/:id')
+  @Roles('SUB_ADMIN')
+  updateHod(
+    @Param('id') id: string, 
+    @Body() dto: { name?: string; email?: string; status?: string; profilePic?: string }, 
+    @Req() req: Request
+  ) {
+    const user = req['user'] as { organizationId: string };
+    return this.usersService.updateHod(id, user.organizationId, dto);
+  }
+
   @Get('hod')
   @Roles('SUB_ADMIN')
   getHods(@Req() req: Request) {
@@ -104,5 +115,16 @@ export class UsersController {
   getEmployees(@Req() req: Request) {
     const user = req['user'] as { userId: string; organizationId: string };
     return this.usersService.getMyEmployees(user.userId, user.organizationId);
+  }
+
+  @Patch(':id/reset-password')
+  @Roles('SUPER_ADMIN')
+  async resetPassword(
+    @Param('id') id: string,
+    @Body('newPassword') newPassword: string,
+    @Req() req: Request
+  ) {
+    const user = req['user'] as { organizationId: string };
+    return this.usersService.resetPassword(id, user.organizationId, newPassword);
   }
 }

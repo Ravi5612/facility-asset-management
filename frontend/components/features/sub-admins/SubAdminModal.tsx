@@ -10,11 +10,13 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { UserPlus, Loader2 } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SubAdminForm from "./SubAdminForm";
 import { SubAdminFormValues } from "@/lib/validations/subadmin";
 import { SubAdmin } from "@/types";
+import { Spinner } from "@/components/ui/spinner";
+
 
 interface SubAdminModalProps {
   isEdit?: boolean;
@@ -31,6 +33,7 @@ export default function SubAdminModal({
 }: SubAdminModalProps) {
   const [open, setOpen] = useState(isEdit && !!initialData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [modalError, setModalError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isEdit && initialData) {
@@ -40,11 +43,12 @@ export default function SubAdminModal({
 
   const handleSubmit = async (data: SubAdminFormValues) => {
     setIsSubmitting(true);
+    setModalError(null);
     try {
       await onSuccess(data);
       setOpen(false);
-    } catch (error) {
-      // Error is handled by the parent component (e.g., setting a global/page error state)
+    } catch (error: any) {
+      setModalError(error?.message || "Failed to save sub-admin");
     } finally {
       setIsSubmitting(false);
     }
@@ -52,8 +56,11 @@ export default function SubAdminModal({
 
   const handleOpenChange = (newOpen: boolean) => {
     setOpen(newOpen);
-    if (!newOpen && onCancel) {
-      onCancel();
+    if (!newOpen) {
+      setModalError(null);
+      if (onCancel) {
+        onCancel();
+      }
     }
   };
 
@@ -80,6 +87,12 @@ export default function SubAdminModal({
           </DialogDescription>
         </DialogHeader>
 
+        {modalError && (
+          <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-md text-sm mt-4">
+            {modalError}
+          </div>
+        )}
+
         {/* The form itself */}
         <SubAdminForm
           onSubmit={handleSubmit}
@@ -104,7 +117,7 @@ export default function SubAdminModal({
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Spinner size="xs" className="mr-2" />
                 {isEdit ? "Updating..." : "Saving..."}
               </>
             ) : isEdit ? (

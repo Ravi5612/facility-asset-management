@@ -1,9 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Users, UserCheck, UserX, Loader2 } from "lucide-react";
+import { Users, UserCheck, UserX } from "lucide-react";
 import { SummaryCard } from "@/components/ui/summary-card";
 import { employeeApi } from "@/services/employeeApi.service";
+import { DashboardSkeleton } from "@/components/ui/skeletons";
+
+
 
 export default function HodDashboardClientPage() {
   const { data: employees, isLoading } = useQuery({
@@ -14,7 +17,7 @@ export default function HodDashboardClientPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <DashboardSkeleton />
       </div>
     );
   }

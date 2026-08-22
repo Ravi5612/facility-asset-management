@@ -5,11 +5,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { X, Loader2, Upload, Eye, EyeOff } from "lucide-react";
+import { X, Upload, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { employeeApi } from "@/services/employeeApi.service";
 import { departmentService } from "@/services/department.service";
 import Image from "next/image";
+import { Spinner } from "@/components/ui/spinner";
+import { ImageUpload } from "@/components/ui/image-upload";
+
 
 const employeeFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -75,9 +78,9 @@ export default function RegisterEmployeeModal({ onClose, onSuccess }: RegisterEm
           <h2 className="text-lg font-bold text-foreground">
             Register New Employee
           </h2>
-          <button onClick={onClose} className="p-1 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground">
-            <X className="h-5 w-5" />
-          </button>
+          <Button onClick={onClose} variant="ghost" size="icon" type="button" className="group rounded-full text-muted-foreground hover:bg-muted">
+            <X className="h-4 w-4 transition-all duration-300 group-hover:rotate-180 group-hover:scale-125 group-hover:text-destructive" />
+          </Button>
         </div>
 
         <div className="overflow-y-auto flex-1">
@@ -89,19 +92,20 @@ export default function RegisterEmployeeModal({ onClose, onSuccess }: RegisterEm
             )}
 
             {/* Profile Picture */}
-            <div className="flex flex-col items-center gap-3">
-              <div className="relative h-20 w-20 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center bg-muted/30 overflow-hidden group">
-                {imagePreview ? (
-                  <Image src={imagePreview} alt="Profile" fill className="object-cover" />
-                ) : (
-                  <Upload className="h-6 w-6 text-muted-foreground" />
-                )}
-                <label className="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity text-xs font-medium">
-                  Upload
-                  <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
-                </label>
-              </div>
-              <p className="text-xs text-muted-foreground">Profile Picture (Optional)</p>
+            <div className="flex justify-center pb-2">
+              <ImageUpload
+                value={imagePreview}
+                onChange={(file) => {
+                  const url = URL.createObjectURL(file);
+                  setImagePreview(url);
+                  setValue("profilePic", url, { shouldValidate: true });
+                }}
+                onRemove={() => {
+                  setImagePreview(null);
+                  setValue("profilePic", undefined as any);
+                }}
+                label="Profile Picture (Optional)"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -203,7 +207,7 @@ export default function RegisterEmployeeModal({ onClose, onSuccess }: RegisterEm
             Cancel
           </Button>
           <Button type="submit" form="employee-form" disabled={mutation.isPending} className="bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] text-white">
-            {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {mutation.isPending && <Spinner size="xs" className="mr-2" />}
             Register
           </Button>
         </div>

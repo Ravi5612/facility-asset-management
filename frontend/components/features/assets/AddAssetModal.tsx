@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, PlusCircle, FolderPlus } from "lucide-react";
+import { PlusCircle, FolderPlus } from "lucide-react";
 import { SuccessAlert } from "@/components/ui/alert-box";
 import { AssetCategory } from "@/types";
 import { MOCK_API } from "@/lib/constants";
@@ -21,6 +21,8 @@ import {
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { assetService } from "@/services/asset.service";
 import { departmentService } from "@/services/department.service";
+import { Spinner } from "@/components/ui/spinner";
+
 
 interface AddAssetModalProps {
   allCategories: AssetCategory[];
@@ -262,7 +264,7 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
           <div className="pt-4 flex justify-end gap-3 border-t">
             <Button type="button" variant="ghost" onClick={() => setIsOpen(false)} disabled={isLoading}>Cancel</Button>
             <Button type="submit" disabled={isLoading} className="bg-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/90 text-white">
-              {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Adding...</> : <><PlusCircle className="mr-2 h-4 w-4" />Save Asset</>}
+              {isLoading ? <><Spinner size="xs" className="mr-2" />Adding...</> : <><PlusCircle className="mr-2 h-4 w-4" />Save Asset</>}
             </Button>
           </div>
         </form>

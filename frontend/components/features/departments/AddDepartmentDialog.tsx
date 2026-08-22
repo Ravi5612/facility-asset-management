@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, PlusCircle } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader,
   DialogTitle, DialogDescription, DialogTrigger,
@@ -14,6 +14,8 @@ import {
 import { MOCK_API } from "@/lib/constants";
 import { SuccessAlert } from "@/components/ui/alert-box";
 import { AddDepartmentFormSchema, AddDepartmentFormValues } from "@/lib/validations/department";
+import { Spinner } from "@/components/ui/spinner";
+
 
 export function AddDepartmentDialog() {
   const [isOpen, setIsOpen] = useState(false);
@@ -95,7 +97,7 @@ export function AddDepartmentDialog() {
           <div className="pt-4 flex justify-end gap-3 border-t">
             <Button type="button" variant="ghost" onClick={() => setIsOpen(false)} disabled={isLoading}>Cancel</Button>
             <Button type="submit" disabled={isLoading} className="bg-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/90 text-white">
-              {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</> : <><PlusCircle className="mr-2 h-4 w-4" />Save Department</>}
+              {isLoading ? <><Spinner size="xs" className="mr-2" />Saving...</> : <><PlusCircle className="mr-2 h-4 w-4" />Save Department</>}
             </Button>
           </div>
         </form>

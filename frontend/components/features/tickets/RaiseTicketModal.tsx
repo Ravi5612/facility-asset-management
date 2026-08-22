@@ -5,9 +5,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Loader2, Ticket as TicketIcon, Paperclip } from "lucide-react";
+import { Ticket as TicketIcon, Paperclip } from "lucide-react";
 import { departmentService } from "@/services/department.service";
 import { ticketService } from "@/services/ticket.service";
+import { Spinner } from "@/components/ui/spinner";
+
 
 interface RaiseTicketModalProps {
   isOpen: boolean;
@@ -163,7 +165,7 @@ export function RaiseTicketModal({ isOpen, setIsOpen }: RaiseTicketModalProps) {
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Spinner size="xs" className="mr-2" />
                   Submitting...
                 </>
               ) : (

@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { hodApi } from "@/services/hodApi.service";
 
 const hodFormSchema = z.object({
@@ -28,7 +30,10 @@ interface CreateHodModalProps {
 }
 
 export default function CreateHodModal({ departmentName, onClose, onSuccess }: CreateHodModalProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<HodFormValues>({
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<HodFormValues>({
     resolver: zodResolver(hodFormSchema),
   });
 
@@ -56,6 +61,23 @@ export default function CreateHodModal({ departmentName, onClose, onSuccess }: C
             </div>
           )}
 
+          
+          <div className="flex justify-center pb-2 pt-2">
+            <ImageUpload
+              value={imagePreview}
+              onChange={(file) => {
+                const url = URL.createObjectURL(file);
+                setImagePreview(url);
+                setValue("profilePic", url, { shouldValidate: true });
+              }}
+              onRemove={() => {
+                setImagePreview(null);
+                setValue("profilePic", undefined as any);
+              }}
+            />
+          </div>
+
+
           <div>
             <label className="block text-sm font-medium text-foreground mb-1">Full Name</label>
             <input
@@ -79,35 +101,42 @@ export default function CreateHodModal({ departmentName, onClose, onSuccess }: C
 
           <div>
             <label className="block text-sm font-medium text-foreground mb-1">Password</label>
-            <input
-              {...register("password")}
-              type="password"
-              placeholder="••••••••"
-              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
-            />
+            <div className="relative">
+              <input
+                {...register("password")}
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                className="w-full px-3 py-2 pr-10 border border-input rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+              />
+              <button 
+                type="button" 
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
             {errors.password && <p className="text-xs text-brand-danger mt-1">{errors.password.message}</p>}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-foreground mb-1">Confirm Password</label>
-            <input
-              {...register("confirmPassword")}
-              type="password"
-              placeholder="••••••••"
-              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
-            />
+            <div className="relative">
+              <input
+                {...register("confirmPassword")}
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="••••••••"
+                className="w-full px-3 py-2 pr-10 border border-input rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+              />
+              <button 
+                type="button" 
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
+              >
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
             {errors.confirmPassword && <p className="text-xs text-brand-danger mt-1">{errors.confirmPassword.message}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Profile Picture</label>
-            <input
-              {...register("profilePic")}
-              type="file"
-              accept="image/*"
-              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[var(--brand-primary)]/10 file:text-[var(--brand-primary)] hover:file:bg-[var(--brand-primary)]/20 focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
-            />
-            {errors.profilePic && <p className="text-xs text-brand-danger mt-1">{errors.profilePic?.message?.toString()}</p>}
           </div>
 
           <div className="pt-4 flex justify-end gap-3">

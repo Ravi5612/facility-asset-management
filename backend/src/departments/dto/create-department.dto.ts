@@ -15,4 +15,8 @@ export class CreateDepartmentDto {
   @IsString()
   @MaxLength(200)
   description?: string;
+
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
 }

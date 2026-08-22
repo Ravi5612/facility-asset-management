@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, UseGuards, Req, Param } from '@nestjs/common';
 import { AssetsService } from './assets.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -9,12 +10,24 @@ import type { Request } from 'express';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('assets')
 export class AssetsController {
-  constructor(private readonly assetsService: AssetsService) {}
+  constructor(private readonly assetsService: AssetsService, private readonly prisma: PrismaService) {}
 
   @Get('categories')
-  getCategories(@Req() req: Request) {
+  async getCategories(@Req() req: Request) {
     const user = req['user'] as any;
-    return this.assetsService.getCategories(user.organizationId);
+    let accessibleDepartments: string[] | undefined = undefined;
+    
+    if (user.role === 'SUB_ADMIN') {
+      const dbUser = await this.prisma.user.findUnique({
+        where: { id: user.userId },
+        select: { accessibleDepartments: true }
+      });
+      if (dbUser?.accessibleDepartments) {
+        accessibleDepartments = dbUser.accessibleDepartments;
+      }
+    }
+    
+    return this.assetsService.getCategories(user.organizationId, accessibleDepartments);
   }
 
   @Post('categories')

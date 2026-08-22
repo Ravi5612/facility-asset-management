@@ -13,12 +13,14 @@ export type Employee = {
 export type Department = {
   id: string;
   name: string;
+  code?: string;
+  imageUrl?: string;
   hod: string;
   employeeCount: number;
   status: "Active" | "Inactive";
-  dateCreated: string;
-  description: string;
-  employees: Employee[];
+  dateCreated?: string;
+  description?: string;
+  employees?: Employee[];
 };
 
 export type AssetItem = {

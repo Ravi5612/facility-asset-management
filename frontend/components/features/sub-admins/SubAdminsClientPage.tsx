@@ -6,14 +6,56 @@ import SubAdminTable from "@/components/features/sub-admins/SubAdminTable";
 import SubAdminModal from "@/components/features/sub-admins/SubAdminModal";
 import { SubAdminFormValues } from "@/lib/validations/subadmin";
 import { SubAdmin } from "@/types";
-import { Loader2, Shield, UserCheck, UserX } from "lucide-react";
+import { Shield, UserCheck, UserX } from "lucide-react";
 import { ErrorAlert } from "@/components/ui/alert-box";
 import { subAdminApiService, SubAdminUser } from "@/services/subAdminApi.service";
+import { PasswordVerificationDialog } from "@/components/features/auth/PasswordVerificationDialog";
+import { ResetPasswordDialog } from "@/components/features/auth/ResetPasswordDialog";
+
 import { SummaryCard } from "@/components/ui/summary-card";
+import { Skeleton } from "@/components/ui/skeleton";
+
+
 
 export function SubAdminsClientPage() {
   const queryClient = useQueryClient();
+  
   const [editingAdmin, setEditingAdmin] = useState<SubAdmin | null>(null);
+
+  // Security flow states
+  type ActionPayload = 
+    | { action: "EDIT"; admin: SubAdmin }
+    | { action: "TOGGLE"; id: string; currentStatus: "Active" | "Inactive" }
+    | { action: "DELETE"; id: string }
+    | { action: "RESET_PWD"; id: string };
+    
+  const [pendingAction, setPendingAction] = useState<ActionPayload | null>(null);
+  const [showPasswordVerify, setShowPasswordVerify] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState<string | null>(null);
+
+  const executeAction = async () => {
+    if (!pendingAction) return;
+    
+    setShowPasswordVerify(false);
+
+    if (pendingAction.action === "EDIT") {
+      setEditingAdmin(pendingAction.admin);
+    } else if (pendingAction.action === "TOGGLE") {
+      await handleToggleStatus(pendingAction.id);
+    } else if (pendingAction.action === "DELETE") {
+      await handleDeleteSubAdmin(pendingAction.id);
+    } else if (pendingAction.action === "RESET_PWD") {
+      setShowResetPassword(pendingAction.id);
+    }
+    
+    setPendingAction(null);
+  };
+
+  const requestAction = (payload: ActionPayload) => {
+    setPendingAction(payload);
+    setShowPasswordVerify(true);
+  };
+
 
   // ── 1. Fetch using TanStack Query (Rule #17) ──────────────────────────────
   const { data, isLoading, error } = useQuery({
@@ -73,7 +115,7 @@ export function SubAdminsClientPage() {
   };
 
   const handleDeleteSubAdmin = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this sub admin?")) return;
+    
     await deleteMutation.mutateAsync(id);
   };
 
@@ -88,9 +130,40 @@ export function SubAdminsClientPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        <span className="ml-3 text-muted-foreground">Loading sub-admins...</span>
+      <div className="space-y-6 w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <Skeleton className="h-8 w-40" />
+            <Skeleton className="h-4 w-72 mt-2" />
+          </div>
+          <Skeleton className="h-10 w-32" />
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
+          <Skeleton className="h-28 w-full rounded-xl" />
+          <Skeleton className="h-28 w-full rounded-xl" />
+          <Skeleton className="h-28 w-full rounded-xl" />
+        </div>
+
+        <div className="border rounded-lg bg-card shadow-sm p-4 mt-6">
+          <div className="flex gap-4 border-b pb-4 mb-4">
+            <Skeleton className="h-6 w-1/4" />
+            <Skeleton className="h-6 w-1/4" />
+            <Skeleton className="h-6 w-1/4" />
+            <Skeleton className="h-6 w-1/4" />
+          </div>
+          <div className="space-y-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex gap-4 items-center">
+                <Skeleton className="h-12 w-12 rounded-full" />
+                <Skeleton className="h-8 w-1/4" />
+                <Skeleton className="h-8 w-1/4" />
+                <Skeleton className="h-8 w-1/4" />
+                <Skeleton className="h-8 w-1/4" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -130,9 +203,10 @@ export function SubAdminsClientPage() {
       <div className="border rounded-lg bg-card shadow-sm">
         <SubAdminTable
           data={mappedData}
-          onEdit={setEditingAdmin}
-          onDelete={handleDeleteSubAdmin}
-          onToggleStatus={async (id) => handleToggleStatus(id)}
+          onEdit={(admin) => requestAction({ action: "EDIT", admin })}
+          onDelete={(id) => requestAction({ action: "DELETE", id })}
+          onToggleStatus={(id, status) => requestAction({ action: "TOGGLE", id, currentStatus: status })}
+            onResetPassword={(id) => requestAction({ action: "RESET_PWD", id })}
         />
       </div>
 
@@ -146,6 +220,24 @@ export function SubAdminsClientPage() {
           onCancel={() => setEditingAdmin(null)}
         />
       )}
-    </div>
+    
+      {/* Security Modals */}
+      <PasswordVerificationDialog
+        isOpen={showPasswordVerify}
+        onClose={() => {
+          setShowPasswordVerify(false);
+          setPendingAction(null);
+        }}
+        onSuccess={executeAction}
+        actionName={pendingAction?.action === "RESET_PWD" ? "Reset Password" : pendingAction?.action.toLowerCase() || "action"}
+      />
+      {showResetPassword && (
+        <ResetPasswordDialog
+          isOpen={true}
+          userId={showResetPassword}
+          onClose={() => setShowResetPassword(null)}
+        />
+      )}
+</div>
   );
 }

@@ -30,7 +30,7 @@ const navItems = [
   { label: "Assets", href: ROUTES.ASSETS, icon: Package },
   { label: "Tickets", href: ROUTES.TICKETS, icon: Ticket },
   { label: "Visitors", href: "/superadmin/visitors", icon: UserPlus },
-  { label: "Departments", href: "/superadmin/users", icon: Building2 },
+  { label: "Departments", href: "/superadmin/departments", icon: Building2 },
 ];
 
 const bottomItems = [
@@ -121,12 +121,18 @@ export function SidebarContent() {
     <>
       {/* Logo */}
       <div className="flex h-20 shrink-0 items-center gap-3 px-5 border-b border-white/10">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white">
-          <LayoutDashboard className="h-6 w-6" />
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white p-1">
+          <Image 
+            src="/sidebar-logo.webp" 
+            alt="Dr IT Logo" 
+            width={36} 
+            height={36} 
+            className="object-contain"
+          />
         </div>
         <div className="min-w-0">
           <p className="text-lg font-extrabold text-white leading-tight truncate tracking-wide">Dr IT GROUP</p>
-          <p className="text-[10px] text-white/55 leading-tight uppercase tracking-[0.15em] truncate mt-0.5">
+          <p className="text-[10px] text-white/60 leading-tight uppercase tracking-[0.15em] truncate mt-0.5">
             Asset Management
           </p>
         </div>
@@ -173,7 +179,7 @@ export default function Sidebar() {
   return (
     <aside
       className="hidden md:flex fixed inset-y-0 left-0 z-50 w-56 flex-col"
-      style={{ backgroundColor: "var(--brand-sidebar)" }}
+      style={{ background: "var(--brand-sidebar)" }}
     >
       <SidebarContent />
     </aside>

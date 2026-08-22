@@ -45,8 +45,7 @@ export class TicketsService {
         raisedByEmployeeId: userId, // Assuming user.id == employee.id
         assignedToDeptId: dto.assignedToDeptId,
         status: 'OPEN',
-        createdById: userId,
-      }
+        createdById: userId }
     });
 
     return ticket;
@@ -64,6 +63,60 @@ export class TicketsService {
   }
 
   // Get tickets ASSIGNED TO my department (Inbound)
+  async getAllTickets(userId: string, organizationId: string, role: string) {
+    if (role === 'SUPER_ADMIN') {
+      return this.prisma.ticket.findMany({
+        where: { organizationId },
+        include: {
+          raisedByDept: { select: { name: true } },
+          assignedToDept: { select: { name: true } },
+          raisedByEmployee: { select: { firstName: true, lastName: true, email: true } }
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+    }
+
+    if (role === 'SUB_ADMIN') {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { accessibleDepartments: true }
+      });
+
+      if (!user || !user.accessibleDepartments || user.accessibleDepartments.length === 0) {
+        return [];
+      }
+
+      const depts = await this.prisma.department.findMany({
+        where: {
+          organizationId,
+          name: { in: user.accessibleDepartments }
+        },
+        select: { id: true }
+      });
+
+      const deptIds = depts.map(d => d.id);
+
+      return this.prisma.ticket.findMany({
+        where: {
+          organizationId,
+          OR: [
+            { assignedToDeptId: { in: deptIds } },
+            { raisedByDeptId: { in: deptIds } }
+          ]
+        },
+        include: {
+          raisedByDept: { select: { name: true } },
+          assignedToDept: { select: { name: true } },
+          raisedByEmployee: { select: { firstName: true, lastName: true, email: true } }
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+    }
+
+    return [];
+  }
+
+
   async getDepartmentTickets(userId: string, organizationId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user || !user.departmentName) return [];
