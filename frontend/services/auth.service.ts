@@ -17,9 +17,8 @@ export type AuthUser = z.infer<typeof loginResponseSchema>["user"];
 export type LoginResponse = z.infer<typeof loginResponseSchema>;
 
 const API_URL = "/api/proxy";
+
 export const authService = {
-  // Calls our Next.js API Route (/api/auth/login)
-  // which sets the httpOnly cookie — Rule #20 compliant ✅
   login: async (data: LoginFormData): Promise<LoginResponse> => {
     const res = await fetch("/api/auth/login", {
       method: "POST",
@@ -33,7 +32,6 @@ export const authService = {
       throw new Error(raw?.message || "Invalid email or password");
     }
 
-    // Validate response with Zod — Rule #19 ✅
     const parsed = loginResponseSchema.safeParse(raw);
     if (!parsed.success) {
       throw new Error("Unexpected response from server");
@@ -43,7 +41,6 @@ export const authService = {
   },
 
   logout: async (): Promise<void> => {
-    // Clear UI user data
     localStorage.removeItem("auth_user");
     await fetch("/api/auth/logout", { method: "POST" });
   },
@@ -59,5 +56,13 @@ export const authService = {
       throw new Error("Incorrect password");
     }
     return true;
+  },
+
+  getMe: async (): Promise<any> => {
+    const res = await fetch("/api/auth/me", { cache: "no-store" });
+    if (!res.ok) return null;
+    const data = await res.json();
+    // Backend returns { success: true, user: {...} } — return just user
+    return data?.user || data || null;
   },
 };

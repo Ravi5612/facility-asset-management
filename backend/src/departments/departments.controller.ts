@@ -8,6 +8,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { imageUploadOptions } from '../common/utils/file-upload.util';
 
 @Controller('departments')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -19,7 +20,7 @@ export class DepartmentsController {
 
   @Post()
   @Roles('SUPER_ADMIN')
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('image', imageUploadOptions))
   async create(
     @Body() createDepartmentDto: CreateDepartmentDto, 
     @Req() req: Request, 
@@ -63,7 +64,7 @@ export class DepartmentsController {
 
   @Patch(':id')
   @Roles('SUPER_ADMIN')
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('image', imageUploadOptions))
   async update(
     @Req() req: Request, 
     @Param('id') id: string, 

@@ -38,7 +38,7 @@ export const assetService = {
     return data as AssetCategory[];
   },
 
-  async getDepartmentAssets(): Promise<AssetCategory[]> {
+  async getDepartmentAssets(viewMode?: string): Promise<any[]> {
     const isServer = typeof window === "undefined";
     const baseUrl = isServer ? (process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : (process.env.NODE_ENV === "development" ? "http://localhost:3000" : ""))) : "";
     
@@ -52,7 +52,11 @@ export const assetService = {
       }
     }
 
-    const res = await fetch(`${baseUrl}/api/assets/department`, {
+    const url = viewMode
+      ? `${baseUrl}/api/assets/department?viewMode=${viewMode}`
+      : `${baseUrl}/api/assets/department`;
+
+    const res = await fetch(url, {
       cache: "no-store",
       headers: fetchHeaders,
     });
@@ -96,6 +100,17 @@ export const assetService = {
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.message || 'Failed to assign asset');
+    }
+    return res.json();
+  },
+
+  async getAssignedToMeAssets(): Promise<any[]> {
+    const res = await fetch("/api/assets/assigned-to-me", {
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(error.error || "Failed to fetch assigned assets");
     }
     return res.json();
   }

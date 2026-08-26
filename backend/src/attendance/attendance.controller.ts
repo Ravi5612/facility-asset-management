@@ -1,6 +1,7 @@
-import { Controller, Post, Body, UseGuards, Req, Get, Param, Query } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Get, Param, Query, ForbiddenException } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PrismaService } from '../prisma/prisma.service';
+import { BulkUploadAttendanceDto } from './dto/bulk-upload-attendance.dto';
 
 @Controller('attendance')
 export class AttendanceController {
@@ -8,11 +9,12 @@ export class AttendanceController {
 
   @UseGuards(JwtAuthGuard)
   @Post('bulk')
-  async uploadBulkAttendance(@Body('records') records: any[], @Req() req: any) {
+  async uploadBulkAttendance(@Body() body: BulkUploadAttendanceDto, @Req() req: any) {
     const user = req.user;
     if (user.role !== 'HOD' && user.role !== 'SUPER_ADMIN') {
       return { success: false, message: 'Unauthorized' };
     }
+    const records = body.records;
 
     let successCount = 0;
     let errorCount = 0;
@@ -48,7 +50,12 @@ export class AttendanceController {
         let checkIn = record.checkIn ? new Date(`${record.date}T${record.checkIn}`) : null;
         let checkOut = record.checkOut ? new Date(`${record.date}T${record.checkOut}`) : null;
 
-        // Find existing record
+        // Auto-determine status if checkIn exists
+        let status = record.status || (checkIn ? 'PRESENT' : 'ABSENT');
+        if (status === 'LEAVE') status = 'ON_LEAVE';
+        const attendanceStatus = status as 'PRESENT' | 'ABSENT' | 'HALF_DAY' | 'ON_LEAVE' | 'HOLIDAY';
+
+        // Upsert is complex with composite keys in this schema, so do find+update/create
         const existing = await this.prisma.attendance.findFirst({
           where: { employeeId: emp.id, date }
         });
@@ -56,7 +63,7 @@ export class AttendanceController {
         if (existing) {
           await this.prisma.attendance.update({
             where: { id: existing.id },
-            data: { checkIn, checkOut, status: record.status || 'PRESENT' }
+            data: { checkIn, checkOut, status: attendanceStatus }
           });
         } else {
           await this.prisma.attendance.create({
@@ -66,18 +73,22 @@ export class AttendanceController {
               date,
               checkIn,
               checkOut,
-              status: record.status || 'PRESENT'
+              status: attendanceStatus
             }
           });
         }
         successCount++;
-      } catch (err) {
+      } catch (err: any) {
         errorCount++;
-        errors.push(`Failed to process ${record.employeeCode}`);
+        errors.push(`Error on ${record.employeeCode}: ${err.message}`);
       }
     }
 
-    return { success: true, successCount, errorCount, errors };
+    return {
+      success: true,
+      message: `Uploaded ${successCount} records. Errors: ${errorCount}`,
+      errors
+    };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -86,6 +97,18 @@ export class AttendanceController {
     const user = req.user;
     const targetDate = dateStr ? new Date(dateStr) : new Date();
     targetDate.setHours(0,0,0,0);
+
+    const fullUser = await this.prisma.user.findUnique({
+      where: { id: user.userId },
+      select: { accessibleDepartments: true }
+    });
+
+    if (user.role !== 'SUPER_ADMIN') {
+      const allowedDepts = fullUser?.accessibleDepartments || [];
+      if (!allowedDepts.includes(deptName)) {
+        throw new ForbiddenException(`You do not have permission to view attendance for the '${deptName}' department.`);
+      }
+    }
 
     const dept = await this.prisma.department.findFirst({
       where: { name: deptName, organizationId: user.organizationId }

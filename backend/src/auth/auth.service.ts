@@ -39,6 +39,18 @@ export class AuthService {
     // 3. Compare Password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
+      await this.prisma.auditLog.create({
+        data: {
+          organizationId: user.organizationId,
+          actorUserId: user.id,
+          action: 'LOGIN_FAILED',
+          entity: 'User',
+          entityId: user.id,
+          ipAddress: ipAddress || 'Unknown',
+          userAgent: userAgent || 'Unknown',
+        }
+      }).catch(() => {}); // ignore audit log errors to not break response
+
       throw new UnauthorizedException('Invalid email or password');
     }
 
@@ -108,11 +120,7 @@ export class AuthService {
     const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
 
     const tokenRecord = await this.prisma.refreshToken.findFirst({
-      where: {
-        tokenHash,
-        revokedAt: null,
-        expiresAt: { gt: new Date() }, // Not expired
-      },
+      where: { tokenHash },
       include: {
         user: {
           include: {
@@ -123,8 +131,31 @@ export class AuthService {
       },
     });
 
-    if (!tokenRecord) {
+    if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
       throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    // Reuse detection
+    if (tokenRecord.revokedAt !== null) {
+      // Suspected token theft. Revoke ALL tokens for this user.
+      await this.prisma.refreshToken.updateMany({
+        where: { userId: tokenRecord.userId },
+        data: { revokedAt: new Date() },
+      });
+      // Also log this security event
+      await this.prisma.auditLog.create({
+        data: {
+          organizationId: tokenRecord.user.organizationId,
+          actorUserId: tokenRecord.userId,
+          action: 'LOGIN_FAILED', // Reusing this action for auth failures
+          entity: 'RefreshToken',
+          entityId: tokenRecord.id,
+          ipAddress: ipAddress || 'Unknown',
+          userAgent: userAgent || 'Unknown',
+          newValue: { reason: 'Token reuse detected' }
+        }
+      }).catch(() => {});
+      throw new UnauthorizedException('Security Alert: Suspicious token reuse detected. All sessions revoked.');
     }
 
     const user = tokenRecord.user;
@@ -142,18 +173,40 @@ export class AuthService {
     };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
 
-    // Optional: Refresh Token Rotation (Revoke old, create new)
-    // For simplicity, we just return a new access token and keep the old refresh token
-    // If you want full rotation:
-    /*
+    // ROTATION: Revoke old refresh token
     await this.prisma.refreshToken.update({
       where: { id: tokenRecord.id },
       data: { revokedAt: new Date() },
     });
-    // Create new refresh token...
-    */
 
-    return { accessToken, user: { ...user, themeColor: user.organization?.themeColor || "blue" } };
+    // Generate NEW refresh token
+    const newRefreshToken = crypto.randomBytes(40).toString('hex');
+    const newRefreshTokenHash = crypto.createHash('sha256').update(newRefreshToken).digest('hex');
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    await this.prisma.refreshToken.create({
+      data: {
+        userId: user.id,
+        tokenHash: newRefreshTokenHash,
+        expiresAt,
+        ipAddress,
+        deviceInfo: userAgent,
+      }
+    });
+
+    return { 
+      accessToken, 
+      refreshToken: newRefreshToken, 
+      user: { ...user, themeColor: user.organization?.themeColor || "blue" } 
+    };
   }
-
+  async logout(refreshToken: string) {
+    if (!refreshToken) return;
+    const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    await this.prisma.refreshToken.updateMany({
+      where: { tokenHash },
+      data: { revokedAt: new Date() },
+    });
+  }
 }

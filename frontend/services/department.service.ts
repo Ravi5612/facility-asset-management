@@ -79,7 +79,7 @@ export const departmentService = {
     const dept = await res.json();
     return {
       ...dept,
-      hod: dept.hod?.fullName || dept.hodId || "Unassigned",
+      hod: dept.hod ? `${dept.hod.firstName} ${dept.hod.lastName}` : (dept.hodId || "Unassigned"),
       employeeCount: dept.employees?.length || 0,
       employees: dept.employees || []
     };

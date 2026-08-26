@@ -12,17 +12,28 @@ import { TicketDetailsModal } from "./TicketDetailsModal";
 import { Spinner } from "@/components/ui/spinner";
 
 
-// ── Helpers ──
-function getStatusIcon(status: TicketStatus) {
-  if (status === "Pending") return <Clock className="h-3 w-3 mr-1" />;
-  if (status === "In Progress") return <Spinner size="xs" className="mr-1" />;
-  return <CheckCircle2 className="h-3 w-3 mr-1" />;
+function getPriorityColor(priority: string) {
+  const p = priority?.toUpperCase() || "";
+  if (p === "HIGH" || p === "URGENT" || p === "CRITICAL") return "text-brand-danger bg-brand-danger/10 border-brand-danger/20 border";
+  if (p === "MEDIUM") return "text-brand-warning bg-brand-warning/10 border-brand-warning/20 border";
+  if (p === "LOW") return "text-brand-success bg-brand-success/10 border-brand-success/20 border";
+  return "text-muted-foreground bg-muted/50 border-border border";
 }
 
-function getPriorityColor(priority: Priority) {
-  if (priority === "High") return "text-brand-danger bg-brand-danger/10 border-brand-danger/20 border";
-  if (priority === "Medium") return "text-brand-warning bg-brand-warning/10 border-brand-warning/20 border";
-  return "text-muted-foreground bg-muted/50 border-border border";
+function getCardPriorityStyle(priority: string) {
+  const p = priority?.toUpperCase() || "";
+  if (p === "HIGH" || p === "URGENT" || p === "CRITICAL") return "border-l-4 border-l-brand-danger border-brand-danger/20";
+  if (p === "MEDIUM") return "border-l-4 border-l-brand-warning border-brand-warning/20";
+  if (p === "LOW") return "border-l-4 border-l-brand-success border-brand-success/20";
+  return "border-l-4 border-l-border";
+}
+
+function getHeaderPriorityStyle(priority: string) {
+  const p = priority?.toUpperCase() || "";
+  if (p === "HIGH" || p === "URGENT" || p === "CRITICAL") return "bg-brand-danger/5 border-b-brand-danger/10";
+  if (p === "MEDIUM") return "bg-brand-warning/5 border-b-brand-warning/10";
+  if (p === "LOW") return "bg-brand-success/5 border-b-brand-success/10";
+  return "bg-muted/10 border-b-border/50";
 }
 
 // ── Props ──
@@ -39,11 +50,13 @@ interface TicketTableProps {
   onDateFilterChange: (v: string) => void;
   onCustomDateChange: (v: string) => void;
   onClearFilters: () => void;
+  onTicketClick?: (ticket: InterDeptTicket) => void;
 }
 
 export function TicketTable({
   tickets, search, statusFilter, priorityFilter, dateFilter, customDate,
-  onSearchChange, onStatusChange, onPriorityChange, onDateFilterChange, onCustomDateChange, onClearFilters
+  onSearchChange, onStatusChange, onPriorityChange, onDateFilterChange, onCustomDateChange, onClearFilters,
+  onTicketClick
 }: TicketTableProps) {
   
   const hasFilters = search !== "" || statusFilter !== "All" || priorityFilter !== "All" || dateFilter !== "All";
@@ -113,14 +126,18 @@ export function TicketTable({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {tickets.map((ticket) => (
-              <div key={ticket.id} className="bg-card border rounded-xl overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+              <div 
+                key={ticket.id} 
+                onClick={() => onTicketClick && onTicketClick(ticket)}
+                className={`bg-card border rounded-r-xl overflow-hidden flex flex-col transition-shadow ${onTicketClick ? 'cursor-pointer hover:shadow-md hover:border-brand-primary/50' : ''} ${getCardPriorityStyle(ticket.priority as string)}`}
+              >
                 
                 {/* Card Header: ID & Priority */}
-                <div className="p-3.5 border-b bg-muted/10 flex justify-between items-center">
+                <div className={`p-3.5 border-b flex justify-between items-center ${getHeaderPriorityStyle(ticket.priority as string)}`}>
                   <span className="font-mono text-xs font-bold text-muted-foreground">{ticket.id}</span>
                   <div className="flex items-center gap-1.5">
-                    {ticket.priority === "High" && <AlertTriangle className="h-3.5 w-3.5 text-red-500" />}
-                    <span className={`text-[10px] px-2 py-0.5 rounded-sm font-bold uppercase tracking-wider ${getPriorityColor(ticket.priority)}`}>
+                    {["HIGH", "URGENT", "CRITICAL"].includes(ticket.priority?.toUpperCase()) && <AlertTriangle className="h-3.5 w-3.5 text-brand-danger" />}
+                    <span className={`text-[10px] px-2 py-0.5 rounded-sm font-bold uppercase tracking-wider ${getPriorityColor(ticket.priority as string)}`}>
                       {ticket.priority}
                     </span>
                   </div>
@@ -131,7 +148,7 @@ export function TicketTable({
                   <div>
                     <h3 className="font-bold text-foreground text-base leading-snug mb-1.5">{ticket.subject}</h3>
                     <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
-                      <Clock className="h-3 w-3" /> Raised: {ticket.dateRaised}
+                      <Clock className="h-3 w-3" /> Raised: {ticket.dateRaised} {ticket.timeRaised && `at ${ticket.timeRaised}`}
                     </p>
                     {ticket.description && (
                       <p className="text-sm text-muted-foreground bg-muted/20 p-2.5 rounded-lg border border-border/30 line-clamp-2" title={ticket.description}>

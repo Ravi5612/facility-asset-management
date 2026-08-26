@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { departmentService } from "@/services/department.service";
 import type { Employee } from "@/types";
 import { EMPLOYEE_STATUS } from "@/lib/constants";
-import { TableSkeleton } from "@/components/ui/skeletons";
+import { DepartmentDetailSkeleton } from "@/components/ui/DepartmentDetailSkeleton";
 
 
 
@@ -30,11 +30,7 @@ export function DepartmentDetailClientPage({ departmentId }: { departmentId: str
   const [roleFilter, setRoleFilter] = useState("All");
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64 border rounded-xl bg-card">
-        <TableSkeleton />
-      </div>
-    );
+    return <DepartmentDetailSkeleton />;
   }
 
   if (!department) {
@@ -77,8 +73,8 @@ export function DepartmentDetailClientPage({ departmentId }: { departmentId: str
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-6">
+      <div className="space-y-6">
+        <div className="space-y-6">
           <div className="bg-card border rounded-xl p-6 shadow-sm">
             <h2 className="text-lg font-bold mb-4">Department Overview</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -157,7 +153,7 @@ export function DepartmentDetailClientPage({ departmentId }: { departmentId: str
                     filteredEmployees.map((emp: Employee) => (
                       <tr key={emp.id} className="hover:bg-muted/20 transition-colors">
                         <td className="px-4 py-3">
-                          <p className="font-bold text-foreground">{emp.name}</p>
+                          <p className="font-bold text-foreground">{emp.name || `${(emp as any).firstName} ${(emp as any).lastName}`}</p>
                           <p className="text-xs text-muted-foreground font-mono mt-0.5">{emp.employeeCode || emp.id}</p>
                           <a href={`mailto:${emp.email}`} className="text-xs text-blue-600 hover:underline mt-0.5 block">{emp.email}</a>
                         </td>

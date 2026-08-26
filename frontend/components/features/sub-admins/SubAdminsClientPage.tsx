@@ -84,6 +84,14 @@ export function SubAdminsClientPage() {
     },
   });
 
+
+  const updateMutation = useMutation({
+    mutationFn: (vars: { id: string, data: any }) => subAdminApiService.updateSubAdmin(vars.id, vars.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sub-admins"] });
+    },
+  });
+
   const toggleMutation = useMutation({
     mutationFn: subAdminApiService.toggleStatus,
     onSuccess: () => {
@@ -101,7 +109,15 @@ export function SubAdminsClientPage() {
   // ── Handlers ──────────────────────────────────────────────────────────────
   const handleSaveSubAdmin = async (formData: SubAdminFormValues) => {
     if (editingAdmin) {
-      await toggleMutation.mutateAsync(editingAdmin.id);
+      await updateMutation.mutateAsync({
+        id: editingAdmin.id,
+        data: {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password || undefined,
+          departmentIds: formData.departments,
+        }
+      });
       setEditingAdmin(null);
     } else {
       await createMutation.mutateAsync({
@@ -173,6 +189,7 @@ export function SubAdminsClientPage() {
     error instanceof Error
       ? error.message
       : createMutation.error?.message ||
+        updateMutation.error?.message ||
         toggleMutation.error?.message ||
         deleteMutation.error?.message;
 

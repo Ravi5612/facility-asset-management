@@ -9,7 +9,7 @@ export interface SummaryCardProps {
   lineClassName?: string;
   className?: string;
 
-}
+}  
 
 export function SummaryCard({
   label,

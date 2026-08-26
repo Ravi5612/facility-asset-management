@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -22,6 +23,9 @@ async function bootstrap() {
 
   // Enable Cookie Parser for HttpOnly Cookies
   app.use(cookieParser());
+
+  // Enable Security Headers
+  app.use(helmet());
 
   // Global strict DTO validation
   app.useGlobalPipes(

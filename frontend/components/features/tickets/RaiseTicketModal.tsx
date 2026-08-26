@@ -14,15 +14,17 @@ import { Spinner } from "@/components/ui/spinner";
 interface RaiseTicketModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  onSuccess?: () => void;
 }
 
-export function RaiseTicketModal({ isOpen, setIsOpen }: RaiseTicketModalProps) {
+export function RaiseTicketModal({ isOpen, setIsOpen, onSuccess }: RaiseTicketModalProps) {
   const queryClient = useQueryClient();
   const [departmentId, setDepartmentId] = useState("");
   const [subject, setSubject] = useState("");
   const [priority, setPriority] = useState("MEDIUM");
   const [description, setDescription] = useState("");
   const [attachment, setAttachment] = useState<File | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Fetch departments so user can select WHICH department to send the ticket to
   const { data: departments = [], isLoading: isLoadingDept } = useQuery({
@@ -39,8 +41,10 @@ export function RaiseTicketModal({ isOpen, setIsOpen }: RaiseTicketModalProps) {
       setDescription("");
       setDepartmentId("");
       setAttachment(null);
-      queryClient.invalidateQueries({ queryKey: ["department-tickets"] });
-      // Handled by mutation onSuccess
+      // Refresh both outbound (help page) and inbound (tickets page)
+      queryClient.invalidateQueries({ queryKey: ["outbound-tickets"] });
+      queryClient.invalidateQueries({ queryKey: ["inbound-tickets"] });
+      onSuccess?.();
     },
     onError: (err: Error) => {
       setSubmitError(err.message || "Failed to raise ticket");
@@ -50,9 +54,7 @@ export function RaiseTicketModal({ isOpen, setIsOpen }: RaiseTicketModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!departmentId || !subject || !description) return;
-    
-    // For MVP, we send data without actual file upload.
-    // Real implementation would use FormData.
+    setSubmitError(null);
     createTicket({
       assignedToDeptId: departmentId,
       subject,
@@ -149,6 +151,11 @@ export function RaiseTicketModal({ isOpen, setIsOpen }: RaiseTicketModalProps) {
             />
           </div>
 
+          {submitError && (
+            <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+              {submitError}
+            </div>
+          )}
           <div className="flex justify-end gap-3 pt-4 border-t">
             <Button
               type="button"

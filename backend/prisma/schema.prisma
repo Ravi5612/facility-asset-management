@@ -283,6 +283,30 @@ model Employee {
   joiningDate      DateTime
   status           EmployeeStatus @default(ACTIVE)
   profilePhoto     String?
+  // Expanded Onboarding Fields
+  fatherName       String?
+  motherName       String?
+  dob              DateTime?
+  gender           String?
+  bloodGroup       String?
+  emergencyContact String?
+  currentAddress   String?
+  permanentAddress String?
+  qualification    String?
+  lastSalary       Decimal?
+  offeredSalary    Decimal?
+  bankName         String?
+  accountNumber    String?
+  ifscCode         String?
+  aadharNumber     String?
+  criminalCase     String?
+  criminalDetails  String?
+  illnesses        String?
+  medication       String?
+  aadharPhoto      String?
+  educationPhoto   String?
+  salaryProofPhoto String?
+
   createdById      String?
   updatedById      String?
   createdAt        DateTime @default(now())

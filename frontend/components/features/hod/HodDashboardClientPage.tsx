@@ -16,8 +16,17 @@ export default function HodDashboardClientPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <DashboardSkeleton />
+      <div className="space-y-6">
+        <div>
+          <div className="h-8 w-48 bg-slate-200 dark:bg-slate-800 rounded animate-pulse mb-2"></div>
+          <div className="h-4 w-72 bg-slate-200 dark:bg-slate-800 rounded animate-pulse"></div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="h-[120px] rounded-xl border bg-slate-100 dark:bg-slate-800/50 animate-pulse"></div>
+          <div className="h-[120px] rounded-xl border bg-slate-100 dark:bg-slate-800/50 animate-pulse"></div>
+          <div className="h-[120px] rounded-xl border bg-slate-100 dark:bg-slate-800/50 animate-pulse"></div>
+        </div>
+        <div className="h-[180px] rounded-xl border bg-slate-100 dark:bg-slate-800/50 animate-pulse"></div>
       </div>
     );
   }

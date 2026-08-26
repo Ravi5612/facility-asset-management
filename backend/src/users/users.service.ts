@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSubAdminDto } from './dto/create-sub-admin.dto';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
@@ -190,8 +190,44 @@ export class UsersService {
     return { message: 'Sub admin deleted successfully' };
   }
 
-  // ─── Create HOD ─────────────────────────────────────────────────────────────
+  // ─── Update Sub Admin ────────────────────────────────────────────────────────
+  async updateSubAdmin(userId: string, dto: import('./dto/update-sub-admin.dto').UpdateSubAdminDto, organizationId: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, organizationId, deletedAt: null },
+    });
+    if (!user) throw new NotFoundException('Sub admin not found');
+
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(dto.name && { fullName: dto.name }),
+        ...(dto.email && { email: dto.email }),
+        ...(dto.departmentIds && { accessibleDepartments: dto.departmentIds }),
+      },
+    });
+
+    return {
+      id: updated.id,
+      email: updated.email,
+      name: updated.fullName,
+      departments: updated.accessibleDepartments,
+      status: updated.status,
+      employeeCode: updated.employeeCode,
+    };
+  }
+
+  // 🛠️🛠️🛠️ Create HOD 🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️🛠️
   async createHod(dto: import('./dto/create-hod.dto').CreateHodDto, createdById: string, organizationId: string) {
+    const creator = await this.prisma.user.findUnique({
+      where: { id: createdById },
+      include: { userRoles: { include: { role: true } } }
+    });
+
+    const allowedDepts = creator?.accessibleDepartments || [];
+    if (!allowedDepts.includes(dto.departmentName)) {
+      throw new ForbiddenException(`You do not have permission to create an HOD for the '${dto.departmentName}' department. Please ensure this department is assigned to you.`);
+    }
+
     const existing = await this.prisma.user.findFirst({ where: { email: dto.email } });
     if (existing) throw new ConflictException('A user with this email already exists');
 
@@ -220,34 +256,39 @@ export class UsersService {
     });
 
     const department = await this.prisma.department.findFirst({
-        where: { name: { equals: dto.departmentName, mode: 'insensitive' }, organizationId }
-      });
+      where: { name: { equals: dto.departmentName, mode: 'insensitive' }, organizationId }
+    });
 
-      if (department) {
-        // Create the Employee record for the HOD so foreign keys work
-        await this.prisma.employee.create({
-          data: {
-            id: user.id, // Keep IDs same for consistency
-            organizationId,
-            firstName: dto.name.split(' ')[0],
-            lastName: dto.name.split(' ').slice(1).join(' ') || '',
-            email: dto.email,
-            designation: 'Head of Department',
-            departmentId: department.id,
-            joiningDate: new Date(),
-            employeeCode
-          }
-        });
+    if (!department) {
+      // Rollback: delete the user we just created
+      await this.prisma.user.delete({ where: { id: user.id } });
+      throw new NotFoundException(`Department "${dto.departmentName}" not found. HOD not created.`);
+    }
 
-        // Now we can set hodId in Department
-        await this.prisma.department.update({
-          where: { id: department.id },
-          data: { hodId: user.id }
-        });
+    // Create the Employee record for the HOD so foreign keys work (needed for tickets etc.)
+    await this.prisma.employee.create({
+      data: {
+        id: user.id,
+        organizationId,
+        firstName: dto.name.split(' ')[0],
+        lastName: dto.name.split(' ').slice(1).join(' ') || '',
+        email: dto.email,
+        designation: 'Head of Department',
+        departmentId: department.id,
+        joiningDate: new Date(),
+        employeeCode
       }
+    });
+
+    // Set hodId in Department
+    await this.prisma.department.update({
+      where: { id: department.id },
+      data: { hodId: user.id }
+    });
 
     return { id: user.id, email: user.email, name: user.fullName, departmentName: user.departmentName };
   }
+
 
   // ─── Get HODs ─────────────────────────────────────────────────────────────
   async updateHod(id: string, organizationId: string, dto: { name?: string; email?: string; status?: string; profilePic?: string }) {
@@ -320,7 +361,17 @@ export class UsersService {
   }
 
   // ─── Create Employee ────────────────────────────────────────────────────────
-  async createEmployee(dto: import('./dto/create-employee-user.dto').CreateEmployeeUserDto, hodId: string, organizationId: string) {
+  async createEmployee(
+    dto: import('./dto/create-employee-user.dto').CreateEmployeeUserDto, 
+    hodId: string, 
+    organizationId: string,
+    files?: {
+      profilePic?: Express.Multer.File[],
+      aadharPhoto?: Express.Multer.File[],
+      educationPhoto?: Express.Multer.File[],
+      salaryProofPhoto?: Express.Multer.File[],
+    }
+  ) {
     const hod = await this.prisma.user.findFirst({ where: { id: hodId, organizationId } });
     if (!hod || !hod.departmentName) throw new NotFoundException('HOD or department not found');
 
@@ -337,6 +388,16 @@ export class UsersService {
     const randomNum = Math.floor(1000 + Math.random() * 9000);
     const employeeCode = `EMP-${randomNum}`;
 
+    let profilePhoto = null;
+    let aadharPhoto = null;
+    let educationPhoto = null;
+    let salaryProofPhoto = null;
+
+    if (files?.profilePic?.[0]) profilePhoto = (await this.cloudinary.uploadImage(files.profilePic[0]).catch(() => null))?.secure_url;
+    if (files?.aadharPhoto?.[0]) aadharPhoto = (await this.cloudinary.uploadImage(files.aadharPhoto[0]).catch(() => null))?.secure_url;
+    if (files?.educationPhoto?.[0]) educationPhoto = (await this.cloudinary.uploadImage(files.educationPhoto[0]).catch(() => null))?.secure_url;
+    if (files?.salaryProofPhoto?.[0]) salaryProofPhoto = (await this.cloudinary.uploadImage(files.salaryProofPhoto[0]).catch(() => null))?.secure_url;
+
     const user = await this.prisma.user.create({
       data: {
         organizationId,
@@ -348,6 +409,7 @@ export class UsersService {
         passwordHash,
         status: 'ACTIVE',
         createdById: hodId,
+        profileImage: profilePhoto,
         userRoles: { create: { roleId: role.id, assignedById: hodId } },
       },
     });
@@ -355,6 +417,7 @@ export class UsersService {
     const department = await this.prisma.department.findFirst({
       where: { name: { equals: dto.departmentName, mode: 'insensitive' }, organizationId }
     });
+
     if (department) {
       await this.prisma.employee.create({
         data: {
@@ -363,10 +426,35 @@ export class UsersService {
           firstName: dto.name.split(' ')[0],
           lastName: dto.name.split(' ').slice(1).join(' ') || '',
           email: dto.email,
+          phone: dto.phone,
           designation: dto.designation || 'Employee',
           departmentId: department.id,
-          joiningDate: new Date(),
-          employeeCode
+          joiningDate: dto.joiningDate ? new Date(dto.joiningDate) : new Date(),
+          employeeCode,
+          profilePhoto,
+          
+          fatherName: dto.fatherName,
+          motherName: dto.motherName,
+          dob: dto.dob ? new Date(dto.dob) : null,
+          gender: dto.gender,
+          bloodGroup: dto.bloodGroup,
+          emergencyContact: dto.emergencyContact,
+          currentAddress: dto.currentAddress,
+          permanentAddress: dto.permanentAddress,
+          qualification: dto.qualification,
+          lastSalary: dto.lastSalary ? parseFloat(dto.lastSalary) : null,
+          offeredSalary: dto.offeredSalary ? parseFloat(dto.offeredSalary) : null,
+          bankName: dto.bankName,
+          accountNumber: dto.accountNumber,
+          ifscCode: dto.ifscCode,
+          aadharNumber: dto.aadharNumber,
+          criminalCase: dto.criminalCase,
+          criminalDetails: dto.criminalDetails,
+          illnesses: dto.illnesses,
+          medication: dto.medication,
+          aadharPhoto,
+          educationPhoto,
+          salaryProofPhoto,
         }
       });
     }
@@ -390,10 +478,7 @@ export class UsersService {
         revokedAt: null, 
         user: { 
           deletedAt: null, 
-          OR: [
-            { departmentName: { equals: hod.departmentName, mode: 'insensitive' } },
-            { createdById: hod.id }
-          ]
+          departmentName: { equals: hod.departmentName, mode: 'insensitive' }
         } 
       },
       include: {

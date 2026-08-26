@@ -57,6 +57,7 @@ export function HodAttendanceClientPage({ deptSlug }: { deptSlug: string }) {
       if (cols.length < headers.length && cols.length < 2) continue;
 
       records.push({
+        
         employeeCode: cols[empIdx],
         date: cols[dateIdx],
         checkIn: inIdx !== -1 ? cols[inIdx] || null : null,

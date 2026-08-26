@@ -22,7 +22,6 @@ import { AssetItem, AssetCategory } from "@/types";
 import { staticAssetsData } from "@/lib/mock-data/assets";
 import { AssetCategoryCard } from "@/components/features/assets/AssetCategoryCard";
 import { SuccessAlert } from "@/components/ui/alert-box";
-import { AddAssetModal } from "@/components/features/assets/AddAssetModal";
 import { AssetDetailModal } from "@/components/features/assets/AssetDetailModal";
 
 /* ─── AUTO PREFIX GENERATOR ─── */
@@ -130,14 +129,7 @@ export function AssetsClientPage({ initialCategories, hideAddButton = false }: {
             <Button variant="outline" className="gap-2 text-foreground">
               <FolderPlus className="h-4 w-4" /> Import CSV
             </Button>
-            <AddAssetModal
-              allCategories={allCategories}
-              onAddCategory={handleAddCategory}
-              getNextId={getNextId}
-              generatePrefix={generatePrefix}
-              isOpen={isAddOpen}
-              setIsOpen={setIsAddOpen}
-            />
+            
           </div>
         )}
       </div>

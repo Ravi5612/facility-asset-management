@@ -48,17 +48,29 @@ export class AuthController {
       path: '/',
     });
 
+    // Set Access Token in HttpOnly Secure Cookie to prevent XSS
+    res.cookie('auth_token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000, // 15 mins in ms
+      path: '/',
+    });
+
     return {
       success: true,
-      accessToken,
       user,
     };
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('refresh_token', { path: '/auth' });
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies['refresh_token'];
+    if (refreshToken) {
+      await this.authService.logout(refreshToken);
+    }
+    res.clearCookie('refresh_token', { path: '/' });
     return { success: true, message: 'Logged out successfully' };
   }
 
@@ -83,10 +95,29 @@ export class AuthController {
       }
     });
 
+    // Fallback: Fetch employee record using email since user.employeeId relation might be null
+    const employeeRecord = user?.email ? await this.prisma.employee.findFirst({
+      where: { email: user.email },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        phone: true,
+        employeeCode: true,
+        designation: true,
+        joiningDate: true,
+        profilePhoto: true,
+        departmentId: true,
+        status: true,
+      }
+    }) : null;
+
     return {
       success: true,
       user: {
         ...user,
+        employee: employeeRecord,
         role: userPayload.role, // from JWT
         themeColor: user?.organization?.themeColor || "blue"
       },
@@ -96,15 +127,15 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('verify-password')
   @HttpCode(HttpStatus.OK)
-  async verifyPassword(@Req() req: Request, @Body('password') password: string) {
+  async verifyPassword(@Req() req: Request, @Body() body: import('./dto/verify-password.dto').VerifyPasswordDto) {
     const userPayload = req['user'] as { userId: string };
-    await this.authService.verifyPassword(userPayload.userId, password);
+    await this.authService.verifyPassword(userPayload.userId, body.password);
     return { success: true };
   }
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refresh(@Req() req: Request) {
+  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies['refresh_token'];
     
     if (!refreshToken) {
@@ -115,15 +146,30 @@ export class AuthController {
     const userAgent = req.headers['user-agent'];
 
     try {
-      const { accessToken, user } = await this.authService.refreshTokens(
+      const { accessToken, refreshToken: newRefreshToken, user } = await this.authService.refreshTokens(
         refreshToken,
         ipAddress,
         userAgent,
       );
 
+      res.cookie('auth_token', accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 15 * 60 * 1000, // 15 mins in ms
+        path: '/',
+      });
+
+      res.cookie('refresh_token', newRefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
+        path: '/',
+      });
+
       return {
         success: true,
-        accessToken,
         user,
       };
     } catch (error) {

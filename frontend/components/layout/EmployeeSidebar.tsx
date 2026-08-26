@@ -13,6 +13,7 @@ import {
   ChevronRight,
   User,
   CalendarDays,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
@@ -112,7 +113,23 @@ export function EmployeeSidebar() {
         <p className="px-4 text-xs font-bold tracking-wider text-white/50 uppercase mb-3">
           Account
         </p>
-        <nav className="space-y-1">{renderLinks(bottomItems)}</nav>
+        <nav className="space-y-1">
+          {renderLinks(bottomItems)}
+          
+          <button
+            onClick={async () => {
+              const { authService } = await import("@/services/auth.service");
+              await authService.logout();
+              window.location.href = "/login";
+            }}
+            className="w-full group flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 text-white/70 hover:bg-red-500/20 hover:text-red-100"
+          >
+            <div className="flex items-center gap-3">
+              <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
+              Logout
+            </div>
+          </button>
+        </nav>
       </div>
     </aside>
   );

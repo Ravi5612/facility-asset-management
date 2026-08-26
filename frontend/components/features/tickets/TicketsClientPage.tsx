@@ -11,6 +11,7 @@ import {
 import { TicketStatus } from "@/types";
 import { InterDeptTicket } from "@/types";
 import { TicketTable } from "@/components/features/tickets/TicketTable";
+import { TicketActionModal } from "@/components/features/tickets/TicketActionModal";
 import { ticketService } from "@/services/ticket.service";
 
 export function TicketsClientPage() {
@@ -20,13 +21,16 @@ export function TicketsClientPage() {
   const [dateFilter, setDateFilter] = useState("All");
   const [customDate, setCustomDate] = useState("");
 
+  const [selectedTicket, setSelectedTicket] = useState<InterDeptTicket | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { data: rawTickets = [], isLoading } = useQuery({
-    queryKey: ["department-tickets"],
-    queryFn: ticketService.getTickets
+    queryKey: ["inbound-tickets"],
+    queryFn: ticketService.getInboundTickets
   });
 
   const formattedTickets: InterDeptTicket[] = useMemo(() => {
-    return rawTickets.map((t: Record<string, unknown>) => ({
+    return rawTickets.map((t: any) => ({
       id: t.ticketCode || t.id,
       subject: t.subject,
       description: t.description,
@@ -38,6 +42,7 @@ export function TicketsClientPage() {
       status: t.status,
       priority: t.priority === "CRITICAL" ? "URGENT" : t.priority,
       dateRaised: new Date(t.createdAt).toISOString().split('T')[0],
+      timeRaised: new Date(t.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
     }));
   }, [rawTickets]);
 
@@ -132,6 +137,10 @@ export function TicketsClientPage() {
         onPriorityChange={setPriorityFilter}
         onDateFilterChange={setDateFilter}
         onCustomDateChange={setCustomDate}
+        onTicketClick={(ticket) => {
+          setSelectedTicket(ticket);
+          setIsModalOpen(true);
+        }}
         onClearFilters={() => {
           setSearch("");
           setStatusFilter("All");
@@ -139,6 +148,12 @@ export function TicketsClientPage() {
           setDateFilter("All");
           setCustomDate("");
         }}
+      />
+
+      <TicketActionModal 
+        ticket={selectedTicket} 
+        isOpen={isModalOpen} 
+        setIsOpen={setIsModalOpen} 
       />
     </div>
   );

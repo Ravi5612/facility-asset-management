@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
 import { 
   User, 
   Calendar, 
@@ -21,38 +22,70 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { RaiseTicketModal } from "@/components/features/tickets/RaiseTicketModal";
+import { TicketActionModal } from "@/components/features/tickets/TicketActionModal";
+import { authService } from "@/services/auth.service";
+import { assetService } from "@/services/asset.service";
+import { ticketService } from "@/services/ticket.service";
+import { InterDeptTicket } from "@/types";
 
 export function EmployeeDashboardClient() {
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState<InterDeptTicket | null>(null);
+  const [isActionModalOpen, setIsActionModalOpen] = useState(false);
 
-  // --- MOCK DATA ---
-  const employeeInfo = {
-    name: "Rahul Sharma",
-    employeeCode: "EMP-0012",
-    designation: "Senior UI/UX Designer",
-    department: "Design",
-    email: "rahul.sharma@drithq.com",
-    phone: "+91 98765 43210",
-    joiningDate: "12 Aug 2024",
-    profilePic: null, // Can put a URL here to test image
+  // Fetch real data
+  const { data: user = null } = useQuery({
+    queryKey: ["auth-me"],
+    queryFn: authService.getMe,
+  });
+
+  const { data: myAssets = [] } = useQuery({
+    queryKey: ["my-assets"],
+    queryFn: assetService.getAssignedToMeAssets,
+  });
+
+  const { data: myRaisedTickets = [] } = useQuery({
+    queryKey: ["outbound-tickets"],
+    queryFn: ticketService.getOutboundTickets,
+  });
+
+  const { data: assignedTicketsRaw = [] } = useQuery({
+    queryKey: ["assigned-to-me-tickets"],
+    queryFn: ticketService.getAssignedToMeTickets,
+  });
+
+  const employeeInfo = user ? {
+    name: (user as any).employee
+      ? `${(user as any).employee.firstName} ${(user as any).employee.lastName}`
+      : (user as any).fullName || "Employee",
+    employeeCode: (user as any).employee?.employeeCode || (user as any).employeeCode || "N/A",
+    designation: (user as any).employee?.designation || (user as any).designation || "N/A",
+    department: (user as any).employee
+      ? (user as any).departmentName
+      : (user as any).departmentName || "N/A",
+    email: (user as any).employee?.email || (user as any).email || "N/A",
+    phone: (user as any).employee?.phone || "N/A",
+    joiningDate: (user as any).employee?.joiningDate
+      ? new Date((user as any).employee.joiningDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
+      : "N/A",
+    profilePic: (user as any).employee?.profilePhoto || null,
+  } : {
+    name: (user as any)?.fullName || "Employee",
+    employeeCode: (user as any)?.employeeCode || "N/A",
+    designation: (user as any)?.designation || "N/A",
+    department: (user as any)?.departmentName || "N/A",
+    email: (user as any)?.email || "N/A",
+    phone: "N/A",
+    joiningDate: "N/A",
+    profilePic: null,
   };
 
   const attendanceStats = {
-    present: 18,
-    absent: 2,
-    leaves: 1,
-    totalWorkingDays: 21
+    present: 0,
+    absent: 0,
+    leaves: 0,
+    totalWorkingDays: 0
   };
-
-  const myAssets = [
-    { id: "AST-LPT-001", name: "MacBook Pro M2", type: "Laptop", assignedOn: "15 Aug 2024", status: "Active" },
-    { id: "AST-MON-042", name: "Dell 27 4K Monitor", type: "Monitor", assignedOn: "20 Aug 2024", status: "Active" },
-  ];
-
-  const myTickets = [
-    { id: "TKT-001", subject: "MacBook charging issue", date: "10 Oct 2025", status: "In Progress", priority: "High" },
-    { id: "TKT-015", subject: "Request for Figma Pro", date: "02 Sep 2025", status: "Completed", priority: "Medium" },
-  ];
 
   const salaryHistory = [
     { month: "October 2025", amount: "₹ 85,000", status: "Processing", date: "-" },
@@ -60,14 +93,35 @@ export function EmployeeDashboardClient() {
     { month: "August 2025", amount: "₹ 85,000", status: "Credited", date: "31 Aug 2025" },
   ];
 
+  // Map assigned tickets for TicketActionModal
+  const mappedAssignedTickets: InterDeptTicket[] = assignedTicketsRaw.map((t: any) => ({
+    id: t.ticketCode || t.id,
+    subject: t.subject,
+    description: t.description,
+    raisedByDept: t.raisedByDept?.name || "Unknown",
+    raisedByHodName: t.raisedByEmployee ? `${t.raisedByEmployee.firstName} ${t.raisedByEmployee.lastName}` : "System",
+    assignedToDept: t.assignedToDept?.name || "Unknown",
+    handler: t.assignedToEmployee ? `${t.assignedToEmployee.firstName} ${t.assignedToEmployee.lastName}` : null,
+    status: t.status,
+    priority: t.priority,
+    dateRaised: new Date(t.createdAt).toISOString().split('T')[0],
+  }));
+
   return (
     <div className="p-6 md:p-8 space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto">
+      <RaiseTicketModal isOpen={isTicketModalOpen} setIsOpen={setIsTicketModalOpen} />
       
+      <TicketActionModal 
+        ticket={selectedTicket} 
+        isOpen={isActionModalOpen} 
+        setIsOpen={setIsActionModalOpen} 
+      />
+
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Welcome back, {employeeInfo.name.split(" ")[0]}! \uD83D\uDC4B
+            Welcome back, {employeeInfo.name.split(" ")[0]}! 👋
           </h1>
           <p className="text-muted-foreground mt-1 text-lg">
             Here's an overview of your work, assets, and requests.
@@ -99,58 +153,57 @@ export function EmployeeDashboardClient() {
                 )}
               </div>
               <h2 className="text-xl font-bold text-foreground">{employeeInfo.name}</h2>
-              <p className="text-[var(--brand-primary)] font-medium text-sm">{employeeInfo.designation}</p>
-              
-              <div className="w-full mt-6 space-y-3 text-sm text-left">
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <Building2 className="h-4 w-4 shrink-0" />
-                  <span className="font-medium text-foreground">{employeeInfo.department} Dept</span>
-                </div>
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <Briefcase className="h-4 w-4 shrink-0" />
-                  <span className="font-medium text-foreground">{employeeInfo.employeeCode}</span>
-                </div>
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <Mail className="h-4 w-4 shrink-0" />
-                  <span className="truncate">{employeeInfo.email}</span>
-                </div>
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <Phone className="h-4 w-4 shrink-0" />
-                  <span>{employeeInfo.phone}</span>
-                </div>
+              <Badge variant="secondary" className="mt-2 font-mono">{employeeInfo.employeeCode}</Badge>
+            </div>
+
+            <div className="mt-8 space-y-4">
+              <div className="flex items-center gap-3 text-sm">
+                <Briefcase className="h-4 w-4 text-muted-foreground" />
+                <span className="text-foreground font-medium">{employeeInfo.designation}</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <Building2 className="h-4 w-4 text-muted-foreground" />
+                <span className="text-foreground font-medium">{employeeInfo.department} Department</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <span className="text-foreground">{employeeInfo.email}</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <span className="text-foreground">{employeeInfo.phone}</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span className="text-foreground">Joined {employeeInfo.joiningDate}</span>
               </div>
             </div>
           </div>
 
           {/* Attendance Stats */}
-          <div className="bg-card border rounded-2xl p-6 shadow-sm space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Calendar className="h-5 w-5 text-brand-primary" />
-              <h3 className="text-lg font-bold">This Month</h3>
-            </div>
-            
+          <div className="bg-card border rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-brand-primary" /> This Month
+            </h3>
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-brand-success/10 p-4 rounded-xl border border-brand-success/20">
-                <p className="text-sm text-brand-success font-medium mb-1">Present</p>
-                <p className="text-3xl font-bold text-foreground">{attendanceStats.present}</p>
+              <div className="bg-brand-success/10 border border-brand-success/20 rounded-xl p-4 text-center">
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">Present</p>
+                <p className="text-2xl font-bold text-brand-success">{attendanceStats.present}</p>
               </div>
-              <div className="bg-brand-danger/10 p-4 rounded-xl border border-brand-danger/20">
-                <p className="text-sm text-brand-danger font-medium mb-1">Absent</p>
-                <p className="text-3xl font-bold text-foreground">{attendanceStats.absent}</p>
+              <div className="bg-brand-danger/10 border border-brand-danger/20 rounded-xl p-4 text-center">
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">Absent</p>
+                <p className="text-2xl font-bold text-brand-danger">{attendanceStats.absent}</p>
               </div>
-              <div className="bg-brand-warning/10 p-4 rounded-xl border border-brand-warning/20">
-                <p className="text-sm text-brand-warning font-medium mb-1">Leaves</p>
-                <p className="text-3xl font-bold text-foreground">{attendanceStats.leaves}</p>
-              </div>
-              <div className="bg-muted p-4 rounded-xl border border-border">
-                <p className="text-sm text-muted-foreground font-medium mb-1">Total Days</p>
-                <p className="text-3xl font-bold text-foreground">{attendanceStats.totalWorkingDays}</p>
-              </div>
+            </div>
+            <div className="mt-4 pt-4 border-t flex justify-between items-center text-sm">
+              <span className="text-muted-foreground">Leaves Taken</span>
+              <span className="font-medium">{attendanceStats.leaves}</span>
             </div>
           </div>
+
         </div>
 
-        {/* RIGHT COLUMN: Tickets, Assets, Salary */}
+        {/* RIGHT COLUMN: Assets & Tickets */}
         <div className="lg:col-span-2 space-y-8">
           
           {/* Quick Stats */}
@@ -163,86 +216,124 @@ export function EmployeeDashboardClient() {
               lineClassName="bg-blue-500"
             />
             <SummaryCard 
-              label="Active Tickets" 
-              value={myTickets.filter(t => t.status !== "Completed").length} 
+              label="Active Requests" 
+              value={myRaisedTickets.filter((t: any) => t.status === "OPEN" || t.status === "IN_PROGRESS").length} 
               icon={<Ticket className="h-5 w-5" />}
-              iconClassName="bg-amber-500/10 text-amber-500"
-              lineClassName="bg-amber-500"
+              iconClassName="bg-brand-warning/10 text-brand-warning"
+              lineClassName="bg-brand-warning"
             />
           </div>
 
-          {/* Salary History */}
+          {/* Assigned Tasks (For Resolvers like IT Support) */}
+          {mappedAssignedTickets.length > 0 && (
+            <div className="bg-card border rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5 text-brand-danger" /> Assigned To Me
+                </h3>
+                <Badge variant="secondary">{mappedAssignedTickets.length} Task(s)</Badge>
+              </div>
+              <div className="space-y-4">
+                {mappedAssignedTickets.map((ticket: InterDeptTicket) => (
+                  <div key={ticket.id} 
+                    onClick={() => {
+                      setSelectedTicket(ticket);
+                      setIsActionModalOpen(true);
+                    }}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-xl hover:bg-muted/30 cursor-pointer transition-colors gap-4">
+                    <div className="flex items-start gap-4">
+                      <div className="h-10 w-10 bg-brand-primary/10 text-brand-primary rounded-lg flex items-center justify-center shrink-0">
+                        <AlertCircle className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground">{ticket.subject}</h4>
+                        <p className="text-sm text-muted-foreground mt-0.5">Raised by: {ticket.raisedByHodName} ({ticket.raisedByDept})</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-xs font-mono text-muted-foreground">{ticket.id}</span>
+                      <StatusBadge status={ticket.status} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* My Assets */}
           <div className="bg-card border rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-brand-primary" />
-                <h3 className="text-lg font-bold">Salary History</h3>
-              </div>
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <Package className="h-5 w-5 text-brand-primary" /> My Assets
+              </h3>
               <Button variant="ghost" size="sm" className="text-brand-primary">View All</Button>
             </div>
             
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-muted/50 text-muted-foreground uppercase text-xs">
-                  <tr>
-                    <th className="px-4 py-3 rounded-l-lg">Month</th>
-                    <th className="px-4 py-3">Amount</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3 rounded-r-lg">Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {salaryHistory.map((salary) => (
-                    <tr key={salary.month} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-4 py-4 font-medium text-foreground">{salary.month}</td>
-                      <td className="px-4 py-4 font-bold">{salary.amount}</td>
-                      <td className="px-4 py-4">
-                        <StatusBadge status={salary.status} />
-                      </td>
-                      <td className="px-4 py-4 text-muted-foreground">{salary.date}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {myAssets.length === 0 ? (
+              <div className="py-8 text-center border rounded-xl border-dashed">
+                <Package className="h-8 w-8 text-muted-foreground mx-auto mb-2 opacity-20" />
+                <p className="text-sm text-muted-foreground">No assets assigned yet</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {myAssets.map((asset: any) => (
+                  <div key={asset.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-xl hover:bg-muted/30 transition-colors gap-4">
+                    <div className="flex items-start gap-4">
+                      <div className="h-10 w-10 bg-brand-primary/10 text-brand-primary rounded-lg flex items-center justify-center shrink-0">
+                        <Package className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground">{asset.name}</h4>
+                        <p className="text-sm text-muted-foreground mt-0.5">{asset.category?.name || 'Asset'} • Assigned: {new Date(asset.assignedDate || asset.createdAt).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-xs font-mono text-muted-foreground">{asset.assetCode || asset.serialNumber}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* My Tickets */}
+          {/* My Raised Tickets */}
           <div className="bg-card border rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-brand-primary" />
-                <h3 className="text-lg font-bold">Recent Tickets</h3>
-              </div>
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <Ticket className="h-5 w-5 text-brand-primary" /> My Raised Tickets
+              </h3>
             </div>
             
-            <div className="space-y-3">
-              {myTickets.map((ticket) => (
-                <div key={ticket.id} className="flex items-center justify-between p-4 rounded-xl border bg-muted/20 hover:bg-muted/50 transition-colors">
-                  <div>
-                    <h4 className="font-semibold text-foreground">{ticket.subject}</h4>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {ticket.id} • Raised on {ticket.date}
-                    </p>
+            {myRaisedTickets.length === 0 ? (
+              <div className="py-8 text-center border rounded-xl border-dashed">
+                <Ticket className="h-8 w-8 text-muted-foreground mx-auto mb-2 opacity-20" />
+                <p className="text-sm text-muted-foreground">No tickets raised</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {myRaisedTickets.slice(0, 3).map((ticket: any) => (
+                  <div key={ticket.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-xl hover:bg-muted/30 transition-colors gap-4">
+                    <div className="flex flex-col gap-1">
+                      <h4 className="font-semibold text-foreground text-sm">{ticket.subject}</h4>
+                      <p className="text-xs text-muted-foreground">To: {ticket.assignedToDept?.name}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground">{new Date(ticket.createdAt).toLocaleDateString()}</span>
+                      <StatusBadge status={ticket.status} />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Badge variant={ticket.priority === "High" ? "destructive" : "default"}>
-                      {ticket.priority}
-                    </Badge>
-                    <StatusBadge status={ticket.status} />
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+                {myRaisedTickets.length > 3 && (
+                  <Button variant="ghost" className="w-full text-brand-primary text-sm">
+                    View All {myRaisedTickets.length} Tickets
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
 
         </div>
       </div>
-
-      {/* Ticket Modal */}
-      {isTicketModalOpen && (
-        <RaiseTicketModal isOpen={isTicketModalOpen} setIsOpen={setIsTicketModalOpen} />
-      )}
     </div>
   );
 }

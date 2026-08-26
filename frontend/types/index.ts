@@ -45,8 +45,8 @@ export type AssetCategory = {
   items: AssetItem[];
 };
 
-export type TicketStatus = "Pending" | "In Progress" | "Completed";
-export type Priority = "High" | "Medium" | "Low";
+export type TicketStatus = "Pending" | "In Progress" | "Completed" | "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+export type Priority = "High" | "Medium" | "Low" | "URGENT" | "CRITICAL";
 
 export type InterDeptTicket = {
   id: string;
@@ -61,6 +61,7 @@ export type InterDeptTicket = {
   status: TicketStatus;
   priority: Priority;
   dateRaised: string;
+  timeRaised?: string;
   resolutionMessage?: string;
   history?: {
     action: string;

@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Put,
   Get,
   Delete,
   Patch,
@@ -11,15 +12,17 @@ import {
   HttpCode,
   HttpStatus,
   UseInterceptors,
-  UploadedFile,
+  UploadedFile, UploadedFiles,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
 import { UsersService } from './users.service';
 import { CreateSubAdminDto } from './dto/create-sub-admin.dto';
+import { UpdateSubAdminDto } from './dto/update-sub-admin.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { imageUploadOptions } from '../common/utils/file-upload.util';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -37,7 +40,7 @@ export class UsersController {
   // POST /users/sub-admins → Only SUPER_ADMIN can create
   @Post('sub-admins')
   @Roles('SUPER_ADMIN')
-  @UseInterceptors(FileInterceptor('profileImage'))
+  @UseInterceptors(FileInterceptor('profileImage', imageUploadOptions))
   @HttpCode(HttpStatus.CREATED)
   createSubAdmin(
     @Body() dto: CreateSubAdminDto,
@@ -46,6 +49,19 @@ export class UsersController {
   ) {
     const user = req['user'] as { userId: string; organizationId: string };
     return this.usersService.createSubAdmin(dto, user.userId, user.organizationId, profileImage);
+  }
+
+  
+  // PUT /users/sub-admins/:id -> Update SUB_ADMIN
+  @Put('sub-admins/:id')
+  @Roles('SUPER_ADMIN')
+  updateSubAdmin(
+    @Param('id') id: string,
+    @Body() dto: UpdateSubAdminDto,
+    @Req() req: Request,
+  ) {
+    const user = req['user'] as { organizationId: string };
+    return this.usersService.updateSubAdmin(id, dto, user.organizationId);
   }
 
   // GET /users/sub-admins  → Only SUPER_ADMIN
@@ -121,10 +137,10 @@ export class UsersController {
   @Roles('SUPER_ADMIN')
   async resetPassword(
     @Param('id') id: string,
-    @Body('newPassword') newPassword: string,
+    @Body() body: import('./dto/reset-password.dto').ResetPasswordDto,
     @Req() req: Request
   ) {
     const user = req['user'] as { organizationId: string };
-    return this.usersService.resetPassword(id, user.organizationId, newPassword);
+    return this.usersService.resetPassword(id, user.organizationId, body.newPassword);
   }
 }

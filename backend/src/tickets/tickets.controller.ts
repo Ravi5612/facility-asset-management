@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Param, Body, Req, UseGuards, Query } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import type { Request } from 'express';
@@ -20,9 +20,15 @@ export class TicketsController {
 
   @Get()
   @Roles('SUPER_ADMIN', 'SUB_ADMIN')
-  getAllTickets(@Req() req: Request) {
+  getAllTickets(
+    @Req() req: Request,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
     const user = req['user'] as any;
-    return this.ticketsService.getAllTickets(user.userId, user.organizationId, user.role);
+    const pageNumber = parseInt(page || '1', 10);
+    const limitNumber = parseInt(limit || '50', 10);
+    return this.ticketsService.getAllTickets(user.userId, user.organizationId, user.role, pageNumber, limitNumber);
   }
 
   @Get('my-department')
@@ -37,5 +43,19 @@ export class TicketsController {
   getMyTickets(@Req() req: Request) {
     const user = req['user'] as any;
     return this.ticketsService.getMyTickets(user.userId, user.organizationId);
+  }
+  
+  @Get('assigned-to-me')
+  @Roles('SUPER_ADMIN', 'SUB_ADMIN', 'HOD', 'EMPLOYEE')
+  getAssignedToMeTickets(@Req() req: Request) {
+    const user = req['user'] as any;
+    return this.ticketsService.getAssignedToMeTickets(user.userId, user.organizationId);
+  }
+
+  @Patch(':id')
+  @Roles('SUPER_ADMIN', 'SUB_ADMIN', 'HOD', 'EMPLOYEE')
+  updateTicket(@Param('id') id: string, @Req() req: Request, @Body() updateTicketDto: any) {
+    const user = req['user'] as any;
+    return this.ticketsService.updateTicket(id, user.userId, user.organizationId, user.role, updateTicketDto);
   }
 }

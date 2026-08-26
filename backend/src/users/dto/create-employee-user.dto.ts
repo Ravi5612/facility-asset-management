@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength, MaxLength, IsNotEmpty, IsOptional, IsDateString } from 'class-validator';
+import { IsEmail, IsString, MinLength, MaxLength, IsNotEmpty, IsOptional, IsDateString, IsNumberString, IsNumber } from 'class-validator';
 
 export class CreateEmployeeUserDto {
   @IsString()
@@ -33,4 +33,32 @@ export class CreateEmployeeUserDto {
   @IsOptional()
   @IsDateString()
   joiningDate?: string;
+
+  // --- NEW FIELDS ---
+  @IsOptional() @IsString() fatherName?: string;
+  @IsOptional() @IsString() motherName?: string;
+  @IsOptional() @IsString() dob?: string;
+  @IsOptional() @IsString() gender?: string;
+  @IsOptional() @IsString() bloodGroup?: string;
+  @IsOptional() @IsString() emergencyContact?: string;
+  @IsOptional() @IsString() currentAddress?: string;
+  @IsOptional() @IsString() permanentAddress?: string;
+  @IsOptional() @IsString() qualification?: string;
+  
+  @IsOptional() lastSalary?: any;
+  @IsOptional() offeredSalary?: any;
+
+  @IsOptional() @IsString() bankName?: string;
+  @IsOptional() @IsString() accountNumber?: string;
+  @IsOptional() @IsString() ifscCode?: string;
+  @IsOptional() @IsString() aadharNumber?: string;
+  
+  @IsOptional() @IsString() criminalCase?: string;
+  @IsOptional() @IsString() criminalDetails?: string;
+  @IsOptional() @IsString() illnesses?: string;
+  @IsOptional() @IsString() medication?: string;
+
+  @IsOptional() @IsString() aadharPhoto?: string;
+  @IsOptional() @IsString() educationPhoto?: string;
+  @IsOptional() @IsString() salaryProofPhoto?: string;
 }

@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAssetCategoryDto, CreateAssetDto } from './dto/asset.dto';
 
@@ -6,7 +6,19 @@ import { CreateAssetCategoryDto, CreateAssetDto } from './dto/asset.dto';
 export class AssetsService {
   constructor(private prisma: PrismaService) {}
 
-  async getCategories(organizationId: string, accessibleDepartments?: string[]) {
+  async getCategories(organizationId: string, userId: string, role: string) {
+    let accessibleDepartments: string[] | undefined = undefined;
+
+    if (role === 'SUB_ADMIN') {
+      const dbUser = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { accessibleDepartments: true }
+      });
+      if (dbUser?.accessibleDepartments) {
+        accessibleDepartments = dbUser.accessibleDepartments;
+      }
+    }
+
     let allowedDeptIds: string[] | undefined = undefined;
 
     if (accessibleDepartments && accessibleDepartments.length > 0) {
@@ -72,8 +84,31 @@ export class AssetsService {
     return result;
   }
 
-  async getDepartmentAssets(organizationId: string, userId: string) {
-    // Find the user to get their department name
+  
+  async createCategory(organizationId: string, userId: string, dto: CreateAssetCategoryDto) {
+    const dbUser = await this.prisma.user.findUnique({ where: { id: userId }, select: { departmentName: true } });
+    if (dbUser?.departmentName?.toLowerCase() !== 'store') {
+      throw new ForbiddenException('Only Store HOD can add asset categories.');
+    }
+
+    const existing = await this.prisma.assetCategory.findFirst({
+      where: { organizationId, name: { equals: dto.name, mode: 'insensitive' } }
+    });
+
+    if (existing) {
+      throw new BadRequestException('Category already exists.');
+    }
+
+    return this.prisma.assetCategory.create({
+      data: {
+        organizationId,
+        name: dto.name,
+        description: (dto as any).description || null,
+      }
+    });
+  }
+
+  async getDepartmentAssets(organizationId: string, userId: string, viewMode?: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId }
     });
@@ -82,76 +117,98 @@ export class AssetsService {
       throw new BadRequestException("No department associated with this user.");
     }
 
-    // Find the department ID based on department name
+    // ── Business rule: Store/Inventory HOD can see all org assets ──────────────
+    const isStoreHOD = user.departmentName.toLowerCase().includes('store') || 
+                       user.departmentName.toLowerCase().includes('inventory');
+
+    const mapAsset = (asset: any, deptName?: string) => {
+      const activeAssign = asset.assignments?.find((a: any) => a.status === 'ACTIVE');
+      return {
+        id: asset.assetCode || asset.id,
+        rawId: asset.id,
+        name: asset.name,
+        categoryName: asset.category.name,
+        status: asset.status === 'ASSIGNED' ? 'Assigned' :
+                asset.status === 'IN_MAINTENANCE' ? 'Repair' :
+                asset.status === 'RETIRED' ? 'Dump' : 'Available',
+        assignee: asset.currentAssignee 
+          ? (asset.currentAssignee.user?.fullName || `${asset.currentAssignee.firstName} ${asset.currentAssignee.lastName}`.trim()) 
+          : null,
+        assigneeDetails: asset.currentAssignee ? {
+          name: asset.currentAssignee.user?.fullName || `${asset.currentAssignee.firstName} ${asset.currentAssignee.lastName}`.trim(),
+          employeeCode: asset.currentAssignee.employeeCode,
+          email: asset.currentAssignee.email,
+          designation: asset.currentAssignee.designation,
+          department: asset.ownerDepartment?.name || null,
+        } : null,
+        serialNumber: asset.serialNumber,
+        departmentName: deptName ?? asset.ownerDepartment?.name ?? null,
+        isStoreHOD,      // Let frontend know it can show the toggle — cosmetic only
+        purchaseDate: asset.purchaseDate ? asset.purchaseDate.toISOString().split('T')[0] : null,
+        warrantyExpiry: asset.warrantyExpiryDate ? asset.warrantyExpiryDate.toISOString().split('T')[0] : null,
+        notes: asset.notes || "",
+        history: asset.assignments?.map((a: any) => ({
+          action: a.status === 'ACTIVE' ? 'Assigned' : 'Returned',
+          person: `${a.employee.firstName} ${a.employee.lastName}`,
+          date: a.assignedAt.toISOString().split('T')[0],
+          note: a.conditionOnAssign || 'No notes'
+        })) || []
+      };
+    };
+
+    // ── Store HOD: return all OR own based on viewMode ──────────────────────────
+    if (isStoreHOD) {
+      const ownDept = await this.prisma.department.findFirst({
+        where: { organizationId, name: { equals: user.departmentName, mode: 'insensitive' } }
+      });
+
+      const whereClause = (viewMode === 'own' && ownDept)
+        ? { organizationId, ownerDepartmentId: ownDept.id }
+        : { organizationId };
+
+      const assets = await this.prisma.asset.findMany({
+        where: whereClause,
+        include: {
+          category: true,
+          ownerDepartment: true,
+          currentAssignee: { include: { user: true } },
+          assignments: { include: { employee: true }, orderBy: { assignedAt: 'desc' } }
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      return assets.map(a => mapAsset(a));
+    }
+
+    // ── Normal HOD: return only their department's assets ───────────────────────
     const department = await this.prisma.department.findFirst({
-      where: {
-        organizationId,
-        name: { equals: user.departmentName, mode: 'insensitive' }
-      }
+      where: { organizationId, name: { equals: user.departmentName, mode: 'insensitive' } }
     });
 
     if (!department) {
       throw new BadRequestException("Department not found in the system.");
     }
 
-    const departmentId = department.id;
-
     const assets = await this.prisma.asset.findMany({
-      where: {
-        organizationId,
-        ownerDepartmentId: departmentId,
-      },
+      where: { organizationId, ownerDepartmentId: department.id },
       include: {
         category: true,
-        assignments: {
-          include: { employee: true },
-          orderBy: { assignedAt: 'desc' },
-          take: 1
-        }
+        ownerDepartment: true,
+        currentAssignee: { include: { user: true } },
+        assignments: { include: { employee: true }, orderBy: { assignedAt: 'desc' } }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
-    return assets.map(asset => {
-      const activeAssign = asset.assignments?.find(a => a.status === 'ACTIVE');
-      return {
-        id: asset.assetCode || asset.id,
-        rawId: asset.id, // Keep the UUID for API calls
-        name: asset.name,
-        categoryName: asset.category.name,
-        serialNumber: asset.serialNumber,
-        status: asset.status === 'AVAILABLE' ? 'Available' : asset.status === 'ASSIGNED' ? 'Assigned' : asset.status === 'IN_MAINTENANCE' ? 'Repair' : 'Dump',
-        assignedTo: activeAssign ? `${activeAssign.employee.firstName} ${activeAssign.employee.lastName}` : null,
-      };
-    });
-  }
-
-  async createCategory(organizationId: string, dto: CreateAssetCategoryDto) {
-    const existing = await this.prisma.assetCategory.findUnique({
-      where: { organizationId_name: { organizationId, name: dto.name } }
-    });
-
-    if (existing) {
-      throw new BadRequestException('Category already exists');
-    }
-
-    const cat = await this.prisma.assetCategory.create({
-      data: {
-        organizationId,
-        name: dto.name,
-        description: dto.prefix || '' // Temporary hack if we want to store prefix
-      }
-    });
-    
-    return {
-      category: cat.id,
-      name: cat.name,
-      prefix: cat.description || cat.name.slice(0,3).toUpperCase(),
-      items: []
-    };
+    return assets.map(a => mapAsset(a, department.name));
   }
 
   async createAsset(organizationId: string, userId: string, dto: CreateAssetDto) {
+    const dbUser = await this.prisma.user.findUnique({ where: { id: userId }, select: { departmentName: true } });
+    if (dbUser?.departmentName?.toLowerCase() !== 'store') {
+      throw new ForbiddenException('Only Store HOD can add assets.');
+    }
+
     // Generate asset code logic (e.g., Prefix-001)
     const category = await this.prisma.assetCategory.findUnique({
       where: { organizationId_name: { organizationId, name: dto.categoryId } } // Frontend sends name as categoryId
@@ -220,10 +277,35 @@ export class AssetsService {
       }),
       this.prisma.asset.update({
         where: { id: asset.id },
-        data: { status: 'ASSIGNED' }
+        data: { status: 'ASSIGNED', currentAssigneeId: employee.id }
       })
     ]);
 
     return { message: "Asset assigned successfully", assignment, updatedAsset };
+  }
+
+  // Get assets assigned to the logged-in employee
+  async getAssignedToMeAssets(userId: string, organizationId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !user.email) return [];
+
+    const employee = await this.prisma.employee.findFirst({
+      where: { email: user.email, organizationId }
+    });
+
+    if (!employee) return [];
+
+    return this.prisma.asset.findMany({
+      where: { 
+        currentAssigneeId: employee.id, // Using currentAssigneeId
+        organizationId,
+        deletedAt: null
+      },
+      include: {
+        category: true,
+        ownerDepartment: true
+      },
+      orderBy: { createdAt: 'desc' }
+    });
   }
 }

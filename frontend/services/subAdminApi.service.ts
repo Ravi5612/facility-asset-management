@@ -73,6 +73,26 @@ export const subAdminApiService = {
     return toggleStatusSchema.parse(raw); // Validate with Zod
   },
 
+  
+  async updateSubAdmin(id: string, data: {
+    name?: string;
+    email?: string;
+    password?: string;
+    departmentIds?: string[];
+  }): Promise<any> {
+    const res = await fetch(`${API_URL}/users/sub-admins/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
+    if (!res.ok) {
+      const errRes = await res.json().catch(() => ({}));
+      throw new Error(errRes.message || "Failed to update sub-admin");
+    }
+    return res.json();
+  },
+
   async deleteSubAdmin(id: string): Promise<void> {
     const res = await fetch(`${API_URL}/users/sub-admins/${id}`, {
       method: "DELETE",

@@ -3,16 +3,13 @@ import { z } from "zod";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3001";
 
-// Zod schema for login request body
 const loginBodySchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
 });
 
-// Zod schema for backend response
 const backendLoginSchema = z.object({
   success: z.boolean(),
-  accessToken: z.string(),
   user: z.object({
     id: z.string(),
     email: z.string().email(),
@@ -25,17 +22,12 @@ const backendLoginSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Validate request body
     const body = await request.json();
     const parsed = loginBodySchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json(
-        { message: "Invalid request data" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Invalid request data" }, { status: 400 });
     }
 
-    // 2. Call NestJS backend
     const backendRes = await fetch(`${BACKEND_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -50,53 +42,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Validate backend response with Zod
     const rawData = await backendRes.json();
     const validated = backendLoginSchema.safeParse(rawData);
     if (!validated.success) {
-      return NextResponse.json(
-        { message: "Unexpected response from server" },
-        { status: 500 }
-      );
+      return NextResponse.json({ message: "Unexpected response from server" }, { status: 500 });
     }
 
-    const { accessToken, user } = validated.data;
+    const { user } = validated.data;
 
-    const response = NextResponse.json({
-      success: true,
-      user,
-    });
+    const response = NextResponse.json({ success: true, user });
 
-    // Forward the refresh_token cookie from NestJS to the Next.js response
+    // Forward ALL cookies set by NestJS backend (auth_token + refresh_token)
     if (backendRes.headers.getSetCookie) {
       const setCookies = backendRes.headers.getSetCookie();
       setCookies.forEach((cookieStr) => {
         response.headers.append("Set-Cookie", cookieStr);
       });
     } else {
-      const rawCookie = backendRes.headers.get('set-cookie');
+      const rawCookie = backendRes.headers.get("set-cookie");
       if (rawCookie) {
         response.headers.append("Set-Cookie", rawCookie);
       }
     }
 
-    // Set access token in httpOnly cookie
+    // Set theme color cookie (non-sensitive, can be readable)
     if (user.themeColor) {
       response.cookies.set("app-theme-color", user.themeColor, { path: "/", maxAge: 365 * 24 * 60 * 60 });
     }
-    response.cookies.set("auth_token", accessToken, {
-      httpOnly: true,       // JS cannot read this — XSS safe ✅
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 15 * 60,      // 15 minutes (access token expiry)
-      path: "/",
-    });
 
     return response;
   } catch {
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }
