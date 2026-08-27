@@ -67,11 +67,21 @@ export function TicketStatusBarChart({ data }: { data: Record<string, string | n
 }
 
 export function DepartmentAssetsPieChart({ data, colors }: { data: Record<string, string | number>[], colors: string[] }) {
+  const activeData = data.filter(d => Number(d.value) > 0);
+
+  if (activeData.length === 0) {
+    return (
+      <div className="flex h-[300px] items-center justify-center text-muted-foreground text-sm">
+        No assets found.
+      </div>
+    );
+  }
+
   return (
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>
         <Pie
-          data={data}
+          data={activeData}
           cx="50%"
           cy="50%"
           labelLine={false}
@@ -80,7 +90,7 @@ export function DepartmentAssetsPieChart({ data, colors }: { data: Record<string
           fill="var(--brand-primary)"
           dataKey="value"
         >
-          {data.map((entry, index) => (
+          {activeData.map((entry, index) => (
             <Cell key={`cell-${entry.name}`} fill={colors[index % colors.length]} />
           ))}
         </Pie>

@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function SubAdminTicketsPage() {
-  return <TicketsClientPage />;
+  return <TicketsClientPage fetchMode="all" />;
 }

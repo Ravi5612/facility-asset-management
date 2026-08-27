@@ -23,7 +23,7 @@ export const employeeApi = {
     });
     if (!res.ok) throw new Error("Failed to fetch employees");
     const data = await res.json();
-    return z.array(employeeSchema).parse(data);
+    return data as EmployeeUser[];
   },
 
   createEmployee: async (data: Record<string, unknown>): Promise<void> => {

@@ -23,6 +23,7 @@ import { staticAssetsData } from "@/lib/mock-data/assets";
 import { AssetCategoryCard } from "@/components/features/assets/AssetCategoryCard";
 import { SuccessAlert } from "@/components/ui/alert-box";
 import { AssetDetailModal } from "@/components/features/assets/AssetDetailModal";
+import { DashboardSkeleton } from "@/components/ui/skeletons";
 
 /* ─── AUTO PREFIX GENERATOR ─── */
 function generatePrefix(name: string): string {
@@ -54,10 +55,21 @@ function getActionColor(action: string) {
 
 const DETAIL_PAGE_SIZE = 8;
 
+import { useQuery } from "@tanstack/react-query";
+import { assetService } from "@/services/asset.service";
+
 /* ═══════════════════════════════════════════ */
-export function AssetsClientPage({ initialCategories, hideAddButton = false }: { initialCategories: AssetCategory[], hideAddButton?: boolean }) {
+export function AssetsClientPage({ initialCategories = [], hideAddButton = false }: { initialCategories?: AssetCategory[], hideAddButton?: boolean }) {
+  const { data: responseData, isLoading: isQueryLoading } = useQuery({
+    queryKey: ["superadmin-assets-categories"],
+    queryFn: assetService.getCategories,
+    initialData: initialCategories.length > 0 ? { data: initialCategories, summary: { total: 0, assigned: 0, dump: 0, available: 0, repair: 0 } } : undefined,
+  });
+
+  const fetchedCategories = responseData?.data || [];
+  const serverSummary = responseData?.summary || { total: 0, assigned: 0, dump: 0, available: 0, repair: 0 };
+
   const [isAddOpen, setIsAddOpen]       = useState(false);
-  const [isLoading, setIsLoading]       = useState(false);
   const [success, setSuccess]           = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<AssetCategory | null>(null);
   const [selectedItem, setSelectedItem] = useState<AssetItem | null>(null);
@@ -76,9 +88,9 @@ export function AssetsClientPage({ initialCategories, hideAddButton = false }: {
 
   // All categories merged
   const allCategories = useMemo<AssetCategory[]>(() => [
-    ...initialCategories,
+    ...fetchedCategories,
     ...customCategories,
-  ], [initialCategories, customCategories]);
+  ], [fetchedCategories, customCategories]);
 
   function handleAddCategory(name: string, prefixStr: string) {
     const trimmed = name.trim();
@@ -96,10 +108,10 @@ export function AssetsClientPage({ initialCategories, hideAddButton = false }: {
   }
 
   
-  const totalAssets   = allCategories.reduce((s, c) => s + c.items.length, 0);
-  const totalAssigned = allCategories.reduce((s, c) => s + c.items.filter(i => i.status === "Assigned").length, 0);
-  const totalDump     = allCategories.reduce((s, c) => s + c.items.filter(i => i.status === "Dump").length, 0);
-  const totalAvailable = allCategories.reduce((s, c) => s + c.items.filter(i => i.status === "Available").length, 0);
+  const totalAssets   = serverSummary.total;
+  const totalAssigned = serverSummary.assigned;
+  const totalDump     = serverSummary.dump;
+  const totalAvailable = serverSummary.available;
 
   const filteredItems = useMemo(() => {
     if (!selectedCategory) return [];
@@ -134,8 +146,12 @@ export function AssetsClientPage({ initialCategories, hideAddButton = false }: {
         )}
       </div>
 
-      {/* ── Stats ── */}
-      <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+      {isQueryLoading ? (
+        <DashboardSkeleton />
+      ) : (
+        <>
+          {/* ── Stats ── */}
+          <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
         <SummaryCard
           label="Total Assets"
           value={totalAssets}
@@ -256,6 +272,8 @@ export function AssetsClientPage({ initialCategories, hideAddButton = false }: {
         </DialogContent>
       </Dialog>
       <AssetDetailModal selectedItem={selectedItem} setSelectedItem={setSelectedItem} />
+        </>
+      )}
     </div>
   );
 }

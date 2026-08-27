@@ -88,6 +88,7 @@ export class AuthController {
         fullName: true,
         employeeCode: true,
         departmentName: true,
+          profileImage: true,
         accessibleDepartments: true,
         organizationId: true,
         status: true,

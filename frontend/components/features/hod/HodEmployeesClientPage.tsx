@@ -90,7 +90,7 @@ export default function HodEmployeesClientPage() {
 
       {/* Content */}
       {isLoading ? (
-        <div className="flex items-center justify-center h-48 border rounded-xl bg-card">
+        <div className="w-full">
           <TableSkeleton />
         </div>
       ) : error ? (
@@ -108,6 +108,7 @@ export default function HodEmployeesClientPage() {
           <table className="w-full text-sm text-left">
             <thead className="bg-muted/50 text-muted-foreground font-semibold">
               <tr>
+                <th className="px-6 py-4 w-16">Profile</th>
                 <th className="px-6 py-4">Name</th>
                 <th className="px-6 py-4">Designation</th>
                 <th className="px-6 py-4">Email</th>
@@ -120,6 +121,17 @@ export default function HodEmployeesClientPage() {
             <tbody className="divide-y divide-border">
               {employees.map(emp => (
                 <tr key={emp.id} className="hover:bg-muted/30 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="h-10 w-10 rounded-full bg-muted border overflow-hidden flex items-center justify-center">
+                      {(emp as any).profileImage ? (
+                        <img src={(emp as any).profileImage} alt="Profile" className="h-full w-full object-cover" />
+                      ) : (
+                        <span className="text-muted-foreground font-semibold text-xs uppercase">
+                          {emp.name ? emp.name.substring(0, 2) : "U"}
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-6 py-4 font-medium text-foreground capitalize">{emp.name || "-"}</td>
                   <td className="px-6 py-4 text-muted-foreground">{emp.designation || "-"}</td>
                   <td className="px-6 py-4">{emp.email}</td>

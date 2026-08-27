@@ -48,21 +48,20 @@ export function DashboardClientPage() {
   const { greeting, stats, assetDistribution, ticketOverview, assetStatus, chartData } = dashboardData;
 
   return (
-    <div className="space-y-8">
-      {/* Welcome Header */}
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground leading-snug">
-            {greeting}, Super Admin! 👋
-          </h1>
-          <p className="text-sm text-muted-foreground mt-2.5">
-            Here&apos;s an overview of your organization&apos;s facility &amp;
-            asset activities.
-          </p>
+    <div className="space-y-8 pb-10">
+      <div className="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-sidebar)] rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">{greeting}, Super Admin! 👋</h1>
+            <p className="text-white/80 text-lg">
+              Here is an overview of your organization's facility & asset activities today.
+            </p>
+          </div>
+          <div className="text-left sm:text-right text-white/90 font-medium">
+            <p>{currentDate}</p>
+          </div>
         </div>
-        <div className="text-left sm:text-right">
-          <p className="text-sm font-semibold text-foreground">{currentDate}</p>
-        </div>
+        <div className="absolute right-0 top-0 h-full w-1/3 bg-white/5 skew-x-12 transform origin-top-left -translate-x-10" />
       </div>
 
       {/* Stats Grid */}

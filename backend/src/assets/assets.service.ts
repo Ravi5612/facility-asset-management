@@ -37,10 +37,25 @@ export class AssetsService {
       include: {
         assets: {
           where: allowedDeptIds ? { ownerDepartmentId: { in: allowedDeptIds } } : undefined,
-          include: {
+          select: {
+            id: true,
+            assetCode: true,
+            serialNumber: true,
+            purchaseDate: true,
+            warrantyExpiryDate: true,
+            status: true,
+            notes: true,
             assignments: {
-              include: { employee: true, asset: true },
-              orderBy: { assignedAt: 'desc' }
+              take: 10,
+              orderBy: { assignedAt: 'desc' },
+              select: {
+                status: true,
+                assignedAt: true,
+                conditionOnAssign: true,
+                employee: {
+                  select: { firstName: true, lastName: true }
+                }
+              }
             }
           }
         }
@@ -77,11 +92,21 @@ export class AssetsService {
       };
     });
 
-    if (accessibleDepartments !== undefined) {
-      return result.filter(cat => cat.items.length > 0);
-    }
+    const finalResult = (accessibleDepartments !== undefined) ? result.filter(cat => cat.items.length > 0) : result;
 
-    return result;
+    let total = 0, assigned = 0, dump = 0, available = 0, repair = 0;
+    finalResult.forEach(cat => {
+      total += cat.items.length;
+      assigned += cat.items.filter(i => i.status === 'Assigned').length;
+      dump += cat.items.filter(i => i.status === 'Dump').length;
+      available += cat.items.filter(i => i.status === 'Available').length;
+      repair += cat.items.filter(i => i.status === 'Repair').length;
+    });
+
+    return {
+      data: finalResult,
+      summary: { total, assigned, dump, available, repair }
+    };
   }
 
   

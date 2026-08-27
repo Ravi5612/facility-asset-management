@@ -482,7 +482,7 @@ export class UsersService {
         } 
       },
       include: {
-        user: { select: { id: true, email: true, fullName: true, employeeCode: true, departmentName: true, designation: true, status: true, createdAt: true } },
+        user: { select: { id: true, email: true, fullName: true, employeeCode: true, departmentName: true, designation: true, status: true, createdAt: true, profileImage: true } },
       },
     });
 
@@ -493,7 +493,8 @@ export class UsersService {
       employeeCode: ur.user.employeeCode,
       departmentName: ur.user.departmentName,
       designation: ur.user.designation,
-      status: ur.user.status,
+        profileImage: ur.user.profileImage,
+        status: ur.user.status,
       role: 'EMPLOYEE',
       createdAt: ur.user.createdAt,
     }));
@@ -517,5 +518,50 @@ export class UsersService {
     });
     
     return { success: true };
+  }
+  // ─── Self-Service Profile Update ──────────────────────────────────────────
+  async updateMyProfile(userId: string, organizationId: string, dto: any, profileImageFile?: Express.Multer.File) {
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, organizationId },
+      include: { employee: true }
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    if (!dto.oldPassword) {
+      throw new ForbiddenException('Please provide your current password to save changes.');
+    }
+    const isMatch = await bcrypt.compare(dto.oldPassword, user.passwordHash);
+    if (!isMatch) throw new ForbiddenException('Incorrect current password');
+
+    if (dto.newPassword) {
+      const isMatch = await bcrypt.compare(dto.oldPassword, user.passwordHash);
+      if (!isMatch) throw new ForbiddenException('Incorrect old password');
+      user.passwordHash = await bcrypt.hash(dto.newPassword, 10);
+      await this.prisma.user.update({ where: { id: user.id }, data: { passwordHash: user.passwordHash } });
+    }
+
+    let profileImageUrl = user.profileImage;
+    if (profileImageFile) {
+      try {
+        const uploadResult = await this.cloudinary.uploadImage(profileImageFile);
+        profileImageUrl = uploadResult.secure_url;
+        await this.prisma.user.update({ where: { id: user.id }, data: { profileImage: profileImageUrl } });
+      } catch (e) {}
+    }
+
+    if (user.employeeId) {
+      const employeeUpdateData: any = {};
+      if (dto.phone !== undefined) employeeUpdateData.phone = dto.phone;
+      if (dto.address !== undefined) employeeUpdateData.currentAddress = dto.address;
+      if (profileImageUrl !== user.profileImage) employeeUpdateData.profilePhoto = profileImageUrl;
+      
+      if (Object.keys(employeeUpdateData).length > 0) {
+        await this.prisma.employee.update({
+          where: { id: user.employeeId },
+          data: employeeUpdateData
+        });
+      }
+    }
+    return { message: 'Profile updated successfully', profileImage: profileImageUrl };
   }
 }

@@ -115,4 +115,96 @@ export class DashboardService {
       }
     };
   }
+
+  async getHodDashboardData(user: { organizationId: string; userId: string; accessibleDepartments?: string[]; role: string }, deptName: string) {
+    const { organizationId } = user;
+
+    // Optional Check: verify permission
+    if (user.role !== 'SUPER_ADMIN') {
+      const allowedDepts = user.accessibleDepartments || [];
+      if (!allowedDepts.includes(deptName)) {
+        return { success: false, message: 'Forbidden' };
+      }
+    }
+
+    const dept = await this.prisma.department.findFirst({
+      where: { name: deptName, organizationId }
+    });
+    if (!dept) return { success: false, message: 'Department not found' };
+
+    // 1. Employees Count
+    const totalEmployees = await this.prisma.employee.count({
+      where: { organizationId, departmentId: dept.id }
+    });
+
+    // 2. Attendance Count for Today
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const presentToday = await this.prisma.attendance.count({
+      where: {
+        organizationId,
+        date: today,
+        employee: { departmentId: dept.id },
+        status: 'PRESENT'
+      }
+    });
+
+    // 3. Assets Count
+    const totalAssets = await this.prisma.asset.count({
+      where: { organizationId, ownerDepartmentId: dept.id }
+    });
+
+    // 4. Tickets (Outbound/Raised by this dept)
+    const openTickets = await this.prisma.ticket.count({
+      where: { organizationId, raisedByDeptId: dept.id, status: 'OPEN' }
+    });
+    const inProgressTickets = await this.prisma.ticket.count({
+      where: { organizationId, raisedByDeptId: dept.id, status: 'IN_PROGRESS' }
+    });
+    const resolvedTickets = await this.prisma.ticket.count({
+      where: { organizationId, raisedByDeptId: dept.id, status: 'RESOLVED' }
+    });
+    const closedTickets = await this.prisma.ticket.count({
+      where: { organizationId, raisedByDeptId: dept.id, status: 'CLOSED' }
+    });
+    
+    // 5. Recent Tickets
+    const recentTickets = await this.prisma.ticket.findMany({
+      where: { organizationId, raisedByDeptId: dept.id },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      include: { raisedByEmployee: { select: { firstName: true, lastName: true } } }
+    });
+
+    // 6. Employees by Designation (GroupBy)
+    const designations = await this.prisma.employee.groupBy({
+      by: ['designation'],
+      where: { organizationId, departmentId: dept.id },
+      _count: { _all: true }
+    });
+    const employeeDesigData = designations.map(d => ({
+      name: d.designation || 'Unknown',
+      value: d._count._all
+    }));
+
+    return {
+      success: true,
+      stats: {
+        totalEmployees,
+        presentToday,
+        totalAssets,
+        activeTickets: openTickets + inProgressTickets,
+      },
+      chartData: {
+        ticketStatusData: [
+          { name: 'Open', count: openTickets },
+          { name: 'In Progress', count: inProgressTickets },
+          { name: 'Resolved', count: resolvedTickets },
+          { name: 'Closed', count: closedTickets },
+        ],
+        employeeDesigData
+      },
+      recentTickets
+    };
+  }
 }

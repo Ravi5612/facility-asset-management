@@ -143,4 +143,16 @@ export class UsersController {
     const user = req['user'] as { organizationId: string };
     return this.usersService.resetPassword(id, user.organizationId, body.newPassword);
   }
+  // ─── Self-Service Profile Update ──────────────────────────────────────────
+  @Patch('profile')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('profileImage', imageUploadOptions))
+  async updateMyProfile(
+    @Req() req: Request,
+    @Body() dto: import('./dto/update-profile.dto').UpdateProfileDto,
+    @UploadedFile() profileImage?: Express.Multer.File
+  ) {
+    const user = req['user'] as { userId: string; organizationId: string };
+    return this.usersService.updateMyProfile(user.userId, user.organizationId, dto, profileImage);
+  }
 }

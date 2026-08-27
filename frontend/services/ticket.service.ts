@@ -1,7 +1,7 @@
 import { InterDeptTicket } from "@/types";
 
 export const ticketService = {
-  async getTickets(): Promise<Record<string, unknown>[]> {
+  async getTickets(): Promise<any[]> {
     const res = await fetch("/api/tickets/all", {
       cache: "no-store",
     });
@@ -13,7 +13,7 @@ export const ticketService = {
     return res.json();
   },
 
-  async getOutboundTickets(): Promise<Record<string, unknown>[]> {
+  async getOutboundTickets(): Promise<any[]> {
     const res = await fetch("/api/tickets/outbound");
     if (!res.ok) {
       const error = await res.json().catch(() => ({}));
@@ -22,7 +22,7 @@ export const ticketService = {
     return res.json();
   },
 
-  async getAssignedToMeTickets(): Promise<Record<string, unknown>[]> {
+  async getAssignedToMeTickets(): Promise<any[]> {
     const res = await fetch("/api/tickets/assigned-to-me", {
       cache: "no-store",
     });
@@ -33,7 +33,7 @@ export const ticketService = {
     return res.json();
   },
 
-  async updateTicket(id: string, data: Record<string, unknown>): Promise<Record<string, unknown>> {
+  async updateTicket(id: string, data: any): Promise<any> {
     const res = await fetch(`/api/tickets/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -49,7 +49,7 @@ export const ticketService = {
   },
 
   // Tickets ASSIGNED TO my department (inbound — for HOD Tickets page)
-  async getInboundTickets(): Promise<Record<string, unknown>[]> {
+  async getInboundTickets(): Promise<any[]> {
     const res = await fetch("/api/tickets/inbound", {
       cache: "no-store",
     });
@@ -61,7 +61,7 @@ export const ticketService = {
     return res.json();
   },
 
-  async createTicket(data: Record<string, unknown>): Promise<Record<string, unknown>> {
+  async createTicket(data: any): Promise<any> {
     const res = await fetch("/api/tickets/all", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

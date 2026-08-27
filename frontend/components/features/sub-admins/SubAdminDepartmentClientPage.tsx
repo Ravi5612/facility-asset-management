@@ -8,19 +8,9 @@ import { SummaryCard } from "@/components/ui/summary-card";
 import { ErrorAlert } from "@/components/ui/alert-box";
 import { subAdminDepartmentService } from "@/services/subAdminDepartment.service";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DEPT_COLORS } from "@/lib/constants";
 
 
-
-// Department name → Icon color mapping
-const DEPT_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  IT: { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-200" },
-  HR: { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200" },
-  Finance: { bg: "bg-green-50", text: "text-green-600", border: "border-green-200" },
-  Store: { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-200" },
-  Security: { bg: "bg-red-50", text: "text-red-600", border: "border-red-200" },
-  Marketing: { bg: "bg-pink-50", text: "text-pink-600", border: "border-pink-200" },
-  Operations: { bg: "bg-cyan-50", text: "text-cyan-600", border: "border-cyan-200" },
-};
 
 function getDeptColor(name: string) {
   return (
@@ -80,11 +70,14 @@ export default function SubAdminDepartmentClientPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">My Departments</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Departments assigned to you by the Super Admin.
-        </p>
+      <div className="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-sidebar)] rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+        <div className="relative z-10">
+          <h1 className="text-3xl font-bold mb-2">My Departments</h1>
+          <p className="text-white/80 text-lg">
+            Manage the departments assigned to you by the Super Admin.
+          </p>
+        </div>
+        <div className="absolute right-0 top-0 h-full w-1/3 bg-white/5 skew-x-12 transform origin-top-left -translate-x-10" />
       </div>
 
       {/* Stats */}

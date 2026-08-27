@@ -15,7 +15,8 @@ import {
   Ticket,
   PlusCircle,
   FileText,
-  AlertCircle
+  AlertCircle,
+  Edit2
 } from "lucide-react";
 import { SummaryCard } from "@/components/ui/summary-card";
 import { Button } from "@/components/ui/button";
@@ -28,10 +29,13 @@ import { assetService } from "@/services/asset.service";
 import { ticketService } from "@/services/ticket.service";
 import { InterDeptTicket } from "@/types";
 
+import { EditProfileModal } from "./EditProfileModal";
+
 export function EmployeeDashboardClient() {
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<InterDeptTicket | null>(null);
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   // Fetch real data
   const { data: user = null } = useQuery({
@@ -68,7 +72,7 @@ export function EmployeeDashboardClient() {
     joiningDate: (user as any).employee?.joiningDate
       ? new Date((user as any).employee.joiningDate).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
       : "N/A",
-    profilePic: (user as any).employee?.profilePhoto || null,
+    profilePic: (user as any).employee?.profilePhoto || (user as any).profileImage || null,
   } : {
     name: (user as any)?.fullName || "Employee",
     employeeCode: (user as any)?.employeeCode || "N/A",
@@ -77,7 +81,7 @@ export function EmployeeDashboardClient() {
     email: (user as any)?.email || "N/A",
     phone: "N/A",
     joiningDate: "N/A",
-    profilePic: null,
+    profilePic: (user as any)?.profileImage || null,
   };
 
   const attendanceStats = {
@@ -117,23 +121,32 @@ export function EmployeeDashboardClient() {
         setIsOpen={setIsActionModalOpen} 
       />
 
+        <EditProfileModal 
+          isOpen={isEditProfileOpen} 
+          setIsOpen={setIsEditProfileOpen} 
+          employeeInfo={employeeInfo} 
+        />
+
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Welcome back, {employeeInfo.name.split(" ")[0]}! 👋
-          </h1>
-          <p className="text-muted-foreground mt-1 text-lg">
-            Here's an overview of your work, assets, and requests.
-          </p>
+      <div className="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-sidebar)] rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">
+              Welcome back, {employeeInfo.name.split(" ")[0]}! 👋
+            </h1>
+            <p className="text-white/80 text-lg">
+              Here is an overview of your work, assets, and requests.
+            </p>
+          </div>
+          <Button 
+            onClick={() => setIsTicketModalOpen(true)}
+            className="bg-white text-[var(--brand-primary)] hover:bg-white/90 gap-2 shadow-lg"
+          >
+            <PlusCircle className="h-4 w-4" />
+            Raise Ticket
+          </Button>
         </div>
-        <Button 
-          onClick={() => setIsTicketModalOpen(true)}
-          className="bg-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/90 text-white gap-2 shadow-lg"
-        >
-          <PlusCircle className="h-4 w-4" />
-          Raise Ticket
-        </Button>
+        <div className="absolute right-0 top-0 h-full w-1/3 bg-white/5 skew-x-12 transform origin-top-left -translate-x-10" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -142,10 +155,23 @@ export function EmployeeDashboardClient() {
         <div className="lg:col-span-1 space-y-8">
           
           {/* Profile Card */}
-          <div className="bg-card border rounded-2xl p-6 shadow-sm relative overflow-hidden">
+          <div className="bg-card border rounded-2xl p-6 shadow-sm relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-[var(--brand-primary)]/20 to-[var(--brand-sidebar)]/20" />
+            
+            {/* Edit Profile Button */}
+            <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="bg-white/80 hover:bg-white backdrop-blur-sm shadow-sm gap-2 text-xs h-8"
+                onClick={() => setIsEditProfileOpen(true)}
+              >
+                <Edit2 className="h-3 w-3" /> Edit Profile
+              </Button>
+            </div>
+
             <div className="relative pt-6 flex flex-col items-center text-center">
-              <div className="h-24 w-24 rounded-full border-4 border-card bg-muted flex items-center justify-center overflow-hidden shadow-lg mb-4">
+              <div className="relative h-24 w-24 rounded-full border-4 border-card bg-muted flex items-center justify-center overflow-hidden shadow-lg mb-4">
                 {employeeInfo.profilePic ? (
                   <Image src={employeeInfo.profilePic} alt="Profile" fill className="object-cover" />
                 ) : (

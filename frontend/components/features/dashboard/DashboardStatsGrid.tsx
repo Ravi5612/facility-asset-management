@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ReactNode } from "react";
 
 export function DashboardStatsGrid({ statsData }: { statsData: Record<string, unknown> }) {

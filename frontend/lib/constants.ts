@@ -72,6 +72,18 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV 
 // Application Data Constants
 export const DEPARTMENT_LIST = ["IT", "HR", "Finance", "Operations", "Security"];
 
+export const DEPT_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  IT: { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-200" },
+  HR: { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200" },
+  Finance: { bg: "bg-green-50", text: "text-green-600", border: "border-green-200" },
+  Store: { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-200" },
+  Security: { bg: "bg-red-50", text: "text-red-600", border: "border-red-200" },
+  Marketing: { bg: "bg-pink-50", text: "text-pink-600", border: "border-pink-200" },
+  Operations: { bg: "bg-cyan-50", text: "text-cyan-600", border: "border-cyan-200" },
+};
+
+export const CHART_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#ffc658', '#ef4444'];
+
 // Sidebar Navigation
 export const NAV_ITEMS = [
   { title: "Dashboard", href: ROUTES.DASHBOARD, icon: LayoutDashboard },

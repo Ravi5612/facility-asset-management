@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/search-input";
 import { StatusBadge } from "@/components/ui/status-badge";
 import {
   Filter, ChevronRight, Clock, CheckCircle2,
-  AlertTriangle, Mail, Phone, X
+  AlertTriangle, Mail, Phone, X, ChevronDown, ChevronUp
 } from "lucide-react";
 import { InterDeptTicket, TicketStatus, Priority } from "@/types";
 import { TicketDetailsModal } from "./TicketDetailsModal";
@@ -60,6 +61,14 @@ export function TicketTable({
 }: TicketTableProps) {
   
   const hasFilters = search !== "" || statusFilter !== "All" || priorityFilter !== "All" || dateFilter !== "All";
+  
+  // Track which cards are expanded (default is collapsed so they are not in this record initially)
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
+
+  const toggleCollapse = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setExpandedCards(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   return (
     <div className="bg-card border rounded-xl shadow-sm overflow-hidden flex flex-col">
@@ -124,90 +133,136 @@ export function TicketTable({
             No tickets found matching your criteria.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {tickets.map((ticket) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-start">
+            {tickets.map((ticket) => {
+              const isCollapsed = !expandedCards[ticket.id];
+              return (
               <div 
                 key={ticket.id} 
                 onClick={() => onTicketClick && onTicketClick(ticket)}
-                className={`bg-card border rounded-r-xl overflow-hidden flex flex-col transition-shadow ${onTicketClick ? 'cursor-pointer hover:shadow-md hover:border-brand-primary/50' : ''} ${getCardPriorityStyle(ticket.priority as string)}`}
+                className={`relative bg-card rounded-xl overflow-hidden flex flex-col shadow-sm transition-shadow ${onTicketClick ? 'cursor-pointer hover:shadow-md' : ''}`}
+                style={{ 
+                  borderWidth: '3px', 
+                  borderColor: ticket.priority?.toUpperCase() === 'HIGH' || ticket.priority?.toUpperCase() === 'CRITICAL' ? '#ea4335' : ticket.priority?.toUpperCase() === 'MEDIUM' ? '#fbbc04' : ticket.priority?.toUpperCase() === 'LOW' ? '#34a853' : '#9ca3af' 
+                }}
               >
                 
-                {/* Card Header: ID & Priority */}
-                <div className={`p-3.5 border-b flex justify-between items-center ${getHeaderPriorityStyle(ticket.priority as string)}`}>
-                  <span className="font-mono text-xs font-bold text-muted-foreground">{ticket.id}</span>
-                  <div className="flex items-center gap-1.5">
-                    {["HIGH", "URGENT", "CRITICAL"].includes(ticket.priority?.toUpperCase()) && <AlertTriangle className="h-3.5 w-3.5 text-brand-danger" />}
-                    <span className={`text-[10px] px-2 py-0.5 rounded-sm font-bold uppercase tracking-wider ${getPriorityColor(ticket.priority as string)}`}>
+                {/* Card Header: Dark Navy */}
+                <div className={`bg-[#0a0f2c] pt-4 px-4 flex justify-between items-start text-white ${isCollapsed ? 'pb-4' : 'pb-6'}`}>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 border border-white/20 rounded-lg bg-white/5">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold tracking-wider text-white/60 uppercase">Ticket ID</div>
+                      <div className="text-lg font-bold tracking-tight">{ticket.id}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded uppercase tracking-wider ${ticket.priority?.toUpperCase() === 'HIGH' || ticket.priority?.toUpperCase() === 'CRITICAL' ? 'bg-red-500 text-white' : ticket.priority?.toUpperCase() === 'MEDIUM' ? 'bg-yellow-500 text-white' : ticket.priority?.toUpperCase() === 'LOW' ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'}`}>
+                      {ticket.priority?.toUpperCase() === 'HIGH' || ticket.priority?.toUpperCase() === 'CRITICAL' ? <AlertTriangle className="h-3 w-3" /> : null}
                       {ticket.priority}
                     </span>
+                    <button 
+                      onClick={(e) => toggleCollapse(e, ticket.id)}
+                      className="text-white/70 hover:text-white p-1 rounded hover:bg-white/10 transition-colors"
+                      title={isCollapsed ? "Expand Ticket" : "Collapse Ticket"}
+                    >
+                      {isCollapsed ? <ChevronDown className="h-5 w-5" /> : <ChevronUp className="h-5 w-5" />}
+                    </button>
                   </div>
                 </div>
                 
-                {/* Card Body */}
-                <div className="p-4 flex-1 flex flex-col gap-4">
-                  <div>
-                    <h3 className="font-bold text-foreground text-base leading-snug mb-1.5">{ticket.subject}</h3>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
-                      <Clock className="h-3 w-3" /> Raised: {ticket.dateRaised} {ticket.timeRaised && `at ${ticket.timeRaised}`}
+                {!isCollapsed && (
+                  <>
+                    {/* Card Body */}
+                <div className="bg-card flex-1 flex flex-col p-4">
+                  <div className="mb-4">
+                    <h3 className="font-bold text-xl text-slate-800 leading-tight mb-1.5">{ticket.subject}</h3>
+                    <p className="text-xs text-slate-500 flex items-center gap-1">
+                      <Clock className="h-3.5 w-3.5" /> Raised: {ticket.dateRaised} {ticket.timeRaised && `at ${ticket.timeRaised}`}
                     </p>
-                    {ticket.description && (
-                      <p className="text-sm text-muted-foreground bg-muted/20 p-2.5 rounded-lg border border-border/30 line-clamp-2" title={ticket.description}>
+                  </div>
+
+                  {ticket.description && (
+                    <div className="bg-[#f8f9fe] border border-slate-200/60 rounded-xl p-3 flex items-start gap-3 mb-4">
+                      <div className="mt-0.5 text-indigo-500">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                      </div>
+                      <p className="text-sm font-medium text-slate-700 line-clamp-2" title={ticket.description}>
                         {ticket.description}
                       </p>
-                    )}
-                  </div>
+                    </div>
+                  )}
                   
-                  {/* Department Routing & HOD Info */}
-                  <div className="flex flex-col gap-2 p-3 bg-muted/30 border border-border/50 rounded-lg text-sm mt-auto">
-                    {/* HOD Info */}
-                    {ticket.raisedByHodName && (
-                      <div className="flex flex-col gap-1.5 pb-2 mb-1 border-b border-border/50">
-                        <div className="flex justify-between items-center">
-                          <span className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">Raised By (HOD)</span>
-                          <strong className="text-foreground text-xs">{ticket.raisedByHodName}</strong>
+                  {/* Department Routing & HOD Info Box */}
+                  <div className="border border-slate-200/80 shadow-sm rounded-xl p-3.5 mb-3 flex flex-col">
+                    <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center border border-red-100">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         </div>
-                        <div className="flex justify-between items-center text-[11px] text-muted-foreground">
-                          <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {ticket.raisedByHodEmail}</span>
-                          <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {ticket.raisedByHodPhone}</span>
+                        <div className="flex flex-col">
+                          <span className="text-[9px] uppercase font-bold tracking-wider text-slate-400">Raised By (HOD)</span>
+                          <span className="font-bold text-slate-800 text-sm leading-tight">{ticket.raisedByHodName || 'System'}</span>
+                          <span className="text-xs text-slate-500 flex items-center gap-1 mt-0.5"><Mail className="h-3 w-3" /> {ticket.raisedByHodEmail || 'N/A'}</span>
                         </div>
                       </div>
-                    )}
-
-                    <div className="flex justify-between items-center pt-1">
-                      <span className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">From Dept</span>
-                      <strong className="text-foreground text-xs">{ticket.raisedByDept}</strong>
+                      <div className="h-9 w-9 rounded-full border border-red-200 flex items-center justify-center text-red-500 bg-white shadow-sm">
+                        <Phone className="h-4 w-4" />
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center pt-1">
-                      <span className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">To Dept</span>
-                      <strong className="text-brand-primary text-xs">{ticket.assignedToDept}</strong>
+
+                    <div className="flex justify-between items-center mb-1.5">
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">From Dept</span>
+                      <strong className="text-slate-800 text-xs">{ticket.raisedByDept}</strong>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">To Dept</span>
+                      <strong className="text-red-500 text-xs">{ticket.assignedToDept}</strong>
                     </div>
                   </div>
 
-                  {/* Status & Handler */}
-                  <div className="flex justify-between items-end mt-1">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Handler</span>
-                      {ticket.handler ? (
-                        <span className="font-semibold text-sm">{ticket.handler}</span>
-                      ) : (
-                        <span className="text-muted-foreground italic text-xs">Unassigned</span>
-                      )}
+                  {/* Status & Handler Box */}
+                  <div className="border border-slate-200/80 shadow-sm rounded-xl p-3 flex justify-between mt-auto">
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-[9px] uppercase font-bold tracking-wider text-slate-400">Handler</span>
+                      <div className="flex items-center gap-2">
+                        <div className="h-6 w-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </div>
+                        <span className="font-bold text-sm text-slate-800">{ticket.handler || 'Unassigned'}</span>
+                      </div>
                     </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Status</span>
-                      <div className="flex items-center gap-1.5">
-                        <StatusBadge status={ticket.status} />
+                    <div className="flex flex-col gap-1.5 items-start">
+                      <span className="text-[9px] uppercase font-bold tracking-wider text-slate-400">Status</span>
+                      <div className="bg-blue-50/50 border border-blue-100 rounded text-blue-600 px-2 py-1 flex items-center gap-1.5">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="M12 2v4"></path><path d="M12 18v4"></path><path d="M4.93 4.93l2.83 2.83"></path><path d="M16.24 16.24l2.83 2.83"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><path d="M4.93 19.07l2.83-2.83"></path><path d="M16.24 7.76l2.83-2.83"></path></svg>
+                        <span className="text-[10px] font-bold tracking-wider uppercase">{ticket.status}</span>
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                {/* Card Footer */}
-                <div className="p-3 bg-muted/10 border-t flex justify-end">
-                  <TicketDetailsModal ticket={ticket} />
+                {/* Card Footer Button */}
+                <div 
+                  className={`w-full py-3 flex justify-center items-center gap-1 text-white text-sm font-bold tracking-wide transition-opacity ${ticket.priority?.toUpperCase() === 'HIGH' || ticket.priority?.toUpperCase() === 'CRITICAL' ? 'bg-[#ea4335] hover:bg-[#ea4335]/90' : ticket.priority?.toUpperCase() === 'MEDIUM' ? 'bg-[#fbbc04] hover:bg-[#fbbc04]/90' : ticket.priority?.toUpperCase() === 'LOW' ? 'bg-[#34a853] hover:bg-[#34a853]/90' : 'bg-slate-500 hover:bg-slate-500/90'}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const triggerBtn = e.currentTarget.querySelector('.hidden button');
+                    if (triggerBtn) (triggerBtn as HTMLElement).click();
+                  }}
+                >
+                  View Details <ChevronRight className="h-4 w-4" />
+                  <div className="hidden" onClick={(e) => e.stopPropagation()}>
+                     <TicketDetailsModal ticket={ticket} />
+                  </div>
                 </div>
+                  </>
+                )}
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

@@ -86,7 +86,7 @@ export function SubAdminsClientPage() {
 
 
   const updateMutation = useMutation({
-    mutationFn: (vars: { id: string, data: any }) => subAdminApiService.updateSubAdmin(vars.id, vars.data),
+    mutationFn: (vars: { id: string, data: Record<string, unknown> }) => subAdminApiService.updateSubAdmin(vars.id, vars.data as any),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sub-admins"] });
     },

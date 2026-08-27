@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
 }
 
@@ -117,159 +117,159 @@ enum AuditAction {
 // ------------------- MODELS -------------------
 
 model Organization {
-  id        String   @id @default(uuid())
-  name      String
-  code      String   @unique
-  status    OrgStatus @default(ACTIVE)
-  themeColor String   @default("blue")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
+  id         String    @id @default(uuid())
+  name       String
+  code       String    @unique
+  status     OrgStatus @default(ACTIVE)
+  themeColor String    @default("blue")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
 
   // Relations
-  users               User[]
-  roles               Role[]
-  departments         Department[]
-  employees           Employee[]
-  assetCategories     AssetCategory[]
-  assets              Asset[]
-  locations           Location[]
-  tickets             Ticket[]
-  leaveRequests       LeaveRequest[]
-  attendances         Attendance[]
-  assetAssignments    AssetAssignment[]
-  maintenanceLogs     AssetMaintenanceLog[]
-  ticketComments      TicketComment[]
-  attachments         Attachment[]
-  notifications       Notification[]
-  salaryHistories   SalaryHistory[]
+  users            User[]
+  roles            Role[]
+  departments      Department[]
+  employees        Employee[]
+  assetCategories  AssetCategory[]
+  assets           Asset[]
+  locations        Location[]
+  tickets          Ticket[]
+  leaveRequests    LeaveRequest[]
+  attendances      Attendance[]
+  assetAssignments AssetAssignment[]
+  maintenanceLogs  AssetMaintenanceLog[]
+  ticketComments   TicketComment[]
+  attachments      Attachment[]
+  notifications    Notification[]
+  salaryHistories  SalaryHistory[]
 }
 
 model Permission {
-  id          String @id @default(uuid())
-  name        String @unique // e.g. "asset.create"
-  module      String
-  description String?
+  id              String           @id @default(uuid())
+  name            String           @unique // e.g. "asset.create"
+  module          String
+  description     String?
   rolePermissions RolePermission[]
 }
 
 model Role {
-  id             String   @id @default(uuid())
+  id             String       @id @default(uuid())
   organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String
   name           String
   description    String?
-  isSystem       Boolean @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  isSystem       Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
   deletedAt      DateTime?
-
-  @@unique([organizationId, name])
 
   rolePermissions RolePermission[]
   userRoles       UserRole[]
+
+  @@unique([organizationId, name])
 }
 
 model RolePermission {
-  role       Role   @relation(fields: [roleId], references: [id])
-  roleId     String
-  permission Permission @relation(fields: [permissionId], references: [id])
+  role         Role       @relation(fields: [roleId], references: [id])
+  roleId       String
+  permission   Permission @relation(fields: [permissionId], references: [id])
   permissionId String
 
   @@id([roleId, permissionId])
 }
 
 model User {
-  id           String   @id @default(uuid())
-  organization Organization @relation(fields: [organizationId], references: [id])
-  organizationId String
-  employeeId   String?  @unique
-  employeeCode String?  @unique // Auto-generated unique code
-  fullName     String?  // Added for storing user's name
-  departmentName String? // Which department this HOD belongs to
-  accessibleDepartments String[] @default([]) // Added for Sub-Admin multiple departments
-  designation  String? // Added for employee designation
-  profileImage String? // Cloudinary URL for profile picture
-  email        String
-  passwordHash String
-  status       UserStatus @default(ACTIVE)
-  lastLoginAt  DateTime?
-  createdById  String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  deletedAt    DateTime?
+  id                    String       @id @default(uuid())
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  organizationId        String
+  employeeId            String?      @unique
+  employeeCode          String?      @unique // Auto-generated unique code
+  fullName              String? // Added for storing user's name
+  departmentName        String? // Which department this HOD belongs to
+  accessibleDepartments String[]     @default([]) // Added for Sub-Admin multiple departments
+  designation           String? // Added for employee designation
+  profileImage          String? // Cloudinary URL for profile picture
+  email                 String
+  passwordHash          String
+  status                UserStatus   @default(ACTIVE)
+  lastLoginAt           DateTime?
+  createdById           String?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  deletedAt             DateTime?
 
   // Relations
-  employee      Employee? @relation(fields: [employeeId], references: [id])
-  createdBy     User? @relation("UserCreatedBy", fields: [createdById], references: [id])
-  createdUsers  User[] @relation("UserCreatedBy")
+  employee      Employee?      @relation(fields: [employeeId], references: [id])
+  createdBy     User?          @relation("UserCreatedBy", fields: [createdById], references: [id])
+  createdUsers  User[]         @relation("UserCreatedBy")
   userRoles     UserRole[]
-  assignedRoles UserRole[] @relation("AssignedBy")
-  revokedRoles  UserRole[] @relation("RevokedBy")
+  assignedRoles UserRole[]     @relation("AssignedBy")
+  revokedRoles  UserRole[]     @relation("RevokedBy")
   notifications Notification[]
   refreshTokens RefreshToken[]
 }
 
 model RefreshToken {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tokenHash   String   @unique
-  expiresAt   DateTime
-  revokedAt   DateTime?
-  deviceInfo  String?
-  ipAddress   String?
-  createdAt   DateTime @default(now())
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  deviceInfo String?
+  ipAddress  String?
+  createdAt  DateTime  @default(now())
 
   @@index([userId])
   @@index([tokenHash])
 }
 
 model UserRole {
-  id          String @id @default(uuid())
-  user        User @relation(fields: [userId], references: [id])
-  userId      String
-  role        Role @relation(fields: [roleId], references: [id])
-  roleId      String
-  assignedBy  User @relation("AssignedBy", fields: [assignedById], references: [id])
+  id           String    @id @default(uuid())
+  user         User      @relation(fields: [userId], references: [id])
+  userId       String
+  role         Role      @relation(fields: [roleId], references: [id])
+  roleId       String
+  assignedBy   User      @relation("AssignedBy", fields: [assignedById], references: [id])
   assignedById String
-  assignedAt  DateTime @default(now())
-  revokedBy   User? @relation("RevokedBy", fields: [revokedById], references: [id])
-  revokedById String?
-  revokedAt   DateTime?
+  assignedAt   DateTime  @default(now())
+  revokedBy    User?     @relation("RevokedBy", fields: [revokedById], references: [id])
+  revokedById  String?
+  revokedAt    DateTime?
 
   @@unique([userId, roleId])
 }
 
 model Department {
-  id              String   @id @default(uuid())
-  organization    Organization @relation(fields: [organizationId], references: [id])
-  organizationId  String
-  code            String
-  name            String
-  description     String?
-  imageUrl        String?  // Optional image for the department
-  hodId           String?
-  status          RecordStatus @default(ACTIVE)
-  createdById     String?
-  updatedById     String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  deletedAt       DateTime?
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  code           String
+  name           String
+  description    String?
+  imageUrl       String? // Optional image for the department
+  hodId          String?
+  status         RecordStatus @default(ACTIVE)
+  createdById    String?
+  updatedById    String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  deletedAt      DateTime?
+
+  employees       Employee[] @relation("DepartmentEmployees")
+  hod             Employee?  @relation("DepartmentHOD", fields: [hodId], references: [id])
+  assets          Asset[]
+  raisedTickets   Ticket[]   @relation("TicketRaisedByDept")
+  assignedTickets Ticket[]   @relation("TicketAssignedToDept")
 
   @@unique([organizationId, code])
   @@unique([organizationId, name])
-
-  employees       Employee[] @relation("DepartmentEmployees")
-  hod             Employee? @relation("DepartmentHOD", fields: [hodId], references: [id])
-  assets          Asset[]
-  raisedTickets   Ticket[] @relation("TicketRaisedByDept")
-  assignedTickets Ticket[] @relation("TicketAssignedToDept")
 }
 
 model Employee {
-  id               String   @id @default(uuid())
-  organization     Organization @relation(fields: [organizationId], references: [id])
+  id               String         @id @default(uuid())
+  organization     Organization   @relation(fields: [organizationId], references: [id])
   organizationId   String
   employeeCode     String
   firstName        String
@@ -277,7 +277,7 @@ model Employee {
   email            String?
   phone            String?
   designation      String
-  department       Department @relation("DepartmentEmployees", fields: [departmentId], references: [id])
+  department       Department     @relation("DepartmentEmployees", fields: [departmentId], references: [id])
   departmentId     String
   managerId        String?
   joiningDate      DateTime
@@ -307,68 +307,77 @@ model Employee {
   educationPhoto   String?
   salaryProofPhoto String?
 
-  createdById      String?
-  updatedById      String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  deletedAt        DateTime?
+  createdById String?
+  updatedById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  user             User?
+  manager          Employee?         @relation("ManagerSubordinates", fields: [managerId], references: [id])
+  subordinates     Employee[]        @relation("ManagerSubordinates")
+  attendance       Attendance[]
+  leaveRequests    LeaveRequest[]
+  assetsAssigned   Asset[]           @relation("CurrentAssignee")
+  assetAssignments AssetAssignment[]
+  departmentHOD    Department[]      @relation("DepartmentHOD")
+  raisedTickets    Ticket[]          @relation("TicketRaisedByEmployee")
+  assignedTickets  Ticket[]          @relation("TicketAssignedToEmployee")
+  salaryHistories  SalaryHistory[]
 
   @@unique([organizationId, employeeCode])
   @@unique([organizationId, email])
 
-  user             User?
-  manager          Employee? @relation("ManagerSubordinates", fields: [managerId], references: [id])
-  subordinates     Employee[] @relation("ManagerSubordinates")
-  attendance       Attendance[]
-  leaveRequests    LeaveRequest[]
-  assetsAssigned   Asset[] @relation("CurrentAssignee")
-  assetAssignments AssetAssignment[]
-  departmentHOD    Department[] @relation("DepartmentHOD")
-  raisedTickets    Ticket[] @relation("TicketRaisedByEmployee")
-  assignedTickets  Ticket[] @relation("TicketAssignedToEmployee")
-  salaryHistories  SalaryHistory[]
+  @@index([organizationId, departmentId])
+  @@index([organizationId, status])
 }
 
 model Attendance {
-  id            String   @id @default(uuid())
-  organization  Organization @relation(fields: [organizationId], references: [id])
+  id             String           @id @default(uuid())
+  organization   Organization     @relation(fields: [organizationId], references: [id])
   organizationId String
-  employee      Employee @relation(fields: [employeeId], references: [id])
-  employeeId    String
-  date          DateTime @db.Date
-  checkIn       DateTime?
-  checkOut      DateTime?
-  status        AttendanceStatus @default(PRESENT)
-  workingHours  Decimal?
-  notes         String?
-  markedById    String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  employee       Employee         @relation(fields: [employeeId], references: [id])
+  employeeId     String
+  date           DateTime         @db.Date
+  checkIn        DateTime?
+  checkOut       DateTime?
+  status         AttendanceStatus @default(PRESENT)
+  workingHours   Decimal?
+  notes          String?
+  markedById     String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
   @@unique([organizationId, employeeId, date])
+
+  @@index([organizationId, date])
+  @@index([organizationId, employeeId, date])
 }
 
 model LeaveRequest {
-  id               String   @id @default(uuid())
-  organization     Organization @relation(fields: [organizationId], references: [id])
-  organizationId   String
-  employee         Employee @relation(fields: [employeeId], references: [id])
-  employeeId       String
-  leaveType        LeaveType
-  startDate        DateTime @db.Date
-  endDate          DateTime @db.Date
-  totalDays        Int
-  reason           String
-  status           LeaveStatus @default(PENDING)
-  reviewedById     String?
-  reviewedAt       DateTime?
-  rejectionReason  String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id              String       @id @default(uuid())
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  organizationId  String
+  employee        Employee     @relation(fields: [employeeId], references: [id])
+  employeeId      String
+  leaveType       LeaveType
+  startDate       DateTime     @db.Date
+  endDate         DateTime     @db.Date
+  totalDays       Int
+  reason          String
+  status          LeaveStatus  @default(PENDING)
+  reviewedById    String?
+  reviewedAt      DateTime?
+  rejectionReason String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([organizationId, employeeId])
+  @@index([organizationId, status])
 }
 
 model Location {
-  id               String   @id @default(uuid())
+  id               String       @id @default(uuid())
   organization     Organization @relation(fields: [organizationId], references: [id])
   organizationId   String
   name             String
@@ -377,196 +386,205 @@ model Location {
   address          String?
   parentLocationId String?
   status           RecordStatus @default(ACTIVE)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
   deletedAt        DateTime?
 
-  @@unique([organizationId, code])
-
-  parent   Location? @relation("LocationHierarchy", fields: [parentLocationId], references: [id])
+  parent   Location?  @relation("LocationHierarchy", fields: [parentLocationId], references: [id])
   children Location[] @relation("LocationHierarchy")
   assets   Asset[]
+
+  @@unique([organizationId, code])
 }
 
 model AssetCategory {
-  id               String   @id @default(uuid())
-  organization     Organization @relation(fields: [organizationId], references: [id])
-  organizationId   String
-  name             String
-  description      String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  deletedAt        DateTime?
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  name           String
+  description    String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  deletedAt      DateTime?
+  assets         Asset[]
 
   @@unique([organizationId, name])
-  assets Asset[]
 }
 
 model Asset {
-  id               String   @id @default(uuid())
-  organization     Organization @relation(fields: [organizationId], references: [id])
-  organizationId   String
-  assetCode        String
-  name             String
-  category         AssetCategory @relation(fields: [categoryId], references: [id])
-  categoryId       String
-  serialNumber     String
-  purchaseDate     DateTime
-  purchasePrice    Decimal
+  id                 String        @id @default(uuid())
+  organization       Organization  @relation(fields: [organizationId], references: [id])
+  organizationId     String
+  assetCode          String
+  name               String
+  category           AssetCategory @relation(fields: [categoryId], references: [id])
+  categoryId         String
+  serialNumber       String
+  purchaseDate       DateTime
+  purchasePrice      Decimal
   warrantyExpiryDate DateTime?
-  status           AssetStatus @default(AVAILABLE)
-  currentAssigneeId String?
-  ownerDepartmentId String?
-  locationId       String?
-  notes            String?
-  createdById      String?
-  updatedById      String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  deletedAt        DateTime?
+  status             AssetStatus   @default(AVAILABLE)
+  currentAssigneeId  String?
+  ownerDepartmentId  String?
+  locationId         String?
+  notes              String?
+  createdById        String?
+  updatedById        String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  deletedAt          DateTime?
+
+  currentAssignee Employee?             @relation("CurrentAssignee", fields: [currentAssigneeId], references: [id])
+  ownerDepartment Department?           @relation(fields: [ownerDepartmentId], references: [id])
+  location        Location?             @relation(fields: [locationId], references: [id])
+  assignments     AssetAssignment[]
+  maintenanceLogs AssetMaintenanceLog[]
 
   @@unique([organizationId, assetCode])
   @@unique([organizationId, serialNumber])
 
-  currentAssignee Employee? @relation("CurrentAssignee", fields: [currentAssigneeId], references: [id])
-  ownerDepartment Department? @relation(fields: [ownerDepartmentId], references: [id])
-  location        Location? @relation(fields: [locationId], references: [id])
-  assignments    AssetAssignment[]
-  maintenanceLogs AssetMaintenanceLog[]
+  @@index([organizationId, categoryId])
+  @@index([organizationId, ownerDepartmentId])
+  @@index([organizationId, status])
 }
 
 model AssetAssignment {
-  id            String   @id @default(uuid())
-  organization  Organization @relation(fields: [organizationId], references: [id])
-  organizationId String
-  asset         Asset @relation(fields: [assetId], references: [id])
-  assetId       String
-  employee      Employee @relation(fields: [employeeId], references: [id])
-  employeeId    String
-  assignedById  String
-  assignedAt    DateTime @default(now())
-  returnedById  String?
-  returnedAt    DateTime?
-  status        AssignmentStatus @default(ACTIVE)
+  id                String           @id @default(uuid())
+  organization      Organization     @relation(fields: [organizationId], references: [id])
+  organizationId    String
+  asset             Asset            @relation(fields: [assetId], references: [id])
+  assetId           String
+  employee          Employee         @relation(fields: [employeeId], references: [id])
+  employeeId        String
+  assignedById      String
+  assignedAt        DateTime         @default(now())
+  returnedById      String?
+  returnedAt        DateTime?
+  status            AssignmentStatus @default(ACTIVE)
   conditionOnAssign String?
   conditionOnReturn String?
 }
 
 model AssetMaintenanceLog {
-  id               String   @id @default(uuid())
-  organization     Organization @relation(fields: [organizationId], references: [id])
-  organizationId   String
-  asset            Asset @relation(fields: [assetId], references: [id])
-  assetId          String
-  reportedById     String
-  issue            String
-  resolution       String?
-  cost             Decimal?
-  vendorName       String?
-  maintenanceDate  DateTime
-  completedAt      DateTime?
-  createdAt        DateTime @default(now())
+  id              String       @id @default(uuid())
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  organizationId  String
+  asset           Asset        @relation(fields: [assetId], references: [id])
+  assetId         String
+  reportedById    String
+  issue           String
+  resolution      String?
+  cost            Decimal?
+  vendorName      String?
+  maintenanceDate DateTime
+  completedAt     DateTime?
+  createdAt       DateTime     @default(now())
 }
 
 model Ticket {
-  id                  String   @id @default(uuid())
-  organization        Organization @relation(fields: [organizationId], references: [id])
-  organizationId      String
-  ticketCode          String
-  subject             String
-  description         String
-  raisedByDeptId      String
-  raisedByEmployeeId  String
-  assignedToDeptId    String
+  id                   String         @id @default(uuid())
+  organization         Organization   @relation(fields: [organizationId], references: [id])
+  organizationId       String
+  ticketCode           String
+  subject              String
+  description          String
+  raisedByDeptId       String
+  raisedByEmployeeId   String
+  assignedToDeptId     String
   assignedToEmployeeId String?
-  status              TicketStatus @default(OPEN)
-  priority            TicketPriority @default(MEDIUM)
-  resolvedAt          DateTime?
-  createdById         String?
-  updatedById         String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  deletedAt           DateTime?
+  status               TicketStatus   @default(OPEN)
+  priority             TicketPriority @default(MEDIUM)
+  resolvedAt           DateTime?
+  createdById          String?
+  updatedById          String?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  deletedAt            DateTime?
+
+  raisedByDept       Department @relation("TicketRaisedByDept", fields: [raisedByDeptId], references: [id])
+  raisedByEmployee   Employee   @relation("TicketRaisedByEmployee", fields: [raisedByEmployeeId], references: [id])
+  assignedToDept     Department @relation("TicketAssignedToDept", fields: [assignedToDeptId], references: [id])
+  assignedToEmployee Employee?  @relation("TicketAssignedToEmployee", fields: [assignedToEmployeeId], references: [id])
+
+  comments      TicketComment[]
+  statusHistory TicketStatusHistory[]
 
   @@unique([organizationId, ticketCode])
 
-  raisedByDept       Department @relation("TicketRaisedByDept", fields: [raisedByDeptId], references: [id])
-  raisedByEmployee   Employee @relation("TicketRaisedByEmployee", fields: [raisedByEmployeeId], references: [id])
-  assignedToDept     Department @relation("TicketAssignedToDept", fields: [assignedToDeptId], references: [id])
-  assignedToEmployee Employee? @relation("TicketAssignedToEmployee", fields: [assignedToEmployeeId], references: [id])
-
-  comments            TicketComment[]
-  statusHistory       TicketStatusHistory[]
+  @@index([organizationId, raisedByDeptId])
+  @@index([organizationId, assignedToDeptId])
+  @@index([organizationId, status])
+  @@index([organizationId, priority])
 }
 
 model TicketComment {
-  id          String   @id @default(uuid())
-  organization Organization @relation(fields: [organizationId], references: [id])
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String
-  ticket       Ticket @relation(fields: [ticketId], references: [id])
-  ticketId    String
-  authorId    String // references User.id (FK via raw SQL if needed)
-  message     String
-  isInternal  Boolean @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  ticket         Ticket       @relation(fields: [ticketId], references: [id])
+  ticketId       String
+  authorId       String // references User.id (FK via raw SQL if needed)
+  message        String
+  isInternal     Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 }
 
 model TicketStatusHistory {
-  id          String   @id @default(uuid())
-  ticket       Ticket @relation(fields: [ticketId], references: [id])
+  id          String        @id @default(uuid())
+  ticket      Ticket        @relation(fields: [ticketId], references: [id])
   ticketId    String
   oldStatus   TicketStatus?
   newStatus   TicketStatus
   changedById String // references User.id
-  changedAt   DateTime @default(now())
+  changedAt   DateTime      @default(now())
   comment     String?
 }
 
 model Attachment {
-  id               String   @id @default(uuid())
-  organization     Organization @relation(fields: [organizationId], references: [id])
-  organizationId   String
-  fileName         String
-  storageKey       String
-  mimeType         String
-  sizeBytes        Int
-  entityType       String // e.g. "Asset", "Ticket", "Employee"
-  entityId         String // parent record ID
-  uploadedById     String
-  createdAt        DateTime @default(now())
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  fileName       String
+  storageKey     String
+  mimeType       String
+  sizeBytes      Int
+  entityType     String // e.g. "Asset", "Ticket", "Employee"
+  entityId       String // parent record ID
+  uploadedById   String
+  createdAt      DateTime     @default(now())
 
   @@index([organizationId, entityType, entityId])
 }
 
 model Notification {
-  id               String   @id @default(uuid())
-  organization     Organization @relation(fields: [organizationId], references: [id])
-  organizationId   String
-  userId           String
-  user             User @relation(fields: [userId], references: [id])
-  title            String
-  message          String
-  isRead           Boolean @default(false)
-  link             String?
-  createdAt        DateTime @default(now())
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  title          String
+  message        String
+  isRead         Boolean      @default(false)
+  link           String?
+  createdAt      DateTime     @default(now())
 
   @@index([organizationId, userId, isRead, createdAt])
 }
 
 model AuditLog {
-  id            String   @id @default(uuid())
+  id             String      @id @default(uuid())
   organizationId String // immutable string, not FK
-  actorUserId   String // immutable string, not FK
-  action        AuditAction
-  entity        String
-  entityId      String
-  oldValue      Json?
-  newValue      Json?
-  ipAddress     String?
-  userAgent     String?
-  requestId     String?
-  createdAt     DateTime @default(now())
+  actorUserId    String // immutable string, not FK
+  action         AuditAction
+  entity         String
+  entityId       String
+  oldValue       Json?
+  newValue       Json?
+  ipAddress      String?
+  userAgent      String?
+  requestId      String?
+  createdAt      DateTime    @default(now())
 
   @@index([organizationId, entity, entityId, createdAt])
   @@index([organizationId, actorUserId, createdAt])
@@ -612,20 +630,19 @@ model AuditLog {
 // WHERE "deletedAt" IS NULL;
 // ---------------------------------------------------
 
-
 model SalaryHistory {
-  id              String   @id @default(uuid())
-  organization    Organization @relation(fields: [organizationId], references: [id])
-  organizationId  String
-  employee        Employee @relation(fields: [employeeId], references: [id])
-  employeeId      String
-  month           String
-  year            Int
-  amount          Decimal
-  status          String    @default("Processing")
-  datePaid        DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  employee       Employee     @relation(fields: [employeeId], references: [id])
+  employeeId     String
+  month          String
+  year           Int
+  amount         Decimal
+  status         String       @default("Processing")
+  datePaid       DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   @@index([organizationId, employeeId])
 }
