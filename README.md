@@ -73,6 +73,7 @@ npm run dev
 
 Developed by **Ravi Rai**
 - 📧 Email: [ravirai84272@gmail.com](mailto:ravirai84272@gmail.com)
-- 📱 Phone: +91-XXXXXXXXXX (Update this in README.md)
+- 📱 Phone: +91-6239408981
 - 🌐 GitHub: [@Ravi5612](https://github.com/Ravi5612)
+
 
