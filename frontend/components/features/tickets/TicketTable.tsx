@@ -150,9 +150,21 @@ export function TicketTable({
                 {/* Card Header: Dark Navy */}
                 <div className={`bg-[#0a0f2c] pt-4 px-4 flex justify-between items-start text-white ${isCollapsed ? 'pb-4' : 'pb-6'}`}>
                   <div className="flex items-center gap-3">
-                    <div className="p-2 border border-white/20 rounded-lg bg-white/5">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
-                    </div>
+                      <div className={`p-2 border rounded-lg ${
+                        ticket.status === 'RESOLVED' || ticket.status === 'CLOSED' 
+                          ? 'border-green-500/30 bg-green-500/10 text-green-400' 
+                          : ticket.status === 'IN_PROGRESS'
+                          ? 'border-blue-500/30 bg-blue-500/10 text-blue-400'
+                          : 'border-orange-500/30 bg-orange-500/10 text-orange-400'
+                      }`}>
+                        {ticket.status === 'RESOLVED' || ticket.status === 'CLOSED' ? (
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        ) : ticket.status === 'IN_PROGRESS' ? (
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-[spin_3s_linear_infinite]"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                        ) : (
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>
+                        )}
+                      </div>
                     <div>
                       <div className="text-[10px] font-bold tracking-wider text-white/60 uppercase">Ticket ID</div>
                       <div className="text-lg font-bold tracking-tight">{ticket.id}</div>

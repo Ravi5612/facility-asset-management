@@ -75,6 +75,9 @@ export function TicketsClientPage({ fetchMode = "inbound" }: { fetchMode?: "all"
       priority: t.priority === "CRITICAL" ? "URGENT" : t.priority,
       dateRaised: new Date(t.createdAt).toISOString().split('T')[0],
       timeRaised: new Date(t.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+      assignedAt: (t as any).assignedAt,
+      resolvedAt: (t as any).resolvedAt,
+      createdAt: t.createdAt
     }));
   }, [rawTickets]);
 
@@ -138,16 +141,22 @@ export function TicketsClientPage({ fetchMode = "inbound" }: { fetchMode?: "all"
           <div className="pt-4"><PageSkeleton /></div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {departments?.map((dept: any) => {
-              const dTix = formattedTickets.filter((t: InterDeptTicket) => t.assignedToDept === dept.name || t.raisedByDept === dept.name);
-              const stats = {
-                total: dTix.length,
-                pending: dTix.filter((t: InterDeptTicket) => t.status === "Pending").length,
-                inProgress: dTix.filter((t: InterDeptTicket) => t.status === "In Progress").length,
-                completed: dTix.filter((t: InterDeptTicket) => t.status === "Completed").length,
-              };
-              
-              return (
+              {departments?.map((dept: any) => {
+                // Fetch stats directly from the backend summary! (Rule #39: No Data Calculation on Frontend)
+                const backendStats = (rawData as any)?.departmentStats?.[dept.name] || {
+                  total: 0, pending: 0, inProgress: 0, completed: 0, score: 0
+                };
+                
+                const stats = {
+                  total: backendStats.total,
+                  pending: backendStats.pending,
+                  inProgress: backendStats.inProgress,
+                  completed: backendStats.completed,
+                };
+                
+                const deptScore = backendStats.score;
+                
+                return (
               <div 
                 key={dept.id} 
                 onClick={() => setSelectedDept(dept)}
@@ -169,10 +178,14 @@ export function TicketsClientPage({ fetchMode = "inbound" }: { fetchMode?: "all"
                       <p className="text-xs text-muted-foreground font-mono mt-1 uppercase">{dept.code || dept.id.split("-")[0]}</p>
                     </div>
                   </div>
-                  {/* Status Badge */}
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                    {dept.status || "ACTIVE"}
-                  </span>
+                  {/* Score Badge */}
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <div className="flex items-center gap-1.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full shadow-sm text-xs font-bold transform transition-transform group-hover:scale-105">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-sm"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                        {deptScore} Pts
+                      </div>
+                      <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider mr-1">Perf. Score</span>
+                    </div>
                 </div>
 
                 <p className="text-sm text-muted-foreground line-clamp-2">

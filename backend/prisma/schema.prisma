@@ -247,6 +247,7 @@ model Department {
   organizationId String
   code           String
   name           String
+  floor          String?
   description    String?
   imageUrl       String? // Optional image for the department
   hodId          String?
@@ -433,6 +434,11 @@ model Asset {
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
   deletedAt          DateTime?
+    ipAddress          String?
+    hostname           String?
+    macAddress         String?
+    seatNumber         String?
+    floor              String?
 
   currentAssignee Employee?             @relation("CurrentAssignee", fields: [currentAssigneeId], references: [id])
   ownerDepartment Department?           @relation(fields: [ownerDepartmentId], references: [id])
@@ -454,8 +460,8 @@ model AssetAssignment {
   organizationId    String
   asset             Asset            @relation(fields: [assetId], references: [id])
   assetId           String
-  employee          Employee         @relation(fields: [employeeId], references: [id])
-  employeeId        String
+  employee          Employee?        @relation(fields: [employeeId], references: [id])
+  employeeId        String?
   assignedById      String
   assignedAt        DateTime         @default(now())
   returnedById      String?
@@ -492,8 +498,10 @@ model Ticket {
   raisedByEmployeeId   String
   assignedToDeptId     String
   assignedToEmployeeId String?
+    assignedAt           DateTime?
   status               TicketStatus   @default(OPEN)
   priority             TicketPriority @default(MEDIUM)
+    resolutionNotes      String?
   resolvedAt           DateTime?
   createdById          String?
   updatedById          String?
@@ -645,4 +653,32 @@ model SalaryHistory {
   updatedAt      DateTime     @updatedAt
 
   @@index([organizationId, employeeId])
+}
+
+model Inventory {
+  id               String   @id @default(uuid())
+    seatNumber       String?
+    floor            String?
+    department       String?
+    hostname         String?
+  os               String?
+  ipAddress        String?
+  macAddress       String?
+  make             String?
+  modelName        String?
+  serialNumber     String?
+  ramGB            Int?
+  ramType          String?
+  processor        String?
+  driveConfig      String?
+  bitlocker        String?
+  symantec         String?
+  createdAt        DateTime @default(now())
+    monitor          String?
+  keyboard         String?
+  mouse            String?
+  headset          String?
+  cables           String?
+  accessories      String?
+  updatedAt        DateTime @updatedAt
 }

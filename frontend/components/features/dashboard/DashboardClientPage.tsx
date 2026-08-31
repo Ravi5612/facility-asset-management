@@ -10,6 +10,10 @@ import {
 } from "@/components/features/dashboard/DashboardCharts";
 import { DashboardStatsGrid } from "@/components/features/dashboard/DashboardStatsGrid";
 import { DashboardSkeleton } from "@/components/ui/skeletons";
+import { AnalogClock } from "@/components/ui/analog-clock";
+
+
+
 
 export function DashboardClientPage() {
   const { data: dashboardData, isLoading, error } = useQuery({
@@ -18,15 +22,24 @@ export function DashboardClientPage() {
   });
 
   const [currentDate, setCurrentDate] = useState("");
+  const [timeObj, setTimeObj] = useState<Date | null>(null);
 
   useEffect(() => {
-    setCurrentDate(new Date().toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      timeZone: "Asia/Kolkata",
-    }));
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentDate(now.toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        timeZone: "Asia/Kolkata",
+      }));
+      setTimeObj(now);
+    };
+    
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
   }, []);
 
   if (isLoading) {
@@ -49,19 +62,28 @@ export function DashboardClientPage() {
 
   return (
     <div className="space-y-8 pb-10">
-      <div className="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-sidebar)] rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
+      <div className="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-sidebar)] rounded-2xl p-8 text-white shadow-lg relative">
+        {/* Background skew isolated */}
+        <div className="absolute inset-0 overflow-hidden rounded-2xl z-0 pointer-events-none">
+          
+        </div>
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="flex-1">
             <h1 className="text-3xl font-bold mb-2">{greeting}, Super Admin! 👋</h1>
             <p className="text-white/80 text-lg">
               Here is an overview of your organization's facility & asset activities today.
             </p>
           </div>
-          <div className="text-left sm:text-right text-white/90 font-medium">
-            <p>{currentDate}</p>
+          
+          <div className="flex items-center gap-4 sm:justify-end z-20 bg-black/10 pr-3 pl-5 py-2.5 rounded-[50px] backdrop-blur-sm border border-white/10 shadow-inner">
+            <div className="text-right text-white/90 font-medium">
+              <p className="text-lg font-bold">{currentDate}</p>
+              {timeObj && <p className="text-sm opacity-90 mt-0.5 tracking-wider font-mono">{timeObj.toLocaleTimeString("en-US", { timeZone: "Asia/Kolkata" })}</p>}
+            </div>
+            {timeObj && <AnalogClock date={timeObj} className="shadow-[0_10px_25px_-5px_rgba(0,0,0,0.5)]" style={{ width: 130, height: 130, marginTop: "-25px", marginBottom: "-25px", marginRight: "-5px" }} />}
           </div>
         </div>
-        <div className="absolute right-0 top-0 h-full w-1/3 bg-white/5 skew-x-12 transform origin-top-left -translate-x-10" />
+        
       </div>
 
       {/* Stats Grid */}

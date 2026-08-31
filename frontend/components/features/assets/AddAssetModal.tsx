@@ -120,7 +120,7 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
     const trimmed = data.categoryName.trim();
     if (!trimmed) return;
     
-    if (allCategories.some(c => c.category.toLowerCase() === trimmed.toLowerCase())) {
+    if ((Array.isArray(allCategories) ? allCategories : (allCategories as any)?.data || []).some((c: any) => c.category.toLowerCase() === trimmed.toLowerCase())) {
       setCatError("Category already exists!");
       return;
     }
@@ -154,32 +154,13 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
         <form onSubmit={handleSubmitAsset(onSubmitAsset)} className="space-y-5 mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-2">
-              <Label htmlFor="assetName">Asset Name *</Label>
-              <Input id="assetName" placeholder="e.g. MacBook Pro M3" disabled={isLoading} {...registerAsset("assetName")} />
-              {assetErrors.assetName && <p className="text-xs text-brand-danger">{assetErrors.assetName.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="department">Department *</Label>
-              <select id="department" disabled={isLoading}
-                {...registerAsset("departmentId")}
-                className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
-                <option value="">Select Department</option>
-                {departments.map((d: Department) => (
-                  <option key={d.id} value={d.id}>{d.name}</option>
-                ))}
-              </select>
-              {assetErrors.departmentId && <p className="text-xs text-brand-danger">{assetErrors.departmentId.message}</p>}
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="category">Category *</Label>
               <div className="flex gap-2">
                 <select id="category" disabled={isLoading}
                   {...registerAsset("category")}
                   className="flex-1 px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
                   <option value="">Select Category</option>
-                  {allCategories.map(c => (
+                  {(Array.isArray(allCategories) ? allCategories : (allCategories as any)?.data || []).map((c: any) => (
                     <option key={c.category} value={c.category}>{c.name}{c.isCustom ? " ✦" : ""}</option>
                   ))}
                 </select>
@@ -240,15 +221,34 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
               {assetErrors.category && <p className="text-xs text-brand-danger">{assetErrors.category.message}</p>}
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="assetName">Asset Name *</Label>
+              <Input id="assetName" placeholder="e.g. MacBook Pro M3" disabled={isLoading} {...registerAsset("assetName")} />
+              {assetErrors.assetName && <p className="text-xs text-brand-danger">{assetErrors.assetName.message}</p>}
+            </div>
+
             {selectedFormCat && (
               <div className="space-y-2 col-span-2">
                 <Label>Auto-Generated Asset ID</Label>
                 <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted border border-dashed">
                   <span className="font-mono font-bold text-[var(--brand-primary)] text-base">{getNextId(selectedFormCat)}</span>
-                  <span className="text-xs text-muted-foreground">— This ID will be assigned automatically</span>
+                  <span className="text-xs text-muted-foreground">&rarr; This ID will be assigned automatically</span>
                 </div>
               </div>
             )}
+
+            <div className="space-y-2">
+              <Label htmlFor="department">Department *</Label>
+              <select id="department" disabled={isLoading}
+                {...registerAsset("departmentId")}
+                className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                <option value="">Select Department</option>
+                {departments.map((d: Department) => (
+                  <option key={d.id} value={d.id}>{d.name}</option>
+                ))}
+              </select>
+              {assetErrors.departmentId && <p className="text-xs text-brand-danger">{assetErrors.departmentId.message}</p>}
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="serialNumber">Serial Number *</Label>

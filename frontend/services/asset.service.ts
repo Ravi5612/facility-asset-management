@@ -91,15 +91,41 @@ export const assetService = {
     return res.json();
   },
 
-  async assignAsset(assetId: string, employeeId: string, condition?: string, notes?: string): Promise<AssetCategory> {
+  async assignAsset(assetId: string, employeeId: string | undefined, condition?: string, notes?: string, networkDetails?: any, replaceExisting?: boolean, existingSerialNumber?: string, swapAction?: string): Promise<any> {
     const res = await fetch(`/api/assets/${assetId}/assign`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ employeeId, condition, notes })
+      body: JSON.stringify({ employeeId, condition, notes, ...networkDetails, replaceExisting, existingSerialNumber, swapAction })
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.message || 'Failed to assign asset');
+    }
+    return res.json();
+  },
+
+  async shiftAsset(assetId: string, departmentId: string, notes?: string, networkDetails?: any): Promise<any> {
+    const res = await fetch(`/api/assets/${assetId}/shift`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ departmentId, notes, ...networkDetails })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to shift asset');
+    }
+    return res.json();
+  },
+
+  async updateAssetStatus(assetId: string, status: string, notes?: string): Promise<any> {
+    const res = await fetch(`/api/assets/${assetId}/status`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status, notes })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to update asset status');
     }
     return res.json();
   },

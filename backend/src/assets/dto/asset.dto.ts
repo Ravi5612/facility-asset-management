@@ -1,4 +1,4 @@
-import { IsString, IsOptional, MaxLength, IsNotEmpty, IsDateString, IsNumber } from 'class-validator';
+import { IsString, IsOptional, MaxLength, IsNotEmpty, IsDateString, IsNumber, IsEnum } from 'class-validator';
 
 export class CreateAssetCategoryDto {
   @IsString()
@@ -42,13 +42,78 @@ export class CreateAssetDto {
 }
 
 export class AssignAssetDto {
+  @IsOptional()
+  replaceExisting?: boolean;
+
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  employeeId: string;
+  existingSerialNumber?: string;
+  @IsString()
+  @IsOptional()
+  ipAddress?: string;
+
+  @IsString()
+  @IsOptional()
+  hostname?: string;
+
+  @IsString()
+  @IsOptional()
+  macAddress?: string;
+
+  @IsString()
+  @IsOptional()
+  seatNumber?: string;
+
+  @IsString()
+  @IsOptional()
+  floor?: string;
+
+  @IsString()
+  @IsOptional()
+  employeeId?: string;
 
   @IsString()
   @IsOptional()
   condition?: string;
+
+  @IsString()
+  @IsOptional()
+  notes?: string;
+
+  @IsString()
+  @IsOptional()
+  swapAction?: string;
+}
+
+export class ShiftAssetDto {
+  @IsString()
+  @IsOptional()
+  ipAddress?: string;
+
+  @IsString()
+  @IsOptional()
+  hostname?: string;
+
+  @IsString()
+  @IsOptional()
+  macAddress?: string;
+
+  @IsString()
+  @IsOptional()
+  seatNumber?: string;
+
+  @IsString()
+  @IsOptional()
+  floor?: string;
+
+  @IsString()
+  @IsOptional()
+  notes?: string;
+}
+
+export class UpdateAssetStatusDto {
+  @IsEnum(['AVAILABLE', 'IN_MAINTENANCE', 'RETIRED', 'LOST'])
+  status: 'AVAILABLE' | 'IN_MAINTENANCE' | 'RETIRED' | 'LOST';
 
   @IsString()
   @IsOptional()

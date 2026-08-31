@@ -11,6 +11,8 @@ import { UserPlus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 import { AssignAssetModal } from "@/components/features/assets/AssignAssetModal";
+import { ShiftAssetModal } from "@/components/features/assets/ShiftAssetModal";
+import { UpdateStatusModal } from "@/components/features/assets/UpdateStatusModal";
 import { AddAssetModal } from "@/components/features/assets/AddAssetModal";
 import { AssetCategoryCard } from "@/components/features/assets/AssetCategoryCard";
 import { AssetDetailModal } from "@/components/features/assets/AssetDetailModal";
@@ -54,7 +56,9 @@ export function HodAssetsClientPage({ initialAssets }: { initialAssets: any[] })
   }
 
   function getNextId(categoryName: string): string {
-    const cat = rawCategories.find((c: any) => c.category === categoryName || c.name === categoryName);
+    if (!categoryName) return "";
+    const catList = Array.isArray(rawCategories) ? rawCategories : (rawCategories as any)?.data || [];
+    const cat = catList.find((c: any) => c.category === categoryName || c.name === categoryName);
     const prefix = cat?.prefix ?? generatePrefix(categoryName);
     const count = (cat?.items?.length ?? 0) + 1;
     return `${prefix}-${String(count).padStart(3, "0")}`;
@@ -130,6 +134,8 @@ export function HodAssetsClientPage({ initialAssets }: { initialAssets: any[] })
   const paginatedItems = filteredItems.slice((detailPage - 1) * itemsPerPage, detailPage * itemsPerPage);
 
   const [assignAssetId, setAssignAssetId] = useState<string | null>(null);
+  const [shiftAssetId, setShiftAssetId] = useState<string | null>(null);
+  const [updateStatusAssetId, setUpdateStatusAssetId] = useState<string | null>(null);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -137,8 +143,26 @@ export function HodAssetsClientPage({ initialAssets }: { initialAssets: any[] })
         <AssignAssetModal
           assetId={assignAssetId}
           assetName={filteredItems.find(i => (i as any).rawId === assignAssetId)?.name || ""}
+          categoryName={(filteredItems.find(i => (i as any).rawId === assignAssetId) as any)?.categoryName || "CPU"} asset={filteredItems.find(i => (i as any).rawId === assignAssetId)}
           isOpen={!!assignAssetId}
           setIsOpen={(open) => !open && setAssignAssetId(null)}
+        />
+      )}
+      {shiftAssetId && (
+        <ShiftAssetModal
+          assetId={shiftAssetId}
+          assetName={filteredItems.find(i => (i as any).rawId === shiftAssetId)?.name || ""}
+          isOpen={!!shiftAssetId}
+          setIsOpen={(open) => !open && setShiftAssetId(null)}
+        />
+      )}
+      {updateStatusAssetId && (
+        <UpdateStatusModal
+          assetId={updateStatusAssetId}
+          assetName={filteredItems.find(i => (i as any).rawId === updateStatusAssetId)?.name || ""}
+          currentStatus={filteredItems.find(i => (i as any).rawId === updateStatusAssetId)?.status || ""}
+          isOpen={!!updateStatusAssetId}
+          setIsOpen={(open) => !open && setUpdateStatusAssetId(null)}
         />
       )}
       
@@ -289,13 +313,18 @@ export function HodAssetsClientPage({ initialAssets }: { initialAssets: any[] })
                           </td>
                           <td className="px-4 py-3 text-muted-foreground">{item.assignee || '-'}</td>
                           <td className="px-4 py-3 text-right">
-                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex justify-end gap-2">
                               <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-primary" onClick={() => setSelectedItem(item)}>
                                 <Eye className="h-4 w-4" />
                               </Button>
                               {item.status === "Available" && (
                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-primary" onClick={() => setAssignAssetId(item.rawId)}>
                                   <UserPlus className="h-4 w-4" />
+                                </Button>
+                              )}
+                              {(item.status === "Available" || item.status === "Repair") && (
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-primary" onClick={() => setUpdateStatusAssetId(item.rawId)}>
+                                  <Wrench className="h-4 w-4" />
                                 </Button>
                               )}
                             </div>

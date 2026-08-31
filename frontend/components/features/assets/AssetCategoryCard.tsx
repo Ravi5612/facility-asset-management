@@ -25,7 +25,7 @@ export function AssetCategoryCard({ cat, onSelect }: AssetCategoryCardProps) {
   const bad = cat.items.filter(i => i.status === "Dump" || i.status === "Repair").length;
 
   return (
-    <div className="bg-card border rounded-xl p-5 shadow-sm hover:shadow-md transition-all group flex flex-col gap-4">
+    <div className="bg-card border rounded-xl p-5 shadow-sm hover:shadow-md hover:border-brand-primary transition-all group flex flex-col gap-4">
       <div className="flex items-center gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary group-hover:bg-brand-primary/20 transition-colors">
           <Icon className="h-5 w-5" />

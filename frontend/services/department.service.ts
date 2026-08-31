@@ -10,6 +10,7 @@ export const departmentSchema = z.object({
   code: z.string(),
   name: z.string(),
   description: z.string().nullable().optional(),
+  floor: z.string().nullable().optional(),
   imageUrl: z.string().nullable().optional(),
   hodId: z.string().nullable().optional(),
   hodName: z.string().nullable().optional(),
@@ -34,7 +35,7 @@ export const departmentService = {
     const parsed = z.array(departmentSchema).parse(data);
     return parsed.map(d => ({
       ...d,
-      hod: d.hodId ? "Assigned" : "Unassigned",
+      hod: d.hodName || "Unassigned",
       employeeCount: d._count?.employees || 0,
       employees: new Array(d._count?.employees || 0) // some components check employees.length
     }));

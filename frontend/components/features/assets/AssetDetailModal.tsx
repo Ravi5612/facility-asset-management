@@ -82,6 +82,28 @@ export function AssetDetailModal({ selectedItem, setSelectedItem }: AssetDetailM
                 ) : null)}
               </div>
             </div>
+          ) : (selectedItem as any).seatDetails ? (
+            <div className="rounded-lg border border-brand-primary/30 bg-brand-primary/5 p-4 space-y-3">
+              <h3 className="text-sm font-bold flex items-center gap-2">
+                <User className="h-4 w-4 text-brand-primary" />
+                Currently Assigned To Seat
+              </h3>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                {[
+                  { label: "Seat Number", value: (selectedItem as any).seatDetails.seatNumber },
+                  { label: "Floor", value: (selectedItem as any).seatDetails.floor },
+                  { label: "Department", value: (selectedItem as any).seatDetails.department },
+                  { label: "Assigned By", value: (selectedItem as any).seatDetails.assignedBy },
+                  { label: "Assigned By Email", value: (selectedItem as any).seatDetails.assignedByEmail },
+                  { label: "Assigned On", value: (selectedItem as any).seatDetails.assignedAt ? new Date((selectedItem as any).seatDetails.assignedAt).toLocaleDateString() : null },
+                ].map((f) => f.value ? (
+                  <div key={f.label} className="rounded-md bg-muted/50 p-2">
+                    <p className="text-xs text-muted-foreground mb-0.5">{f.label}</p>
+                    <p className="font-semibold text-xs">{f.value}</p>
+                  </div>
+                ) : null)}
+              </div>
+            </div>
           ) : (
             <div className="rounded-lg bg-muted/50 p-3 text-sm">
               <p className="text-xs text-muted-foreground mb-1">Assigned To</p>

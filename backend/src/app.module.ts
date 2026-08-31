@@ -1,3 +1,4 @@
+import { InventoryModule } from "./inventory/inventory.module";
 import { Module } from '@nestjs/common';
 import { AttendanceModule } from './attendance/attendance.module';
 import { SettingsModule } from './settings/settings.module';
@@ -18,6 +19,7 @@ import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    InventoryModule,
     ThrottlerModule.forRoot([{
       ttl: 60000,
       limit: 10,

@@ -46,6 +46,20 @@ export class AssetsController {
     return this.assetsService.assignAsset(user.organizationId, assetId, dto.employeeId, user.userId, dto);
   }
 
+  @Post(':id/shift')
+  @Roles('HOD')
+  shiftAsset(@Req() req: Request, @Param('id') assetId: string, @Body() dto: any) {
+    const user = req.user as any;
+    return this.assetsService.shiftAsset(user.organizationId, assetId, user.userId, dto);
+  }
+
+    @Post(':id/status')
+  @Roles('HOD')
+  updateAssetStatus(@Req() req: Request, @Param('id') assetId: string, @Body() dto: import('./dto/asset.dto').UpdateAssetStatusDto) {
+    const user = req.user as any;
+    return this.assetsService.updateAssetStatus(user.organizationId, assetId, user.userId, dto);
+  }
+
   @Get('assigned-to-me')
   @Roles('SUPER_ADMIN', 'SUB_ADMIN', 'HOD', 'EMPLOYEE')
   getAssignedToMeAssets(@Req() req: Request) {

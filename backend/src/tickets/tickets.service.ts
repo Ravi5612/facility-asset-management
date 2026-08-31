@@ -120,24 +120,72 @@ export class TicketsService {
   async getAllTickets(userId: string, organizationId: string, role: string, page: number = 1, limit: number = 50) {
     const skip = (page - 1) * limit;
 
-    if (role === 'SUPER_ADMIN') {
-      const [data, total] = await Promise.all([
-        this.prisma.ticket.findMany({
-          where: { organizationId },
-          include: {
-            raisedByDept: { select: { name: true } },
-            assignedToDept: { select: { name: true } },
-            raisedByEmployee: { select: { firstName: true, lastName: true, email: true } },
-            assignedToEmployee: { select: { firstName: true, lastName: true, email: true } }
-          },
-          orderBy: { createdAt: 'desc' },
-          skip,
-          take: limit
-        }),
-        this.prisma.ticket.count({ where: { organizationId } })
-      ]);
-      return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
-    }
+      if (role === 'SUPER_ADMIN') {
+        const [data, total, allTickets] = await Promise.all([
+          this.prisma.ticket.findMany({
+            where: { organizationId },
+            include: {
+              raisedByDept: { select: { name: true } },
+              assignedToDept: { select: { name: true } },
+              raisedByEmployee: { select: { firstName: true, lastName: true, email: true } },
+              assignedToEmployee: { select: { firstName: true, lastName: true, email: true } }
+            },
+            orderBy: { createdAt: 'desc' },
+            skip,
+            take: limit
+          }),
+          this.prisma.ticket.count({ where: { organizationId } }),
+          this.prisma.ticket.findMany({
+            where: { organizationId },
+            select: { 
+                status: true, 
+                assignedToDept: { select: { name: true } },
+                createdAt: true, 
+                assignedAt: true, 
+                resolvedAt: true, 
+                updatedAt: true 
+            }
+          })
+        ]);
+
+        // Strict Backend Calculation (FRONTEND_GUIDELINES #39)
+        const departmentStats: Record<string, any> = {};
+        allTickets.forEach((t: any) => {
+            const deptName = t.assignedToDept?.name;
+            if (!deptName) return;
+            
+            if (!departmentStats[deptName]) {
+                departmentStats[deptName] = { total: 0, pending: 0, inProgress: 0, completed: 0, score: 0 };
+            }
+            const stats = departmentStats[deptName];
+            stats.total++;
+            
+            if (t.status === "OPEN") stats.pending++;
+            else if (t.status === "IN_PROGRESS") stats.inProgress++;
+            else if (t.status === "RESOLVED" || t.status === "CLOSED") stats.completed++;
+
+            let ticketScore = 0;
+            // Assign Bonus
+            if (t.assignedAt && t.createdAt) {
+                const diffMins = (t.assignedAt.getTime() - t.createdAt.getTime()) / (1000 * 60);
+                if (diffMins <= 10) ticketScore += 10;
+            }
+            // Speed Bonus
+            if (t.status === "RESOLVED" || t.status === "CLOSED") {
+                ticketScore += 10;
+                if ((t.resolvedAt || t.updatedAt) && t.createdAt) {
+                    const resolved = t.resolvedAt || t.updatedAt;
+                    const diffHours = (resolved.getTime() - t.createdAt.getTime()) / (1000 * 60 * 60);
+                    if (diffHours <= 1) ticketScore += 30;
+                    else if (diffHours <= 3) ticketScore += 15;
+                    else if (diffHours <= 6) ticketScore += 7;
+                }
+            }
+            stats.score += ticketScore;
+        });
+
+        return { data, total, page, limit, totalPages: Math.ceil(total / limit), departmentStats };
+      }
 
     if (role === 'SUB_ADMIN') {
       const user = await this.prisma.user.findUnique({
@@ -260,19 +308,34 @@ export class TicketsService {
     const updateData: any = {};
 
     // 1. Status Update Logic
-    if (dto.status) {
-      // Sirf assigned employee hi status badal sakta hai
-      if (ticket.assignedToEmployeeId !== employeeId) {
-        throw new ForbiddenException('Only the assigned employee can change the ticket status.');
+      if (dto.status) {
+        // Sirf assigned employee hi status badal sakta hai
+        if (ticket.assignedToEmployeeId !== employee.id) {
+          throw new ForbiddenException('Only the assigned employee can change the ticket status.');
+        }
+        updateData.status = dto.status;
+        if (dto.status === 'COMPLETED' || dto.status === 'RESOLVED' || dto.status === 'CLOSED') {
+          updateData.resolvedAt = new Date();
+        }
       }
-      updateData.status = dto.status;
-    }
-    
-    // 2. Ticket Assignment Logic
+
+      if (dto.resolutionNotes) {
+        updateData.resolutionNotes = dto.resolutionNotes;
+      }
+      
+      // 2. Ticket Assignment Logic
     // Only HODs or Admins can assign tickets
     if (dto.assignedToEmployeeId !== undefined && dto.assignedToEmployeeId !== null) {
       if (role === 'HOD' || role === 'SUPER_ADMIN' || role === 'SUB_ADMIN') {
         updateData.assignedToEmployeeId = dto.assignedToEmployeeId;
+        // Avoid overwriting assignedAt if it's already assigned
+        if (!ticket.assignedToEmployeeId) {
+          updateData.assignedAt = new Date();
+          // Automatically change status from OPEN to IN_PROGRESS when assigned for the first time
+          if (ticket.status === 'OPEN' && !dto.status) {
+            updateData.status = 'IN_PROGRESS';
+          }
+        }
       } else {
         throw new ForbiddenException('You do not have permission to assign tickets.');
       }

@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { dashboardService } from "@/services/dashboard.service";
+import { AnalogClock } from "@/components/ui/analog-clock";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 
 export default function HodDashboardClientPage() {
@@ -22,6 +23,31 @@ export default function HodDashboardClientPage() {
     if (stored) {
       try { setUser(JSON.parse(stored)); } catch (e) {}
     }
+  }, []);
+
+    const [currentDate, setCurrentDate] = useState("");
+  const [timeObj, setTimeObj] = useState<Date | null>(null);
+  const [greeting, setGreeting] = useState("Welcome back");
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentDate(now.toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      }));
+      setTimeObj(now);
+      
+      const hour = now.getHours();
+      if (hour < 12) setGreeting("Good morning");
+      else if (hour < 17) setGreeting("Good afternoon");
+      else setGreeting("Good evening");
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
   }, []);
 
   const deptName = user?.departmentName || "";
@@ -89,9 +115,19 @@ export default function HodDashboardClientPage() {
   return (
     <div className="space-y-8 pb-10">
       <div className="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-sidebar)] rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
-        <div className="relative z-10">
-          <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.fullName?.split(" ")[0] || "HOD"}! 👋</h1>
-          <p className="text-white/80 text-lg">Here is what is happening in the {deptName} department today.</p>
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">{greeting}, {user?.fullName?.split(" ")[0] || "HOD"}! ??</h1>
+            <p className="text-white/80 text-lg">Here is what is happening in the {deptName} department today.</p>
+          </div>
+          
+          <div className="flex items-center gap-4 sm:justify-end z-20 bg-black/10 pr-3 pl-5 py-2.5 rounded-[50px] backdrop-blur-sm border border-white/10 shadow-inner">
+            <div className="text-right text-white/90 font-medium">
+              <p className="text-lg font-bold">{currentDate}</p>
+              {timeObj && <p className="text-sm opacity-90 mt-0.5 tracking-wider font-mono">{timeObj.toLocaleTimeString("en-US", { timeZone: "Asia/Kolkata" })}</p>}
+            </div>
+            {timeObj && <AnalogClock date={timeObj} className="shadow-[0_10px_25px_-5px_rgba(0,0,0,0.5)]" style={{ width: 130, height: 130, marginTop: "-25px", marginBottom: "-25px", marginRight: "-5px" }} />}
+          </div>
         </div>
         <div className="absolute right-0 top-0 h-full w-1/3 bg-white/5 skew-x-12 transform origin-top-left -translate-x-10" />
       </div>

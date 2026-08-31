@@ -9,4 +9,8 @@ export class UpdateTicketDto {
   @IsOptional()
   @IsString()
   assignedToEmployeeId?: string;
+
+  @IsOptional()
+  @IsString()
+  resolutionNotes?: string;
 }

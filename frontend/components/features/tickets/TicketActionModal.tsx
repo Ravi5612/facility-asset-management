@@ -15,18 +15,21 @@ interface TicketActionModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   onSuccess?: () => void;
+  canAssign?: boolean;
 }
 
-export function TicketActionModal({ ticket, isOpen, setIsOpen, onSuccess }: TicketActionModalProps) {
+export function TicketActionModal({ ticket, isOpen, setIsOpen, onSuccess, canAssign = true }: TicketActionModalProps) {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<string>("");
   const [assigneeId, setAssigneeId] = useState<string>("");
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [resolutionNotes, setResolutionNotes] = useState<string>("");
 
   // When ticket changes, reset state
   useState(() => {
     if (ticket) {
       setStatus(ticket.status || "");
+      setResolutionNotes((ticket as any).resolutionNotes || "");
     }
   });
 
@@ -38,19 +41,23 @@ export function TicketActionModal({ ticket, isOpen, setIsOpen, onSuccess }: Tick
   });
 
   const { mutate: updateTicket, isPending } = useMutation({
-    mutationFn: (data: { status?: string; assignedToEmployeeId?: string }) => {
+    mutationFn: (data: { status?: string; assignedToEmployeeId?: string; resolutionNotes?: string }) => {
       return ticketService.updateTicket(ticket!.id, data);
     },
     onSuccess: () => {
       setIsOpen(false);
       queryClient.invalidateQueries({ queryKey: ["inbound-tickets"] });
       queryClient.invalidateQueries({ queryKey: ["outbound-tickets"] });
+      queryClient.invalidateQueries({ queryKey: ["employee-tickets"] });
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
       onSuccess?.();
     },
     onError: (err: Error) => {
       setSubmitError(err.message || "Failed to update ticket");
     }
   });
+
+  const isResolved = ticket?.status === "RESOLVED" || ticket?.status === "CLOSED";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,6 +66,7 @@ export function TicketActionModal({ ticket, isOpen, setIsOpen, onSuccess }: Tick
     updateTicket({
       status: status || undefined,
       assignedToEmployeeId: assigneeId && assigneeId !== "unassigned" ? assigneeId : undefined,
+      resolutionNotes: resolutionNotes || undefined,
     });
   };
 
@@ -68,7 +76,19 @@ export function TicketActionModal({ ticket, isOpen, setIsOpen, onSuccess }: Tick
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>Update Ticket</DialogTitle>
+          <DialogTitle className="flex justify-between items-center pr-6">
+            {isResolved && !canAssign ? "Ticket Details" : "Update Ticket"}
+            <span className={`text-xs px-2.5 py-1 rounded-full font-bold tracking-wider uppercase border
+              ${ticket.status === 'RESOLVED' || ticket.status === 'CLOSED' 
+                  ? 'bg-green-100 text-green-700 border-green-200' 
+                  : ticket.status === 'IN_PROGRESS' 
+                  ? 'bg-blue-100 text-blue-700 border-blue-200' 
+                  : 'bg-orange-100 text-orange-700 border-orange-200'
+              }`}
+            >
+              {ticket.status === 'OPEN' ? 'PENDING' : ticket.status?.replace('_', ' ')}
+            </span>
+          </DialogTitle>
           <DialogDescription>
             {ticket.subject} ({ticket.id})
           </DialogDescription>
@@ -87,45 +107,71 @@ export function TicketActionModal({ ticket, isOpen, setIsOpen, onSuccess }: Tick
               id="status"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
+              disabled={isResolved && !canAssign}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <option value="OPEN">Open</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="RESOLVED">Resolved</option>
-              <option value="CLOSED">Closed</option>
+              {!canAssign ? (
+                <>
+                  <option value="IN_PROGRESS">In Progress</option>
+                  <option value="RESOLVED">Completed (Resolved)</option>
+                </>
+              ) : (
+                <>
+                  <option value="OPEN">Open</option>
+                  <option value="IN_PROGRESS">In Progress</option>
+                  <option value="RESOLVED">Resolved</option>
+                  <option value="CLOSED">Closed</option>
+                </>
+              )}
             </select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="assignee">Assign To Employee</Label>
-            <select
-              id="assignee"
-              value={assigneeId}
-              onChange={(e) => setAssigneeId(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="unassigned">-- Select Employee --</option>
-              {employees.map((emp: any) => (
-                <option key={emp.id} value={emp.id}>
-                  {emp.name} {emp.employeeCode ? `(${emp.employeeCode})` : ''}
-                </option>
-              ))}
-            </select>
-            {ticket.handler && !assigneeId && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Currently handled by: {ticket.handler}
-              </p>
-            )}
-          </div>
+          {!canAssign && (
+            <div className="space-y-2">
+              <Label htmlFor="resolutionNotes">Problem Description & Solution Details</Label>
+              <textarea
+                id="resolutionNotes"
+                value={resolutionNotes}
+                onChange={(e) => setResolutionNotes(e.target.value)}
+              disabled={isResolved && !canAssign}
+                placeholder="Briefly describe what the issue was and how you resolved it..."
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              />
+            </div>
+          )}
+
+          {canAssign && (
+            <div className="space-y-2">
+              <Label htmlFor="assignee">Assign To Employee</Label>
+              <select
+                id="assignee"
+                value={assigneeId}
+                onChange={(e) => setAssigneeId(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="unassigned">-- Select Employee --</option>
+                {employees.map((emp: any) => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.name} {emp.employeeCode ? `(${emp.employeeCode})` : ''}
+                  </option>
+                ))}
+              </select>
+              {ticket.handler && !assigneeId && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Currently handled by: {ticket.handler}
+                </p>
+              )}
+            </div>
+          )}
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={isPending}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending} className="bg-[var(--brand-primary)] text-white hover:opacity-90">
+            {!isResolved || canAssign ? <Button type="submit" disabled={isPending} className="bg-[var(--brand-primary)] text-white hover:opacity-90">
               {isPending ? <Spinner className="h-4 w-4 mr-2" /> : null}
               Save Changes
-            </Button>
+            </Button> : null}
           </DialogFooter>
         </form>
       </DialogContent>
