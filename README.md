@@ -69,4 +69,10 @@ npm run dev
 *(You can add screenshots of your dashboards and modals here by dragging and dropping images into this README file on GitHub)*
 
 ---
-Developed by [Ravi Rai](https://github.com/Ravi5612).
+## 📞 Contact
+
+Developed by **Ravi Rai**
+- 📧 Email: [ravirai84272@gmail.com](mailto:ravirai84272@gmail.com)
+- 📱 Phone: +91-XXXXXXXXXX (Update this in README.md)
+- 🌐 GitHub: [@Ravi5612](https://github.com/Ravi5612)
+
