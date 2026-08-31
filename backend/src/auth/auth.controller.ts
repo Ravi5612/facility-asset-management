@@ -9,11 +9,12 @@ import {
   UseGuards,
   Get,
 } from '@nestjs/common';
+import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import type { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-
+import { refreshCookieOptions } from './auth-cookie';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Controller('auth')
@@ -25,6 +26,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ short: { limit: 5, ttl: 60000 } }) // Brute-force protection: max 5 login attempts / min
   async login(
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
@@ -40,19 +42,13 @@ export class AuthController {
     );
 
     // Set Refresh Token in HttpOnly Secure Cookie
-    res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
-      path: '/',
-    });
+    res.cookie('refresh_token', refreshToken, refreshCookieOptions());
 
     // Set Access Token in HttpOnly Secure Cookie to prevent XSS
     res.cookie('auth_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'strict',   // Stricter than 'lax' — internal app doesn't need cross-site
       maxAge: 15 * 60 * 1000, // 15 mins in ms
       path: '/',
     });
@@ -71,10 +67,12 @@ export class AuthController {
       await this.authService.logout(refreshToken);
     }
     res.clearCookie('refresh_token', { path: '/' });
+    res.clearCookie('auth_token', { path: '/' });
     return { success: true, message: 'Logged out successfully' };
   }
 
   @UseGuards(JwtAuthGuard)
+  @SkipThrottle() // Called on every page refresh — don't throttle session validation
   @Get('me')
   async getMe(@Req() req: Request) {
     const userPayload = req['user'] as { userId: string; organizationId: string; role: string };
@@ -128,6 +126,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('verify-password')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ short: { limit: 5, ttl: 60000 } }) // Brute-force protection on password check
   async verifyPassword(@Req() req: Request, @Body() body: import('./dto/verify-password.dto').VerifyPasswordDto) {
     const userPayload = req['user'] as { userId: string };
     await this.authService.verifyPassword(userPayload.userId, body.password);
@@ -136,6 +135,7 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ short: { limit: 5, ttl: 60000 } }) // Protect against refresh token brute force
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies['refresh_token'];
     
@@ -156,18 +156,12 @@ export class AuthController {
       res.cookie('auth_token', accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        sameSite: 'strict',
         maxAge: 15 * 60 * 1000, // 15 mins in ms
         path: '/',
       });
 
-      res.cookie('refresh_token', newRefreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
-        path: '/',
-      });
+      res.cookie('refresh_token', newRefreshToken, refreshCookieOptions());
 
       return {
         success: true,

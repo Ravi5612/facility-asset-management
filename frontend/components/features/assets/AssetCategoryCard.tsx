@@ -15,14 +15,28 @@ function getCategoryIcon(category: string) {
 interface AssetCategoryCardProps {
   cat: AssetCategory;
   onSelect: (cat: AssetCategory) => void;
+  isStockView?: boolean;
 }
 
-export function AssetCategoryCard({ cat, onSelect }: AssetCategoryCardProps) {
+export function AssetCategoryCard({ cat, onSelect, isStockView }: AssetCategoryCardProps) {
   const Icon = getCategoryIcon(cat.category);
   const total = cat.items.length;
-  const assigned = cat.items.filter(i => i.status === "Assigned").length;
-  const available = cat.items.filter(i => i.status === "Available").length;
-  const bad = cat.items.filter(i => i.status === "Dump" || i.status === "Repair").length;
+  
+  const isStoreAsset = (a: any) => !a.departmentName || a.departmentName.toLowerCase().includes('store') || a.departmentName.toLowerCase().includes('inventory');
+
+  let assigned = 0;
+  let available = 0;
+  let bad = 0;
+
+  if (isStockView) {
+    assigned = cat.items.filter((i: any) => !isStoreAsset(i) && i.status !== "Repair" && i.status !== "IN_MAINTENANCE" && i.status !== "Dump" && i.status !== "RETIRED" && i.status !== "Returned").length;
+    available = cat.items.filter((i: any) => isStoreAsset(i) && (i.status === "Available" || i.status === "AVAILABLE")).length;
+    bad = cat.items.filter((i: any) => i.status === "Dump" || i.status === "Repair" || i.status === "IN_MAINTENANCE" || i.status === "RETIRED" || i.status === "Returned").length;
+  } else {
+    assigned = cat.items.filter((i: any) => i.status === "Assigned" || i.status === "ASSIGNED").length;
+    available = cat.items.filter((i: any) => i.status === "Available" || i.status === "AVAILABLE").length;
+    bad = cat.items.filter((i: any) => i.status === "Dump" || i.status === "Repair" || i.status === "IN_MAINTENANCE" || i.status === "RETIRED" || i.status === "Returned").length;
+  }
 
   return (
     <div className="bg-card border rounded-xl p-5 shadow-sm hover:shadow-md hover:border-brand-primary transition-all group flex flex-col gap-4">

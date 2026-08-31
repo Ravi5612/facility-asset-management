@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { assetService } from "@/services/asset.service";
 import { departmentService } from "@/services/department.service";
+import { inventoryService } from "@/services/inventory.service";
 import { ErrorAlert, SuccessAlert } from "@/components/ui/alert-box";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -48,13 +49,7 @@ export function ShiftAssetModal({ assetId, assetName, isOpen, setIsOpen }: Shift
   // Fetch employees based on selected department
   const { data: employees = [], isLoading: isLoadingEmployees } = useQuery({
     queryKey: ["department-employees", departmentId],
-    queryFn: async () => {
-      // Direct call to backend (CORS allowed since departmentService uses it)
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-      const res = await fetch(`${API_URL}/departments/${departmentId}/employees`, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch employees");
-      return res.json();
-    },
+    queryFn: () => departmentService.getDepartmentEmployees(departmentId),
     enabled: !!departmentId && isOpen,
   });
 
@@ -69,23 +64,14 @@ export function ShiftAssetModal({ assetId, assetName, isOpen, setIsOpen }: Shift
       setSeatStatus({ type: 'loading', msg: 'Checking seat details...' });
       
       try {
-        const url = new URL(window.location.origin + '/api/proxy/inventory/by-seat');
-        url.searchParams.append('seatNumber', seatNumber);
-        if (floor) url.searchParams.append('floor', floor);
-        
-        const res = await fetch(url.toString());
-        if (res.ok) {
-          const data = await res.json();
-          if (data && Object.keys(data).length > 0) {
-            setHostname(prev => prev || data.hostname || "");
-            setIpAddress(prev => prev || data.ipAddress || "");
-            setMacAddress(prev => prev || data.macAddress || "");
-            setSeatStatus({ type: 'success', msg: 'Auto-filled from previous record.' });
-          } else {
-            setSeatStatus({ type: 'warning', msg: 'New Seat / No previous record found.' });
-          }
+        const data = await inventoryService.getBySeat(seatNumber, floor);
+        if (data && Object.keys(data).length > 0) {
+          setHostname(prev => prev || data.hostname || "");
+          setIpAddress(prev => prev || data.ipAddress || "");
+          setMacAddress(prev => prev || data.macAddress || "");
+          setSeatStatus({ type: 'success', msg: 'Auto-filled from previous record.' });
         } else {
-          setSeatStatus({ type: 'warning', msg: 'Failed to verify seat.' });
+          setSeatStatus({ type: 'warning', msg: 'New Seat / No previous record found.' });
         }
       } catch (e) {
         console.error("Failed to fetch seat details", e);

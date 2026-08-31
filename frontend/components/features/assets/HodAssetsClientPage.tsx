@@ -11,16 +11,22 @@ import { UserPlus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 import { AssignAssetModal } from "@/components/features/assets/AssignAssetModal";
+import { AllocateToDeptModal } from "@/components/features/assets/AllocateToDeptModal";
 import { ShiftAssetModal } from "@/components/features/assets/ShiftAssetModal";
 import { UpdateStatusModal } from "@/components/features/assets/UpdateStatusModal";
 import { AddAssetModal } from "@/components/features/assets/AddAssetModal";
 import { AssetCategoryCard } from "@/components/features/assets/AssetCategoryCard";
 import { AssetDetailModal } from "@/components/features/assets/AssetDetailModal";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { assetService } from "@/services/asset.service";
 import { AssetItem, AssetCategory } from "@/types";
 
-export function HodAssetsClientPage({ initialAssets }: { initialAssets: any[] }) {
+interface HodAssetsClientPageProps {
+  initialAssets: any[];
+  isStockView?: boolean;
+}
+
+export function HodAssetsClientPage({ initialAssets, isStockView = false }: HodAssetsClientPageProps) {
   const [user, setUser] = useState<any>(null);
   useEffect(() => {
     const stored = localStorage.getItem("auth_user");
@@ -92,18 +98,35 @@ export function HodAssetsClientPage({ initialAssets }: { initialAssets: any[] })
         });
       }
       
-      // Backend already converts status to human-readable string
-      const statusStr = asset.status as string;
+      let finalStatus = asset.status as string;
+      let finalAssignee = asset.assignee;
+      let canAction = true;
+
+      // In Stock View, Store HOD shouldn't see end-user assignees of other departments
+      if (isStockView) {
+        const isStoreAssetLocal = !asset.departmentName || asset.departmentName.toLowerCase().includes('store') || asset.departmentName.toLowerCase().includes('inventory');
+        if (!isStoreAssetLocal) {
+          // If allocated to another dept, the status for Store is just "Assigned" (unless it's in repair/dump)
+          if (finalStatus !== "Repair" && finalStatus !== "Dump" && finalStatus !== "RETIRED" && finalStatus !== "Returned") {
+            finalStatus = "Assigned";
+          }
+          finalAssignee = "-"; // Hide employee/seat info
+          canAction = false; // Store cannot take action on assets currently held by other departments
+        } else {
+          finalAssignee = "-"; // If it's in store, it's not assigned to an employee yet
+        }
+      }
 
       map.get(catName)!.items.push({
         ...asset,
         id: asset.id,
         rawId: asset.rawId || asset.id,
         name: asset.name,
-        status: statusStr,
-        assignee: asset.assignee,
+        status: finalStatus,
+        assignee: finalAssignee,
         serialNumber: asset.serialNumber,
         departmentName: asset.departmentName,
+        canAction: canAction,
         history: asset.history || [],
       } as any);
     });
@@ -115,10 +138,22 @@ export function HodAssetsClientPage({ initialAssets }: { initialAssets: any[] })
     return result;
   }, [filteredAssets, search]);
 
+  // Helper to check if asset belongs to Store/Inventory
+  const isStoreAsset = (a: any) => !a.departmentName || a.departmentName.toLowerCase().includes('store') || a.departmentName.toLowerCase().includes('inventory');
+
   const totalAssets = filteredAssets.length;
-  const availableAssets = filteredAssets.filter((a: any) => a.status === "Available" || a.status === "AVAILABLE").length;
-  const assignedAssets = filteredAssets.filter((a: any) => a.status === "Assigned" || a.status === "ASSIGNED").length;
-  const maintenanceAssets = filteredAssets.filter((a: any) => a.status === "Repair" || a.status === "Dump" || a.status === "IN_MAINTENANCE" || a.status === "RETIRED").length;
+  
+  // Assigned: Given to any OTHER department (not store), and not returned/dumped yet
+  const assignedAssets = filteredAssets.filter((a: any) => !isStoreAsset(a) && a.status !== "Repair" && a.status !== "IN_MAINTENANCE" && a.status !== "Dump" && a.status !== "RETIRED" && a.status !== "Returned").length;
+  
+  // In Stock: Held by store AND is available
+  const inStockAssets = filteredAssets.filter((a: any) => isStoreAsset(a) && (a.status === "Available" || a.status === "AVAILABLE")).length;
+  
+  // Returned/Maintenance
+  const returnedAssets = filteredAssets.filter((a: any) => a.status === "Returned" || a.status === "RETURNED" || a.status === "Repair" || a.status === "IN_MAINTENANCE").length;
+  
+  // Dumped
+  const dumpedAssets = filteredAssets.filter((a: any) => a.status === "Dump" || a.status === "RETIRED").length;
 
   const filteredItems = useMemo(() => {
     if (!selectedCategory) return [];
@@ -134,11 +169,20 @@ export function HodAssetsClientPage({ initialAssets }: { initialAssets: any[] })
   const paginatedItems = filteredItems.slice((detailPage - 1) * itemsPerPage, detailPage * itemsPerPage);
 
   const [assignAssetId, setAssignAssetId] = useState<string | null>(null);
+  const [allocateAssetId, setAllocateAssetId] = useState<string | null>(null);
   const [shiftAssetId, setShiftAssetId] = useState<string | null>(null);
   const [updateStatusAssetId, setUpdateStatusAssetId] = useState<string | null>(null);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {allocateAssetId && (
+        <AllocateToDeptModal
+          assetId={allocateAssetId}
+          assetName={filteredItems.find(i => (i as any).rawId === allocateAssetId)?.name || ""}
+          isOpen={!!allocateAssetId}
+          setIsOpen={(open) => !open && setAllocateAssetId(null)}
+        />
+      )}
       {assignAssetId && (
         <AssignAssetModal
           assetId={assignAssetId}
@@ -168,29 +212,14 @@ export function HodAssetsClientPage({ initialAssets }: { initialAssets: any[] })
       
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Department Assets</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">{isStockView ? "Central Stock" : "Department Assets"}</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            View and manage assets assigned to your department.
+            {isStockView ? "Manage all company assets, add new stock, and track allocations." : "View and manage assets assigned to your department."}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {isStoreHOD && (
-            <div className="flex bg-slate-100 p-1 rounded-md">
-              <button 
-                className={`px-3 py-1.5 text-sm font-medium rounded-sm transition-colors ${viewMode === 'all' ? 'bg-white shadow text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                onClick={() => setViewMode('all')}
-              >
-                All Assets
-              </button>
-              <button 
-                className={`px-3 py-1.5 text-sm font-medium rounded-sm transition-colors ${viewMode === 'own' ? 'bg-white shadow text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                onClick={() => setViewMode('own')}
-              >
-                Own Assets
-              </button>
-            </div>
-          )}
-          {isStoreHOD && (
+          {/* We hide the All/Own toggle because it's replaced by the two distinct pages */}
+          {isStoreHOD && isStockView && (
             <AddAssetModal
               allCategories={rawCategories as any}
               onAddCategory={handleAddCategory}
@@ -209,36 +238,43 @@ export function HodAssetsClientPage({ initialAssets }: { initialAssets: any[] })
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <SummaryCard
-          label="Total Assets"
-          value={totalAssets}
-          icon={<MonitorPlay className="h-6 w-6" />}
-          iconClassName="bg-brand-primary-light text-brand-primary"
-          lineClassName="bg-brand-primary"
-        />
-        <SummaryCard
-          label="Available"
-          value={availableAssets}
-          icon={<Package className="h-6 w-6" />}
-          iconClassName="bg-brand-success/10 text-brand-success"
-          lineClassName="bg-brand-success"
-        />
-        <SummaryCard
-          label="Assigned"
-          value={assignedAssets}
-          icon={<UserCheck className="h-6 w-6" />}
-          iconClassName="bg-brand-warning/10 text-brand-warning"
-          lineClassName="bg-brand-warning"
-        />
-        <SummaryCard
-          label="Maintenance"
-          value={maintenanceAssets}
-          icon={<Wrench className="h-6 w-6" />}
-          iconClassName="bg-brand-error/10 text-brand-error"
-          lineClassName="bg-brand-error"
-        />
-      </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <SummaryCard
+            label="Total Assets"
+            value={totalAssets}
+            icon={<MonitorPlay className="h-6 w-6" />}
+            iconClassName="bg-brand-primary-light text-brand-primary"
+            lineClassName="bg-brand-primary"
+          />
+          <SummaryCard
+            label="Assigned"
+            value={assignedAssets}
+            icon={<UserCheck className="h-6 w-6" />}
+            iconClassName="bg-brand-warning/10 text-brand-warning"
+            lineClassName="bg-brand-warning"
+          />
+          <SummaryCard
+            label="In Stock"
+            value={inStockAssets}
+            icon={<Package className="h-6 w-6" />}
+            iconClassName="bg-brand-success/10 text-brand-success"
+            lineClassName="bg-brand-success"
+          />
+          <SummaryCard
+            label="Returned"
+            value={returnedAssets}
+            icon={<Wrench className="h-6 w-6" />}
+            iconClassName="bg-brand-error/10 text-brand-error"
+            lineClassName="bg-brand-error"
+          />
+          <SummaryCard
+            label="Dump / Retired"
+            value={dumpedAssets}
+            icon={<Trash2 className="h-6 w-6" />}
+            iconClassName="bg-gray-100 text-gray-500"
+            lineClassName="bg-gray-500"
+          />
+        </div>
 
       {/* Category Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -246,6 +282,7 @@ export function HodAssetsClientPage({ initialAssets }: { initialAssets: any[] })
           <AssetCategoryCard 
             key={cat.category}
             cat={cat}
+            isStockView={isStockView}
             onSelect={(c) => {
               setSelectedCategory(c);
               setDetailSearch("");
@@ -317,12 +354,12 @@ export function HodAssetsClientPage({ initialAssets }: { initialAssets: any[] })
                               <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-primary" onClick={() => setSelectedItem(item)}>
                                 <Eye className="h-4 w-4" />
                               </Button>
-                              {item.status === "Available" && (
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-primary" onClick={() => setAssignAssetId(item.rawId)}>
+                              {item.status === "Available" && item.canAction !== false && (
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-primary" onClick={() => isStockView ? setAllocateAssetId(item.rawId) : setAssignAssetId(item.rawId)}>
                                   <UserPlus className="h-4 w-4" />
                                 </Button>
                               )}
-                              {(item.status === "Available" || item.status === "Repair") && (
+                              {(item.status === "Available" || item.status === "Repair") && item.canAction !== false && (
                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-primary" onClick={() => setUpdateStatusAssetId(item.rawId)}>
                                   <Wrench className="h-4 w-4" />
                                 </Button>

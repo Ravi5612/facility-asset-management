@@ -38,4 +38,16 @@ export const employeeApi = {
       throw new Error(err.message || "Failed to create Employee");
     }
   },
+
+  updateMyProfile: async (formData: FormData): Promise<void> => {
+    const res = await fetch(`${API_URL}/users/profile`, {
+      method: "PATCH",
+      body: formData,
+      credentials: "include",
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || "Failed to update profile");
+    }
+  }
 };

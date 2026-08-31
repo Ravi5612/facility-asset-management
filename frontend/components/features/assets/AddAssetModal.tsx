@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -47,6 +47,7 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
     reset: resetAsset,
     watch: watchAsset,
     setValue: setAssetValue,
+    setError: setAssetError,
     formState: { errors: assetErrors },
   } = useForm<AddAssetFormValues>({
     resolver: zodResolver(AddAssetFormSchema),
@@ -54,6 +55,11 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
   });
 
   const selectedFormCat = watchAsset("category");
+  const activeCategoryObj = useMemo(() => {
+    if (!selectedFormCat) return null;
+    const cats = Array.isArray(allCategories) ? allCategories : (allCategories as any)?.data || [];
+    return cats.find((c: any) => c.category === selectedFormCat || c.name === selectedFormCat) || null;
+  }, [selectedFormCat, allCategories]);
 
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -78,7 +84,35 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
     enabled: isOpen,
   });
 
+  // Auto-select the Store department in the hidden field so Zod validation passes
+  useEffect(() => {
+    if (departments.length > 0) {
+      const storeDept = departments.find((d: Department) => d.name.toLowerCase().includes('store') || d.name.toLowerCase().includes('inventory'));
+      if (storeDept) {
+        setAssetValue("departmentId", storeDept.id, { shouldValidate: true });
+      }
+    }
+  }, [departments, setAssetValue]);
+
   const onSubmitAsset = (data: AddAssetFormValues) => {
+    // Dynamic Custom Fields Validation
+    if (activeCategoryObj?.customFields) {
+      let hasError = false;
+      for (const field of activeCategoryObj.customFields) {
+        if (field.required) {
+          const val = data.hardwareDetails?.[field.name];
+          if (!val || val.toString().trim() === "") {
+            setAssetError(`hardwareDetails.${field.name}` as any, {
+              type: "manual",
+              message: `${field.name} is required`
+            });
+            hasError = true;
+          }
+        }
+      }
+      if (hasError) return;
+    }
+
     setIsLoading(true);
     addAssetMutation.mutate({
       assetName: data.assetName,
@@ -87,6 +121,7 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
       serialNumber: data.serialNumber,
       purchaseDate: data.purchaseDate,
       warrantyExpiry: data.warrantyExpiry,
+      hardwareDetails: data.hardwareDetails || {},
       notes: data.notes
     });
   };
@@ -237,7 +272,8 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
               </div>
             )}
 
-            <div className="space-y-2">
+            {/* We auto-assign the asset to the Store/Inventory department behind the scenes */}
+            <div className="hidden space-y-2">
               <Label htmlFor="department">Department *</Label>
               <select id="department" disabled={isLoading}
                 {...registerAsset("departmentId")}
@@ -247,7 +283,6 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
                   <option key={d.id} value={d.id}>{d.name}</option>
                 ))}
               </select>
-              {assetErrors.departmentId && <p className="text-xs text-brand-danger">{assetErrors.departmentId.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -258,11 +293,28 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
             <div className="space-y-2">
               <Label htmlFor="purchaseDate">Purchase Date</Label>
               <Input id="purchaseDate" type="date" disabled={isLoading} {...registerAsset("purchaseDate")} />
+              {assetErrors.purchaseDate && <p className="text-xs text-brand-danger">{assetErrors.purchaseDate.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="warrantyExpiry">Warranty Expiry</Label>
               <Input id="warrantyExpiry" type="date" disabled={isLoading} {...registerAsset("warrantyExpiry")} />
+              {assetErrors.warrantyExpiry && <p className="text-xs text-brand-danger">{assetErrors.warrantyExpiry.message}</p>}
             </div>
+            {activeCategoryObj?.customFields?.map((field: any) => {
+              const err = (assetErrors.hardwareDetails as any)?.[field.name];
+              return (
+                <div key={field.name} className="space-y-2">
+                  <Label htmlFor={`hw_${field.name}`}>{field.name} {field.required && '*'}</Label>
+                  <Input 
+                    id={`hw_${field.name}`} 
+                    placeholder={`Enter ${field.name}`} 
+                    disabled={isLoading} 
+                    {...registerAsset(`hardwareDetails.${field.name}` as any)} 
+                  />
+                  {err && <p className="text-xs text-brand-danger">{err.message}</p>}
+                </div>
+              );
+            })}
           </div>
           <div className="space-y-2">
             <Label htmlFor="notes">Notes</Label>

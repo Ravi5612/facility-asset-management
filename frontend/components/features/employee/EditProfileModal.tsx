@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { Camera, User, Lock, Upload, Eye, EyeOff } from "lucide-react";
 import { authService } from "@/services/auth.service";
+import { employeeApi } from "@/services/employeeApi.service";
 import { useQueryClient } from "@tanstack/react-query";
 
 const API_URL = "/api/proxy";
@@ -56,17 +57,7 @@ export function EditProfileModal({ isOpen, setIsOpen, employeeInfo }: EditProfil
       if (newPassword) formData.append("newPassword", newPassword);
       if (profileImage) formData.append("profileImage", profileImage);
 
-      const token = localStorage.getItem("auth_token") || "";
-      const res = await fetch(`${API_URL}/users/profile`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || "Failed to update profile");
-      }
+      await employeeApi.updateMyProfile(formData);
 
       await queryClient.invalidateQueries({ queryKey: ["auth-me"] });
       setIsOpen(false);

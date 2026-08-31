@@ -404,6 +404,7 @@ model AssetCategory {
   organizationId String
   name           String
   description    String?
+  customFields   Json?        @default("[]") // For dynamic form fields (e.g. RAM, Storage)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   deletedAt      DateTime?
@@ -429,6 +430,7 @@ model Asset {
   ownerDepartmentId  String?
   locationId         String?
   notes              String?
+  hardwareDetails    Json?       @default("{}") // Stores actual specs mapping from customFields
   createdById        String?
   updatedById        String?
   createdAt          DateTime      @default(now())

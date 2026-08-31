@@ -9,6 +9,9 @@ export class CreateAssetCategoryDto {
   @IsOptional()
   @MaxLength(5)
   prefix?: string;
+
+  @IsOptional()
+  customFields?: any;
 }
 
 export class CreateAssetDto {
@@ -35,6 +38,9 @@ export class CreateAssetDto {
   @IsDateString()
   @IsOptional()
   warrantyExpiry?: string;
+
+  @IsOptional()
+  hardwareDetails?: any;
 
   @IsString()
   @IsOptional()

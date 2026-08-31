@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, UserCheck } from "lucide-react";
 import { assetService } from "@/services/asset.service";
 import { departmentService } from "@/services/department.service";
+import { inventoryService } from "@/services/inventory.service";
 import { ErrorAlert, SuccessAlert } from "@/components/ui/alert-box";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -63,13 +64,7 @@ export function AssignAssetModal({ assetId, assetName, categoryName = 'CPU', ass
   // Fetch employees based on selected department
   const { data: employees = [], isLoading: isLoadingEmployees } = useQuery({
     queryKey: ["department-employees", departmentId],
-    queryFn: async () => {
-      // Direct call to backend (CORS allowed since departmentService uses it)
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-      const res = await fetch(`${API_URL}/departments/${departmentId}/employees`, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch employees");
-      return res.json();
-    },
+    queryFn: () => departmentService.getDepartmentEmployees(departmentId),
     enabled: !!departmentId && isOpen,
   });
 
@@ -84,15 +79,9 @@ export function AssignAssetModal({ assetId, assetName, categoryName = 'CPU', ass
       setSeatStatus({ type: 'loading', msg: 'Verifying seat...' });
       
       try {
-        const url = new URL(window.location.origin + '/api/proxy/inventory/by-seat');
-        url.searchParams.append('seatNumber', seatNumber);
-        if (floor) url.searchParams.append('floor', floor);
-        
-        const res = await fetch(url.toString());
-        if (res.ok) {
-          const data = await res.json();
-          if (data && Object.keys(data).length > 0) {
-            setHostname(prev => prev || data.hostname || "");
+        const data = await inventoryService.getBySeat(seatNumber, floor);
+        if (data && Object.keys(data).length > 0) {
+          setHostname(prev => prev || data.hostname || "");
             setIpAddress(prev => prev || data.ipAddress || "");
             setMacAddress(prev => prev || data.macAddress || "");
             
@@ -109,9 +98,6 @@ export function AssignAssetModal({ assetId, assetName, categoryName = 'CPU', ass
           } else {
             setExistingSerialNumber(null);
             setSeatStatus({ type: 'warning', msg: `New Seat / No ${categoryName} or previous record found.` });
-          }
-        } else {
-          setSeatStatus({ type: 'warning', msg: 'Failed to verify seat.' });
         }
       } catch (e) {
         console.error("Failed to fetch seat details", e);

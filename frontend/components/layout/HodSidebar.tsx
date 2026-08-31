@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, CalendarCheck, FileText, Monitor, Ticket, HelpCircle, Package } from "lucide-react";
+import { LayoutDashboard, Users, CalendarCheck, FileText, Monitor, Ticket, HelpCircle, Package, Archive } from "lucide-react";
 import React from "react";
 
 export function HodSidebar() {
@@ -12,11 +12,14 @@ export function HodSidebar() {
 
   const deptSegment = pathname.split('/')[2] || "general";
 
-  const isItDepartment = deptSegment.toLowerCase().includes('information-technology') || deptSegment.toLowerCase() === 'it';
+  const isStoreOrIT = deptSegment.toLowerCase().includes('information-technology') || 
+                      deptSegment.toLowerCase() === 'it' ||
+                      deptSegment.toLowerCase().includes('store') ||
+                      deptSegment.toLowerCase().includes('inventory');
 
   const navItems = [
     { title: "Dashboard", href: `/hod/${deptSegment}/dashboard`, icon: LayoutDashboard },
-    ...(isItDepartment ? [{ title: "Inventory", href: `/hod/${deptSegment}/inventory`, icon: Package }] : []),
+    ...(isStoreOrIT ? [{ title: "Central Stock", href: `/hod/${deptSegment}/stock`, icon: Archive }] : []),
     { title: "Assets", href: `/hod/${deptSegment}/assets`, icon: Monitor },
     { title: "Tickets", href: `/hod/${deptSegment}/tickets`, icon: Ticket },
     { title: "Employees", href: `/hod/${deptSegment}/employees`, icon: Users },

@@ -126,5 +126,13 @@ export const departmentService = {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.message || "Failed to delete department");
     }
+  },
+
+  getDepartmentEmployees: async (departmentId: string): Promise<any[]> => {
+    const res = await fetch(`${API_URL}/departments/${departmentId}/employees`, {
+      credentials: "include",
+    });
+    if (!res.ok) throw new Error("Failed to fetch employees");
+    return res.json();
   }
 };

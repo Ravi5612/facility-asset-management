@@ -116,19 +116,26 @@ export class DashboardService {
     };
   }
 
-  async getHodDashboardData(user: { organizationId: string; userId: string; accessibleDepartments?: string[]; role: string }, deptName: string) {
+  async getHodDashboardData(user: { organizationId: string; userId: string; accessibleDepartments?: string[]; role: string; departmentName?: string }, deptName: string) {
     const { organizationId } = user;
 
     // Optional Check: verify permission
     if (user.role !== 'SUPER_ADMIN') {
       const allowedDepts = user.accessibleDepartments || [];
-      if (!allowedDepts.includes(deptName)) {
+      const deptMatch = allowedDepts.some(d => d.toLowerCase() === deptName.toLowerCase()) || 
+                        (user.departmentName && user.departmentName.toLowerCase() === deptName.toLowerCase());
+      
+      if (!deptMatch) {
+        console.log('FORBIDDEN:', { user, deptName, allowedDepts, deptMatch });
         return { success: false, message: 'Forbidden' };
       }
     }
 
     const dept = await this.prisma.department.findFirst({
-      where: { name: deptName, organizationId }
+      where: { 
+        name: { equals: deptName, mode: 'insensitive' }, 
+        organizationId 
+      }
     });
     if (!dept) return { success: false, message: 'Department not found' };
 
@@ -187,7 +194,7 @@ export class DashboardService {
       value: d._count._all
     }));
 
-    return {
+    const result = {
       success: true,
       stats: {
         totalEmployees,
@@ -206,5 +213,7 @@ export class DashboardService {
       },
       recentTickets
     };
+    console.log('getHodDashboardData returning:', JSON.stringify(result, null, 2));
+    return result;
   }
 }

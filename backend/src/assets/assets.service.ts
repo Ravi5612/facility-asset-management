@@ -70,6 +70,7 @@ export class AssetsService {
         category: cat.name,
         name: cat.name,
         prefix: cat.name.slice(0, 3).toUpperCase(),
+        customFields: (cat as any).customFields || [],
         items: cat.assets.map(asset => {
           const activeAssign = asset.assignments?.find(a => a.status === 'ACTIVE');
           
@@ -144,6 +145,7 @@ export class AssetsService {
         organizationId,
         name: dto.name,
         description: (dto as any).description || null,
+        customFields: dto.customFields || [],
       }
     });
   }
@@ -226,9 +228,9 @@ export class AssetsService {
         where: { organizationId, name: { equals: user.departmentName, mode: 'insensitive' } }
       });
 
-      const whereClause = (viewMode === 'own' && ownDept)
-        ? { organizationId, ownerDepartmentId: ownDept.id }
-        : { organizationId };
+      const whereClause = (viewMode === 'stock')
+        ? { organizationId }
+        : (ownDept ? { organizationId, ownerDepartmentId: ownDept.id } : { organizationId });
 
       const assets = await this.prisma.asset.findMany({
         where: whereClause,
@@ -304,6 +306,12 @@ export class AssetsService {
   }
 
   async createAsset(organizationId: string, userId: string, dto: CreateAssetDto) {
+    if (dto.purchaseDate && dto.warrantyExpiry) {
+      if (new Date(dto.warrantyExpiry) < new Date(dto.purchaseDate)) {
+        throw new BadRequestException('Warranty expiry date cannot be earlier than purchase date.');
+      }
+    }
+
     const dbUser = await this.prisma.user.findUnique({ where: { id: userId }, select: { departmentName: true } });
     if (dbUser?.departmentName?.toLowerCase() !== 'store') {
       throw new ForbiddenException('Only Store HOD can add assets.');
@@ -315,6 +323,18 @@ export class AssetsService {
     });
     if (!category) {
       throw new BadRequestException('Category not found');
+    }
+
+    // Backend validation for dynamic custom fields
+    if (category.customFields && Array.isArray(category.customFields)) {
+      for (const field of category.customFields) {
+        if ((field as any).required) {
+          const val = dto.hardwareDetails?.[(field as any).name];
+          if (!val || val.toString().trim() === '') {
+            throw new BadRequestException(`Missing required custom field: ${(field as any).name}`);
+          }
+        }
+      }
     }
 
     const count = await this.prisma.asset.count({ where: { categoryId: category.id } });
@@ -333,6 +353,7 @@ export class AssetsService {
         purchaseDate: dto.purchaseDate ? new Date(dto.purchaseDate) : new Date(),
         purchasePrice: 0, // Not provided in simple form
         warrantyExpiryDate: dto.warrantyExpiry ? new Date(dto.warrantyExpiry) : null,
+        hardwareDetails: dto.hardwareDetails || {},
         notes: dto.notes,
         createdById: userId,
         status: 'AVAILABLE'

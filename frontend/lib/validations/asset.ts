@@ -38,7 +38,20 @@ export const AddAssetFormSchema = z.object({
   serialNumber: z.string().min(3, "Serial number is required"),
   purchaseDate: z.string().optional(),
   warrantyExpiry: z.string().optional(),
+  hardwareDetails: z.record(z.any()).optional(),
   notes: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.purchaseDate && data.warrantyExpiry) {
+    const purchase = new Date(data.purchaseDate);
+    const warranty = new Date(data.warrantyExpiry);
+    if (warranty < purchase) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Warranty expiry cannot be before purchase date",
+        path: ["warrantyExpiry"],
+      });
+    }
+  }
 });
 export type AddAssetFormValues = z.infer<typeof AddAssetFormSchema>;
 

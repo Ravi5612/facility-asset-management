@@ -128,7 +128,12 @@ export function AttendanceManager({ deptName }: AttendanceManagerProps) {
                 Upload
               </Button>
             </div>
-            
+            {
+
+
+
+
+            }
             {result && (
               <div className={`flex gap-3 p-4 rounded-lg border ${result.success ? "bg-green-50 border-green-200 text-green-900" : "bg-red-50 border-red-200 text-red-900"}`}>
                 <div className="mt-0.5">

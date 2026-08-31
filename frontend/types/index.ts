@@ -42,6 +42,7 @@ export type AssetCategory = {
   name: string; 
   prefix: string;
   isCustom?: boolean; 
+  customFields?: { name: string, type: string, required?: boolean }[];
   items: AssetItem[];
 };
 

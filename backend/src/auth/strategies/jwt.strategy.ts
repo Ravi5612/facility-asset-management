@@ -46,6 +46,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       userId: payload.sub,
       organizationId: payload.organizationId,
       role: currentRole, // FRESH role from database, not from JWT
+      departmentName: user.departmentName,
+      accessibleDepartments: user.accessibleDepartments,
     };
   }
 }

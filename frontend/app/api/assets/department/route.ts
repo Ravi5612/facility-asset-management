@@ -7,7 +7,10 @@ export async function GET(request: NextRequest) {
     const token = request.cookies.get("auth_token")?.value;
     if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    const res = await fetch(`${BACKEND_URL}/assets/department`, {
+    const { searchParams } = new URL(request.url);
+    const queryString = searchParams.toString() ? `?${searchParams.toString()}` : '';
+
+    const res = await fetch(`${BACKEND_URL}/assets/department${queryString}`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: "no-store",
     });

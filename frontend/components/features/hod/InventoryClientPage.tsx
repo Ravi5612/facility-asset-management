@@ -24,8 +24,11 @@ export default function InventoryClientPage() {
 
   useEffect(() => {
     const deptSegment = pathname.split('/')[2];
-    const isItDepartment = deptSegment?.toLowerCase().includes('information-technology') || deptSegment?.toLowerCase() === 'it';
-    if (!isItDepartment) {
+    const isStoreOrIT = deptSegment?.toLowerCase().includes('information-technology') || 
+                        deptSegment?.toLowerCase() === 'it' ||
+                        deptSegment?.toLowerCase().includes('store') ||
+                        deptSegment?.toLowerCase().includes('inventory');
+    if (!isStoreOrIT) {
       setIsAuthorized(false);
       router.push(`/hod/${deptSegment || 'general'}/dashboard`);
     }

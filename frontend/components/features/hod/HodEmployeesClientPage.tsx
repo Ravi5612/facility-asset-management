@@ -41,8 +41,6 @@ export default function HodEmployeesClientPage() {
           // Backend returns { success: true, user: { ... } }
           const fetchedUser = data.user || data;
           const dept = (fetchedUser.departmentName || "").toLowerCase();
-          
-          console.log("Fetched HOD Department:", dept);
 
           if (dept === "hr" || dept.includes("human resource")) {
             setIsHr(true);
