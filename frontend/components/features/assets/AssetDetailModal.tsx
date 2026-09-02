@@ -53,11 +53,18 @@ export function AssetDetailModal({ selectedItem, setSelectedItem }: AssetDetailM
               </div>
             ))}
             {(selectedItem as any).notes && (
-              <div className="rounded-lg bg-brand-warning/10 p-3 col-span-2">
-                <p className="text-xs text-brand-warning mb-1">Notes</p>
-                <p className="font-semibold text-brand-warning">{(selectedItem as any).notes}</p>
+            <div className="rounded-lg bg-orange-50/50 p-3 mb-4 border border-orange-100 col-span-2">
+              <p className="text-xs text-orange-800 font-bold mb-2">Important Notes & Status Changes</p>
+              <div className="space-y-1.5">
+                {(selectedItem as any).notes.split('\n').filter(Boolean).map((note: string, idx: number) => (
+                  <div key={idx} className="flex gap-2 text-xs text-orange-700 bg-white/60 p-2 rounded">
+                    <span className="shrink-0 text-orange-500">•</span>
+                    <span className="font-medium">{note}</span>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
+          )}
           </div>
 
           {/* ── Assignee Detail Card ── */}

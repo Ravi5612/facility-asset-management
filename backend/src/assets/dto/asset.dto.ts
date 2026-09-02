@@ -24,8 +24,8 @@ export class CreateAssetDto {
   categoryId: string;
 
   @IsString()
-  @IsNotEmpty()
-  departmentId: string;
+  @IsOptional()
+  departmentId?: string;
 
   @IsString()
   @IsNotEmpty()

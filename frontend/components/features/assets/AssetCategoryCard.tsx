@@ -37,9 +37,32 @@ export function AssetCategoryCard({ cat, onSelect, isStockView }: AssetCategoryC
     available = cat.items.filter((i: any) => i.status === "Available" || i.status === "AVAILABLE").length;
     bad = cat.items.filter((i: any) => i.status === "Dump" || i.status === "Repair" || i.status === "IN_MAINTENANCE" || i.status === "RETIRED" || i.status === "Returned").length;
   }
+  let cardBorderClass = "border-border hover:border-brand-primary";
+  let stockBoxBg = "bg-muted/50";
+  let stockBoxText = "text-foreground";
+  let stockBoxSub = "text-muted-foreground";
+
+  if (isStockView && total > 0) {
+    if (available === 0 || available <= 0.20 * assigned) {
+      cardBorderClass = "border-red-400 bg-red-50/40 hover:border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.1)]";
+      stockBoxBg = "bg-red-600 animate-pulse border border-red-700 shadow-[0_0_10px_rgba(220,38,38,0.5)]";
+      stockBoxText = "text-white";
+      stockBoxSub = "text-white/90";
+    } else if (available <= 0.50 * assigned) {
+      cardBorderClass = "border-orange-300 bg-orange-50/40 hover:border-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.1)]";
+      stockBoxBg = "bg-orange-500 border border-orange-600 shadow-[0_0_8px_rgba(249,115,22,0.4)]";
+      stockBoxText = "text-white";
+      stockBoxSub = "text-white/90";
+    } else {
+      cardBorderClass = "border-green-300 bg-green-50/40 hover:border-green-400 shadow-[0_0_15px_rgba(34,197,94,0.1)]";
+      stockBoxBg = "bg-green-500 border border-green-600 shadow-[0_0_8px_rgba(34,197,94,0.3)]";
+      stockBoxText = "text-white";
+      stockBoxSub = "text-white/90";
+    }
+  }
 
   return (
-    <div className="bg-card border rounded-xl p-5 shadow-sm hover:shadow-md hover:border-brand-primary transition-all group flex flex-col gap-4">
+    <div className={`bg-card border-2 rounded-xl p-5 shadow-sm hover:shadow-md transition-all group flex flex-col gap-4 ${cardBorderClass}`}>
       <div className="flex items-center gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary group-hover:bg-brand-primary/20 transition-colors">
           <Icon className="h-5 w-5" />
@@ -57,8 +80,14 @@ export function AssetCategoryCard({ cat, onSelect, isStockView }: AssetCategoryC
         {[
           { label: "Total", value: total, bg: "bg-brand-primary/10", text: "text-brand-primary", sub: "text-brand-primary/70" },
           { label: "Assigned", value: assigned, bg: "bg-brand-success/10", text: "text-brand-success", sub: "text-brand-success/70" },
-          { label: "Available", value: available, bg: "bg-muted/50", text: "text-foreground", sub: "text-muted-foreground" },
-          { label: "Dump/Rep", value: bad, bg: "bg-brand-danger/10", text: "text-brand-danger", sub: "text-brand-danger/70" },
+          { 
+            label: isStockView ? "Stock" : "Available", 
+            value: available, 
+            bg: stockBoxBg, 
+            text: stockBoxText, 
+            sub: stockBoxSub 
+          },
+          { label: "Returned", value: bad, bg: "bg-brand-danger/10", text: "text-brand-danger", sub: "text-brand-danger/70" },
         ].map(s => (
           <div key={s.label} className={`rounded-lg ${s.bg} py-2`}>
             <p className={`text-lg font-extrabold ${s.text}`}>{s.value}</p>

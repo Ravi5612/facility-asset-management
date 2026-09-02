@@ -32,9 +32,10 @@ interface AddAssetModalProps {
   generatePrefix: (name: string) => string;
   isOpen: boolean;
   setIsOpen: (val: boolean) => void;
+  onSuccessCallback?: () => void;
 }
 
-export function AddAssetModal({ allCategories, onAddCategory, getNextId, generatePrefix, isOpen, setIsOpen }: AddAssetModalProps) {
+export function AddAssetModal({ allCategories, onAddCategory, getNextId, generatePrefix, isOpen, setIsOpen, onSuccessCallback }: AddAssetModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [isAddCatOpen, setIsAddCatOpen] = useState(false);
@@ -69,7 +70,8 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
     onSuccess: () => {
       setSuccess(true);
       resetAsset();
-      router.refresh(); // Tells Next.js to re-fetch Server Components (page.tsx)
+      router.refresh(); // Tells Next.js to re-fetch Server Components
+      if (onSuccessCallback) onSuccessCallback(); // Refetch CSR data
       setTimeout(() => {
         setSuccess(false);
         setIsOpen(false);
@@ -84,15 +86,9 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
     enabled: isOpen,
   });
 
-  // Auto-select the Store department in the hidden field so Zod validation passes
-  useEffect(() => {
-    if (departments.length > 0) {
-      const storeDept = departments.find((d: Department) => d.name.toLowerCase().includes('store') || d.name.toLowerCase().includes('inventory'));
-      if (storeDept) {
-        setAssetValue("departmentId", storeDept.id, { shouldValidate: true });
-      }
-    }
-  }, [departments, setAssetValue]);
+  // Note: departmentId is intentionally left empty for new assets.
+  // New assets go into the general company pool (ownerDepartmentId = null on backend).
+  // An asset becomes Store's asset only when a department assigns/returns it to Store.
 
   const onSubmitAsset = (data: AddAssetFormValues) => {
     // Dynamic Custom Fields Validation
@@ -302,15 +298,61 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
             </div>
             {activeCategoryObj?.customFields?.map((field: any) => {
               const err = (assetErrors.hardwareDetails as any)?.[field.name];
+              const isWiredWireless = field.name.includes("Wired") || field.name.includes("wired");
+              const isBrand = field.name.toLowerCase() === "brand";
+              
               return (
                 <div key={field.name} className="space-y-2">
                   <Label htmlFor={`hw_${field.name}`}>{field.name} {field.required && '*'}</Label>
-                  <Input 
-                    id={`hw_${field.name}`} 
-                    placeholder={`Enter ${field.name}`} 
-                    disabled={isLoading} 
-                    {...registerAsset(`hardwareDetails.${field.name}` as any)} 
-                  />
+                  {isWiredWireless ? (
+                    <select
+                      id={`hw_${field.name}`}
+                      disabled={isLoading}
+                      className="w-full px-3 py-2 flex h-10 border border-input rounded-md bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      {...registerAsset(`hardwareDetails.${field.name}` as any)}
+                    >
+                      <option value="">Select Type</option>
+                      <option value="Wired">Wired</option>
+                      <option value="Wireless">Wireless</option>
+                    </select>
+                  ) : isBrand ? (
+                    <select
+                      id={`hw_${field.name}`}
+                      disabled={isLoading}
+                      className="w-full px-3 py-2 flex h-10 border border-input rounded-md bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      {...registerAsset(`hardwareDetails.${field.name}` as any)}
+                    >
+                      <option value="">Select Brand</option>
+                      <option value="Logitech">Logitech</option>
+                      <option value="Razer">Razer</option>
+                      <option value="Microsoft">Microsoft</option>
+                      <option value="HP">HP</option>
+                      <option value="Dell">Dell</option>
+                      <option value="Lenovo">Lenovo</option>
+                      <option value="ASUS">ASUS</option>
+                      <option value="Acer">Acer</option>
+                      <option value="Corsair">Corsair</option>
+                      <option value="SteelSeries">SteelSeries</option>
+                      <option value="ZOWIE (BenQ)">ZOWIE (BenQ)</option>
+                      <option value="HyperX">HyperX</option>
+                      <option value="Cooler Master">Cooler Master</option>
+                      <option value="Glorious">Glorious</option>
+                      <option value="Redragon">Redragon</option>
+                      <option value="Rapoo">Rapoo</option>
+                      <option value="Portronics">Portronics</option>
+                      <option value="Zebronics">Zebronics</option>
+                      <option value="Ant Esports">Ant Esports</option>
+                      <option value="Targus">Targus</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  ) : (
+                    <Input 
+                      id={`hw_${field.name}`} 
+                      placeholder={`Enter ${field.name}`} 
+                      disabled={isLoading} 
+                      {...registerAsset(`hardwareDetails.${field.name}` as any)} 
+                    />
+                  )}
                   {err && <p className="text-xs text-brand-danger">{err.message}</p>}
                 </div>
               );

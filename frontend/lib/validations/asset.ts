@@ -34,7 +34,7 @@ export const AssetCategoryArraySchema = z.array(AssetCategorySchema);
 export const AddAssetFormSchema = z.object({
   assetName: z.string().min(2, "Asset name is required"),
   category: z.string().min(1, "Category is required"),
-  departmentId: z.string().min(1, "Department is required"),
+  departmentId: z.string().optional(),
   serialNumber: z.string().min(3, "Serial number is required"),
   purchaseDate: z.string().optional(),
   warrantyExpiry: z.string().optional(),

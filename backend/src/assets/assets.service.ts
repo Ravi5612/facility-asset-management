@@ -88,18 +88,23 @@ export class AssetsService {
             history: asset.assignments?.flatMap((a: any) => {
               const events: any[] = [];
               if (a.status === 'RETURNED') {
+                const noteStr = a.conditionOnReturn || '';
+                let title = 'Returned / Removed';
+                if (noteStr.includes('IT Room')) title = 'Sent to IT Room';
+                if (noteStr.includes('Store')) title = 'Sent to Store';
+                
                 events.push({
-                  action: 'Returned',
-                  person: a.employee ? `${a.employee.firstName} ${a.employee.lastName}` : (a.conditionOnReturn?.includes('Seat:') ? `Seat: ${a.conditionOnReturn.split('Seat: ')[1]}` : 'Seat'),
+                  action: title,
+                  person: 'Status changed',
                   date: a.returnedAt ? a.returnedAt.toISOString().split('T')[0] : a.assignedAt.toISOString().split('T')[0],
-                  note: a.conditionOnReturn || 'No notes'
+                  note: noteStr
                 });
               }
               events.push({
                 action: 'Assigned',
-                person: a.employee ? `${a.employee.firstName} ${a.employee.lastName}` : (asset.seatNumber ? `Seat: ${asset.seatNumber}` : 'Seat'),
+                person: a.employee ? `To Employee: ${a.employee.firstName} ${a.employee.lastName}` : (a.conditionOnAssign?.includes('Seat:') ? `To ${a.conditionOnAssign}` : (asset.seatNumber ? `To Seat: ${asset.seatNumber}` : 'Assigned')),
                 date: a.assignedAt.toISOString().split('T')[0],
-                note: a.conditionOnAssign || 'No notes'
+                note: a.conditionOnAssign || 'No notes provided'
               });
               return events;
             }) || []
@@ -204,18 +209,23 @@ export class AssetsService {
         history: asset.assignments?.flatMap((a: any) => {
           const events: any[] = [];
           if (a.status === 'RETURNED') {
+            const noteStr = a.conditionOnReturn || '';
+            let title = 'Returned / Removed';
+            if (noteStr.includes('IT Room')) title = 'Sent to IT Room';
+            if (noteStr.includes('Store')) title = 'Sent to Store';
+            
             events.push({
-              action: 'Returned',
-              person: a.employee ? `${a.employee.firstName} ${a.employee.lastName}` : (a.conditionOnReturn?.includes('Seat:') ? `Seat: ${a.conditionOnReturn.split('Seat: ')[1]}` : 'Seat'),
+              action: title,
+              person: 'Status changed',
               date: a.returnedAt ? a.returnedAt.toISOString().split('T')[0] : a.assignedAt.toISOString().split('T')[0],
-              note: a.conditionOnReturn || 'No notes'
+              note: noteStr
             });
           }
           events.push({
             action: 'Assigned',
-            person: a.employee ? `${a.employee.firstName} ${a.employee.lastName}` : (asset.seatNumber ? `Seat: ${asset.seatNumber}` : 'Seat'),
+            person: a.employee ? `To Employee: ${a.employee.firstName} ${a.employee.lastName}` : (a.conditionOnAssign?.includes('Seat:') ? `To ${a.conditionOnAssign}` : (asset.seatNumber ? `To Seat: ${asset.seatNumber}` : 'Assigned')),
             date: a.assignedAt.toISOString().split('T')[0],
-            note: a.conditionOnAssign || 'No notes'
+            note: a.conditionOnAssign || 'No notes provided'
           });
           return events;
         }) || []
@@ -347,7 +357,7 @@ export class AssetsService {
         organizationId,
         name: dto.assetName,
         categoryId: category.id, // Better to use category.id directly since we looked it up
-        ownerDepartmentId: dto.departmentId,
+        ownerDepartmentId: dto.departmentId || null, // null = company pool, not owned by any dept yet
         serialNumber: dto.serialNumber,
         assetCode,
         purchaseDate: dto.purchaseDate ? new Date(dto.purchaseDate) : new Date(),
@@ -411,8 +421,16 @@ export class AssetsService {
         where: { serialNumber: dto.existingSerialNumber, organizationId, status: 'ASSIGNED' }
       });
       if (oldAsset) {
-        const swapStatus = (dto as any).swapAction === 'IT_ROOM' ? 'IN_MAINTENANCE' : 'AVAILABLE';
-        const swapNote = swapStatus === 'IN_MAINTENANCE' ? '[Swap]: Returned to IT Room (Repair)' : '[Swap]: Returned to Store (Available)';
+        const swapAction = (dto as any).swapAction;
+        // STORE = theek hai, wapas store (Available)
+        // STORE_DAMAGED = kharab hai, store mein bhejo (IN_MAINTENANCE - store decide karega repair ya dump)
+        // IT_ROOM = IT Room mein rakhenge (IN_MAINTENANCE, still IT dept)
+        const swapStatus = swapAction === 'IT_ROOM' ? 'IN_MAINTENANCE' 
+                         : swapAction === 'STORE_DAMAGED' ? 'IN_MAINTENANCE' 
+                         : 'AVAILABLE';
+        const swapNote = swapAction === 'IT_ROOM' ? '[Swap]: Returned to IT Room (Repair)'
+                       : swapAction === 'STORE_DAMAGED' ? '[Swap]: Returned to Store (Damaged - For Repair/Dump)'
+                       : '[Swap]: Returned to Store (Available)';
         
         const actionUser = await this.prisma.user.findUnique({ where: { id: assignedBy } });
         const actionUserName = actionUser?.fullName || 'HOD';
@@ -427,6 +445,10 @@ export class AssetsService {
             macAddress: null,
             seatNumber: null,
             floor: null,
+            // STORE (device OK) → company pool (null) → IT ka count kam, store stock mein aaye
+            // STORE_DAMAGED → ownerDept IT ka hi rahe → IT ka total count same rahe, Returned mein dikh
+            // IT_ROOM → ownerDept IT ka hi rahe
+            ...(swapAction === 'STORE' ? { ownerDepartmentId: null } : {}),
             notes: oldAsset.notes ? oldAsset.notes + '\n' + swapNote : swapNote
           }
         });
@@ -510,7 +532,7 @@ export class AssetsService {
 
     return this.prisma.asset.findMany({
       where: { 
-        currentAssigneeId: employee.id, // Using currentAssigneeId
+        currentAssigneeId: employee.id,
         organizationId,
         deletedAt: null
       },
@@ -520,5 +542,40 @@ export class AssetsService {
       },
       orderBy: { createdAt: 'desc' }
     });
+  }
+
+  async getInventoryLog(organizationId: string, from?: string, to?: string) {
+    const where: any = { organizationId, deletedAt: null };
+
+    if (from || to) {
+      where.createdAt = {};
+      if (from) where.createdAt.gte = new Date(from);
+      if (to) {
+        const toDate = new Date(to);
+        toDate.setHours(23, 59, 59, 999);
+        where.createdAt.lte = toDate;
+      }
+    }
+
+    const assets = await this.prisma.asset.findMany({
+      where,
+      include: {
+        category: true,
+        ownerDepartment: true,
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    return assets.map((a: any) => ({
+      id: a.assetCode || a.id,
+      name: a.name,
+      category: a.category?.name || '-',
+      serialNumber: a.serialNumber || '-',
+      addedToStoreDate: a.createdAt,       // Jab store mein aaya
+      purchaseDate: a.purchaseDate,
+      assignedToDept: a.ownerDepartment?.name || 'Store (In Stock)',
+      assignedDate: a.updatedAt,           // Jab department ko assign hua
+      status: a.status,
+    }));
   }
 }

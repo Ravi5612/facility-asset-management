@@ -381,6 +381,11 @@ export default function InventoryClientPage() {
   ...(item.cablesDetails ? { Cables: item.cablesDetails } : {})
 }, null, 2)}
                             </pre>
+                            
+                            {/* NEW SEAT HISTORY VIEW */}
+                            <div className="mt-4 bg-white dark:bg-slate-950 p-4 rounded-md border border-slate-200 shadow-sm">
+                              <SeatHistoryView seatNumber={item.seatNumber} />
+                            </div>
                           </td>
                         </tr>
                       )}
@@ -398,6 +403,93 @@ export default function InventoryClientPage() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function SeatHistoryView({ seatNumber }: { seatNumber: string }) {
+  const [history, setHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [show, setShow] = useState(false);
+
+  if (!seatNumber) return null;
+
+  const loadHistory = async () => {
+    if (show) {
+      setShow(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      setShow(true);
+      const res = await fetch(`/api/proxy/inventory/history?seatNumber=${seatNumber}`);
+      if (res.ok) {
+        const data = await res.json();
+        setHistory(data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between">
+        <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Hardware Change History</h4>
+        <button 
+          onClick={loadHistory}
+          className="text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded transition-colors"
+        >
+          {show ? 'Hide History' : 'View History'}
+        </button>
+      </div>
+      
+      {show && (
+        <div className="mt-3 overflow-x-auto">
+          {loading ? (
+            <div className="text-xs text-muted-foreground py-2">Loading history...</div>
+          ) : history.length === 0 ? (
+            <div className="text-xs text-muted-foreground py-2">No changes recorded for this seat yet.</div>
+          ) : (
+            <table className="w-full text-xs text-left border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500">
+                  <th className="py-2 px-3 font-medium">Device</th>
+                  <th className="py-2 px-3 font-medium">Code</th>
+                  <th className="py-2 px-3 font-medium">Assigned</th>
+                  <th className="py-2 px-3 font-medium">Returned</th>
+                  <th className="py-2 px-3 font-medium">Notes</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                {history.map((h, i) => (
+                  <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                    <td className="py-2 px-3 font-semibold text-slate-700 dark:text-slate-300">
+                      {h.assetName} <span className="text-[10px] text-slate-400 font-normal ml-1">({h.category})</span>
+                    </td>
+                    <td className="py-2 px-3 text-slate-600">{h.assetCode}</td>
+                    <td className="py-2 px-3 text-slate-500">
+                      {new Date(h.assignedAt).toLocaleDateString()} {new Date(h.assignedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </td>
+                    <td className="py-2 px-3 text-slate-500">
+                      {h.returnedAt ? (
+                        <>{new Date(h.returnedAt).toLocaleDateString()} {new Date(h.returnedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</>
+                      ) : (
+                        <span className="text-green-600 font-medium">Active</span>
+                      )}
+                    </td>
+                    <td className="py-2 px-3 text-slate-500 max-w-[200px] truncate" title={h.conditionOnReturn || '-'}>
+                      {h.conditionOnReturn || '-'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
     </div>
   );
 }

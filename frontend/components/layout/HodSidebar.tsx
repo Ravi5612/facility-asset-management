@@ -12,14 +12,13 @@ export function HodSidebar() {
 
   const deptSegment = pathname.split('/')[2] || "general";
 
-  const isStoreOrIT = deptSegment.toLowerCase().includes('information-technology') || 
-                      deptSegment.toLowerCase() === 'it' ||
-                      deptSegment.toLowerCase().includes('store') ||
-                      deptSegment.toLowerCase().includes('inventory');
+  const isStore = deptSegment.toLowerCase().includes('store') ||
+                  deptSegment.toLowerCase().includes('inventory');
 
   const navItems = [
     { title: "Dashboard", href: `/hod/${deptSegment}/dashboard`, icon: LayoutDashboard },
-    ...(isStoreOrIT ? [{ title: "Central Stock", href: `/hod/${deptSegment}/stock`, icon: Archive }] : []),
+    ...(isStore ? [{ title: "Stock", href: `/hod/${deptSegment}/stock`, icon: Archive }] : []),
+    { title: isStore ? "Inventory Log" : "Inventory", href: `/hod/${deptSegment}/inventory`, icon: Package },
     { title: "Assets", href: `/hod/${deptSegment}/assets`, icon: Monitor },
     { title: "Tickets", href: `/hod/${deptSegment}/tickets`, icon: Ticket },
     { title: "Employees", href: `/hod/${deptSegment}/employees`, icon: Users },

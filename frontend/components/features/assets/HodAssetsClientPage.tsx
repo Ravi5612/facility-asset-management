@@ -24,9 +24,10 @@ import { AssetItem, AssetCategory } from "@/types";
 interface HodAssetsClientPageProps {
   initialAssets: any[];
   isStockView?: boolean;
+  onAssetAdded?: () => void;
 }
 
-export function HodAssetsClientPage({ initialAssets, isStockView = false }: HodAssetsClientPageProps) {
+export function HodAssetsClientPage({ initialAssets, isStockView = false, onAssetAdded }: HodAssetsClientPageProps) {
   const [user, setUser] = useState<any>(null);
   useEffect(() => {
     const stored = localStorage.getItem("auth_user");
@@ -227,6 +228,7 @@ export function HodAssetsClientPage({ initialAssets, isStockView = false }: HodA
               generatePrefix={generatePrefix}
               isOpen={isAddAssetOpen}
               setIsOpen={setIsAddAssetOpen}
+              onSuccessCallback={onAssetAdded}
             />
           )}
           <SearchInput
@@ -238,7 +240,7 @@ export function HodAssetsClientPage({ initialAssets, isStockView = false }: HodA
         </div>
       </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className={`grid grid-cols-1 gap-4 sm:grid-cols-2 ${isStockView ? 'lg:grid-cols-5' : 'lg:grid-cols-3'}`}>
           <SummaryCard
             label="Total Assets"
             value={totalAssets}
@@ -254,26 +256,30 @@ export function HodAssetsClientPage({ initialAssets, isStockView = false }: HodA
             lineClassName="bg-brand-warning"
           />
           <SummaryCard
-            label="In Stock"
+            label={isStockView ? "In Stock" : "Available"}
             value={inStockAssets}
             icon={<Package className="h-6 w-6" />}
             iconClassName="bg-brand-success/10 text-brand-success"
             lineClassName="bg-brand-success"
           />
-          <SummaryCard
-            label="Returned"
-            value={returnedAssets}
-            icon={<Wrench className="h-6 w-6" />}
-            iconClassName="bg-brand-error/10 text-brand-error"
-            lineClassName="bg-brand-error"
-          />
-          <SummaryCard
-            label="Dump / Retired"
-            value={dumpedAssets}
-            icon={<Trash2 className="h-6 w-6" />}
-            iconClassName="bg-gray-100 text-gray-500"
-            lineClassName="bg-gray-500"
-          />
+          {isStockView && (
+            <>
+              <SummaryCard
+                label="Returned"
+                value={returnedAssets}
+                icon={<Wrench className="h-6 w-6" />}
+                iconClassName="bg-brand-error/10 text-brand-error"
+                lineClassName="bg-brand-error"
+              />
+              <SummaryCard
+                label="Dump / Retired"
+                value={dumpedAssets}
+                icon={<Trash2 className="h-6 w-6" />}
+                iconClassName="bg-gray-100 text-gray-500"
+                lineClassName="bg-gray-500"
+              />
+            </>
+          )}
         </div>
 
       {/* Category Cards */}

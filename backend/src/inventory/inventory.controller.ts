@@ -8,6 +8,41 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 export class InventoryController {
   constructor(private prisma: PrismaService) {}
 
+  @Get('history')
+  async getSeatHistory(@Query('seatNumber') seatNumber: string) {
+    if (!seatNumber) return [];
+    
+    // Find all assignments where the return condition or assign condition mentions this seat
+    const history = await this.prisma.assetAssignment.findMany({
+      where: {
+        OR: [
+          { conditionOnReturn: { contains: seatNumber, mode: 'insensitive' } },
+          { conditionOnAssign: { contains: seatNumber, mode: 'insensitive' } }
+        ]
+      },
+      include: {
+        asset: {
+          include: { category: true }
+        },
+        employee: true,
+      },
+      orderBy: { assignedAt: 'desc' }
+    });
+
+    return history.map(h => ({
+      id: h.id,
+      assetName: (h as any).asset?.name || 'Unknown',
+      assetCode: (h as any).asset?.assetCode || (h as any).asset?.id,
+      category: (h as any).asset?.category?.name || 'Device',
+      assignedAt: h.assignedAt,
+      returnedAt: h.returnedAt,
+      status: h.status,
+      assignedBy: 'HOD',
+      returnedBy: 'HOD',
+      conditionOnReturn: h.conditionOnReturn
+    }));
+  }
+
   @Get('by-seat')
   async getBySeat(@Query('seatNumber') seatNumber: string, @Query('floor') floor: string) {
     if (!seatNumber) return {};
@@ -18,7 +53,54 @@ export class InventoryController {
       },
       orderBy: { updatedAt: 'desc' }
     });
-    return entry || {};
+    
+    if (!entry) return {};
+
+    const serialNumbers: string[] = [];
+    if (entry.serialNumber) serialNumbers.push(entry.serialNumber);
+    if (entry.keyboard) serialNumbers.push(entry.keyboard);
+    if (entry.mouse) serialNumbers.push(entry.mouse);
+    if (entry.monitor) serialNumbers.push(entry.monitor);
+    if (entry.headset) serialNumbers.push(entry.headset);
+    if (entry.cables) serialNumbers.push(entry.cables);
+
+    if (serialNumbers.length === 0) return entry;
+
+    const assets = await this.prisma.asset.findMany({
+      where: { serialNumber: { in: serialNumbers } },
+      include: { 
+        category: true,
+        assignments: {
+          orderBy: { assignedAt: 'desc' },
+          take: 1
+        }
+      }
+    });
+
+    const assetMap = new Map();
+    assets.forEach(a => {
+      // First try to find an active assignment, if not, just use the most recent one we fetched
+      const activeAssign = a.assignments?.find(as => as.status === 'ACTIVE') || a.assignments?.[0];
+      assetMap.set(a.serialNumber, {
+        id: a.assetCode || a.id,
+        name: a.name,
+        category: a.category?.name,
+        purchaseDate: a.purchaseDate,
+        warrantyExpiry: a.warrantyExpiryDate,
+        status: a.status,
+        assignedAt: activeAssign ? activeAssign.assignedAt : null
+      });
+    });
+
+    return {
+      ...entry,
+      cpuDetails: entry.serialNumber ? assetMap.get(entry.serialNumber) : null,
+      keyboardDetails: entry.keyboard ? assetMap.get(entry.keyboard) : null,
+      mouseDetails: entry.mouse ? assetMap.get(entry.mouse) : null,
+      monitorDetails: entry.monitor ? assetMap.get(entry.monitor) : null,
+      headsetDetails: entry.headset ? assetMap.get(entry.headset) : null,
+      cablesDetails: entry.cables ? assetMap.get(entry.cables) : null,
+    };
   }
 
   @Get()
@@ -40,7 +122,6 @@ export class InventoryController {
       include: { 
         category: true,
         assignments: {
-          where: { status: 'ACTIVE' },
           orderBy: { assignedAt: 'desc' },
           take: 1
         }

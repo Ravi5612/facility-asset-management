@@ -35,6 +35,7 @@ export function AssignAssetModal({ assetId, assetName, categoryName = 'CPU', ass
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [existingSerialNumber, setExistingSerialNumber] = useState<string | null>(null);
+  const [existingAssetDetails, setExistingAssetDetails] = useState<any | null>(null);
   const [replaceExisting, setReplaceExisting] = useState(true);
   const [swapAction, setSwapAction] = useState("STORE");
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -87,16 +88,20 @@ export function AssignAssetModal({ assetId, assetName, categoryName = 'CPU', ass
             
             const catLower = categoryName.toLowerCase();
             const peripheralSerial = catLower.includes('keyboard') ? data.keyboard : catLower.includes('mouse') ? data.mouse : catLower.includes('monitor') ? data.monitor : data.serialNumber;
+            const peripheralDetails = catLower.includes('keyboard') ? data.keyboardDetails : catLower.includes('mouse') ? data.mouseDetails : catLower.includes('monitor') ? data.monitorDetails : data.cpuDetails;
             
             if (peripheralSerial) {
               setExistingSerialNumber(peripheralSerial);
+              setExistingAssetDetails(peripheralDetails || null);
               setSeatStatus({ type: 'warning', msg: `A ${categoryName} is already assigned here (${peripheralSerial}).` });
             } else {
               setExistingSerialNumber(null);
+              setExistingAssetDetails(null);
               setSeatStatus({ type: 'success', msg: `No ${categoryName} is currently on this seat. Ready to assign.` });
             }
           } else {
             setExistingSerialNumber(null);
+            setExistingAssetDetails(null);
             setSeatStatus({ type: 'warning', msg: `New Seat / No ${categoryName} or previous record found.` });
         }
       } catch (e) {
@@ -268,9 +273,20 @@ export function AssignAssetModal({ assetId, assetName, categoryName = 'CPU', ass
 
           {existingSerialNumber && (
             <div className="mt-2 p-4 bg-amber-50 border border-amber-200 rounded-md w-full">
-              <p className="text-sm font-semibold text-amber-900 mb-3">
+              <p className="text-sm font-semibold text-amber-900 mb-2">
                 Conflict: A {categoryName} ({existingSerialNumber}) is already assigned to this seat.
               </p>
+              
+              {existingAssetDetails && (
+                <div className="mb-4 bg-white/60 p-3 rounded border border-amber-100 text-xs text-amber-900 grid grid-cols-2 gap-2">
+                  <p><span className="font-medium opacity-75">Name:</span> {existingAssetDetails.name || 'N/A'}</p>
+                  <p><span className="font-medium opacity-75">Code:</span> {existingAssetDetails.id || existingSerialNumber}</p>
+                  <p><span className="font-medium opacity-75">Status:</span> {existingAssetDetails.status || 'N/A'}</p>
+                  <p><span className="font-medium opacity-75">Assigned On:</span> {existingAssetDetails.assignedAt ? new Date(existingAssetDetails.assignedAt).toLocaleDateString() : 'N/A'}</p>
+                  {existingAssetDetails.purchaseDate && <p><span className="font-medium opacity-75">Purchase Date:</span> {new Date(existingAssetDetails.purchaseDate).toLocaleDateString()}</p>}
+                </div>
+              )}
+
               <div className="space-y-3">
                 <label className="flex items-center gap-2 text-sm text-amber-900 cursor-pointer">
                   <input type="radio" checked={replaceExisting} onChange={() => setReplaceExisting(true)} className="mt-0.5" />
@@ -290,7 +306,8 @@ export function AssignAssetModal({ assetId, assetName, categoryName = 'CPU', ass
                     onChange={e => setSwapAction(e.target.value)}
                     className="w-full px-3 py-2 border border-amber-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
                   >
-                    <option value="STORE">Return to Store (Available)</option>
+                    <option value="STORE">Return to Store (Available - Device is OK)</option>
+                    <option value="STORE_DAMAGED">Return to Store (Damaged - For Repair/Dump)</option>
                     <option value="IT_ROOM">Send to IT Room (In Maintenance / Repair)</option>
                   </select>
                 </div>

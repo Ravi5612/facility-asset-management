@@ -66,4 +66,15 @@ export class AssetsController {
     const user = req['user'] as any;
     return this.assetsService.getAssignedToMeAssets(user.userId, user.organizationId);
   }
+
+  @Get('inventory-log')
+  @Roles('SUPER_ADMIN', 'SUB_ADMIN', 'HOD')
+  getInventoryLog(
+    @Req() req: Request,
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+  ) {
+    const user = req['user'] as any;
+    return this.assetsService.getInventoryLog(user.organizationId, from, to);
+  }
 }
