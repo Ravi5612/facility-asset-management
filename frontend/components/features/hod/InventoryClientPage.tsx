@@ -106,11 +106,19 @@ export default function InventoryClientPage() {
     if (selectedDepartment) {
       data = data.filter((i: any) => (i.department || "Unknown Department") === selectedDepartment);
     }
-    return data.filter((item: any) => 
+    
+    const filtered = data.filter((item: any) => 
       (item.hostname?.toLowerCase() || "").includes(search.toLowerCase()) ||
       (item.ipAddress?.toLowerCase() || "").includes(search.toLowerCase()) ||
       (item.seatNumber?.toLowerCase() || "").includes(search.toLowerCase())
     );
+
+    // Natural sort by seatNumber (N-1, N-2, N-10, N-139, etc.)
+    return filtered.sort((a: any, b: any) => {
+      const seatA = a.seatNumber || "";
+      const seatB = b.seatNumber || "";
+      return seatA.localeCompare(seatB, undefined, { numeric: true, sensitivity: 'base' });
+    });
   }, [inventoryData, selectedFloor, selectedDepartment, search]);
 
   if (!isAuthorized) {

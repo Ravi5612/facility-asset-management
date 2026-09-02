@@ -6,24 +6,35 @@ import { SearchInput } from "@/components/ui/search-input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SidebarContent } from "@/components/layout/Sidebar";
 import { authService } from "@/services/auth.service";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+
+import { useQuery } from "@tanstack/react-query";
 
 export default function Header() {
   const router = useRouter();
-  const [user, setUser] = React.useState<{ email: string; role: string; name?: string } | null>(null);
+  const pathname = usePathname();
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  const { data: serverUser } = useQuery({
+    queryKey: ["auth-me"],
+    queryFn: authService.getMe,
+  });
+
+  const [localUser, setLocalUser] = React.useState<any>(null);
 
   React.useEffect(() => {
     const storedUser = localStorage.getItem("auth_user");
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        setLocalUser(JSON.parse(storedUser));
       } catch {
-        // ignore parse error
+        // ignore
       }
     }
   }, []);
+
+  const user = serverUser || localUser;
 
   // Close dropdown on outside click
   React.useEffect(() => {
@@ -42,12 +53,26 @@ export default function Header() {
   };
 
   // Format Display Data
-  const displayName = user?.name || (user?.email ? user.email.split("@")[0] : "Admin");
-  const displayRole = user?.role === "SUB_ADMIN" ? "Sub Administrator" : "Super Administrator";
+  const emp = (user as any)?.employee;
+  const rawName = emp ? `${emp.firstName} ${emp.lastName}` : (user as any)?.fullName || user?.name;
+  const displayName = rawName || (user?.email ? user.email.split("@")[0] : "Admin");
+  
+  const formatRole = (role?: string) => {
+    if (!role) return "User";
+    if (role === "SUPER_ADMIN") return "Super Administrator";
+    if (role === "SUB_ADMIN") return "Sub Administrator";
+    if (role === "HOD") return "Head of Department";
+    if (role === "EMPLOYEE") return "Employee";
+    return role;
+  };
+  const displayRole = formatRole(user?.role);
   const initials = displayName.substring(0, 2).toUpperCase();
+  const profilePhoto = (user as any)?.employee?.profilePhoto || (user as any)?.profileImage || null;
+
+  const isEmployeeRoute = pathname?.startsWith('/employee');
 
   return (
-    <header className="fixed top-0 right-0 left-0 md:left-56 z-40 h-16 flex items-center justify-between gap-4 border-b border-border bg-card px-4 md:px-6">
+    <header className={`fixed top-0 right-0 left-0 ${isEmployeeRoute ? 'md:left-72' : 'md:left-56'} z-40 h-16 flex items-center justify-between gap-4 border-b border-border bg-card px-4 md:px-6`}>
       <div className="flex items-center gap-2 md:hidden">
         <Sheet>
           <SheetTrigger className="flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted transition-colors">
@@ -82,11 +107,10 @@ export default function Header() {
 
         {/* Help */}
         <button className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted transition-colors">
-          <HelpCircle className="h-4.5 w-4.5 text-muted-foreground" />
+          <HelpCircle className="h-5 w-5 text-muted-foreground" />
         </button>
 
-        {/* Divider */}
-        <div className="h-6 w-px bg-border mx-1" />
+        <div className="w-px h-6 bg-border mx-1" />
 
         {/* Profile Dropdown */}
         <div className="relative" ref={dropdownRef}>
@@ -94,8 +118,12 @@ export default function Header() {
             onClick={() => setDropdownOpen((prev) => !prev)}
             className="flex items-center gap-2.5 rounded-full pl-1 pr-2 py-1 hover:bg-muted transition-colors"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--brand-primary)] text-white text-xs font-semibold shrink-0">
-              {initials}
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--brand-primary)] text-white text-xs font-semibold shrink-0 overflow-hidden">
+              {profilePhoto ? (
+                <img src={profilePhoto} alt={displayName} className="h-full w-full object-cover" />
+              ) : (
+                initials
+              )}
             </div>
             <div className="text-left hidden sm:block">
               <p className="text-sm font-semibold text-foreground leading-tight capitalize">

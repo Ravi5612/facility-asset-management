@@ -117,7 +117,7 @@ export default function HodDashboardClientPage() {
       <div className="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-sidebar)] rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-bold mb-2">{greeting}, {user?.fullName?.split(" ")[0] || "HOD"}! ??</h1>
+            <h1 className="text-3xl font-bold mb-2">{greeting}, {user?.fullName?.split(" ")[0] || "HOD"}! 👋</h1>
             <p className="text-white/80 text-lg">Here is what is happening in the {deptName} department today.</p>
           </div>
           

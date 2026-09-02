@@ -14,6 +14,7 @@ import {
   User,
   CalendarDays,
   LogOut,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
@@ -24,11 +25,7 @@ const navItems = [
   { label: "My Assets", href: ROUTES.EMPLOYEE_ASSETS, icon: Package },
   { label: "My Tickets", href: ROUTES.EMPLOYEE_TICKETS, icon: Ticket },
   { label: "Salary History", href: ROUTES.EMPLOYEE_SALARY, icon: Wallet },
-];
-
-const bottomItems = [
-  { label: "My Profile", href: ROUTES.EMPLOYEE_PROFILE, icon: User },
-  { label: "Settings", href: ROUTES.EMPLOYEE_SETTINGS, icon: Settings },
+  { label: "Help & Support", href: ROUTES.EMPLOYEE_HELP, icon: HelpCircle },
 ];
 
 export function EmployeeSidebar() {
@@ -108,29 +105,6 @@ export function EmployeeSidebar() {
         </div>
       </div>
 
-      {/* Bottom Nav */}
-      <div className="relative p-4 border-t border-white/10 bg-black/10 backdrop-blur-sm">
-        <p className="px-4 text-xs font-bold tracking-wider text-white/50 uppercase mb-3">
-          Account
-        </p>
-        <nav className="space-y-1">
-          {renderLinks(bottomItems)}
-          
-          <button
-            onClick={async () => {
-              const { authService } = await import("@/services/auth.service");
-              await authService.logout();
-              window.location.href = "/login";
-            }}
-            className="w-full group flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 text-white/70 hover:bg-red-500/20 hover:text-red-100"
-          >
-            <div className="flex items-center gap-3">
-              <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
-              Logout
-            </div>
-          </button>
-        </nav>
-      </div>
     </aside>
   );
 }

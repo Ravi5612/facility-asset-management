@@ -8,7 +8,8 @@ import { ticketService } from "@/services/ticket.service";
 import { InterDeptTicket } from "@/types";
 import { PageSkeleton } from "@/components/ui/skeletons";
 import { Button } from "@/components/ui/button";
-import { ClipboardList, Navigation } from "lucide-react";
+import { ClipboardList, Navigation, Ticket, Clock, Activity, CheckCircle2 } from "lucide-react";
+import { SummaryCard } from "@/components/ui/summary-card";
 
 export function EmployeeTicketsClientPage() {
   const [activeTab, setActiveTab] = useState<"assigned" | "raised">("assigned");
@@ -38,6 +39,7 @@ export function EmployeeTicketsClientPage() {
   const formattedTickets: InterDeptTicket[] = useMemo(() => {
     return rawTickets.map((t: any) => ({
       id: t.ticketCode || t.id,
+      dbId: t.id,
       subject: t.subject,
       description: t.description,
       raisedByDept: t.raisedByDept?.name || "Unknown",
@@ -51,6 +53,9 @@ export function EmployeeTicketsClientPage() {
       timeRaised: new Date(t.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
       assignedAt: t.assignedAt,
       resolvedAt: t.resolvedAt,
+      resolutionMessage: t.resolutionNotes,
+      rating: t.rating,
+      ratingFeedback: t.ratingFeedback,
       createdAt: t.createdAt
     }));
   }, [rawTickets]);
@@ -75,17 +80,40 @@ export function EmployeeTicketsClientPage() {
     });
   }, [formattedTickets, search, statusFilter, priorityFilter, dateFilter, customDate]);
 
+  // Calculate stats based on current tab's formatted tickets
+  const totalTickets = formattedTickets.length;
+  const pendingTickets = formattedTickets.filter(t => t.status === "OPEN" || t.status === "Pending").length;
+  const inProgressTickets = formattedTickets.filter(t => t.status === "IN_PROGRESS" || t.status === "In Progress").length;
+  const completedTickets = formattedTickets.filter(t => t.status === "RESOLVED" || t.status === "CLOSED" || t.status === "Completed").length;
+
   return (
-    <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto pb-24">
-      {/* Header Section */}
-      <div className="bg-gradient-to-r from-[var(--brand-primary)] to-[#0f2a4a] rounded-2xl p-6 md:p-10 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-        <div className="relative z-10">
-          <h1 className="text-3xl md:text-4xl font-black mb-2 tracking-tight">My Tickets</h1>
-          <p className="text-blue-100/80 max-w-2xl text-sm md:text-base font-medium">
-            Manage the tickets assigned to you or check the status of tickets you've raised.
-          </p>
-        </div>
+    <div className="space-y-6 max-w-7xl mx-auto pb-24 animate-in fade-in duration-500">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <SummaryCard
+          label="Total Tickets"
+          value={totalTickets}
+          icon={<Ticket className="w-5 h-5" />}
+          className="border-blue-100 bg-blue-50/30"
+        />
+        <SummaryCard
+          label="Pending"
+          value={pendingTickets}
+          icon={<Clock className="w-5 h-5 text-orange-500" />}
+          className="border-orange-100 bg-orange-50/30"
+        />
+        <SummaryCard
+          label="In Progress"
+          value={inProgressTickets}
+          icon={<Activity className="w-5 h-5 text-blue-500" />}
+          className="border-blue-100 bg-blue-50/30"
+        />
+        <SummaryCard
+          label="Completed"
+          value={completedTickets}
+          icon={<CheckCircle2 className="w-5 h-5 text-green-500" />}
+          className="border-green-100 bg-green-50/30"
+        />
       </div>
 
       {/* Tabs Section */}

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 
@@ -85,7 +85,11 @@ export class TicketsService {
         createdById: userId }
     });
 
-    return ticket;
+    // Run auto-assign logic (if enabled for the assigned department)
+    await this.autoAssignTicket(ticket, organizationId);
+
+    // Return the updated ticket
+    return this.prisma.ticket.findUnique({ where: { id: ticket.id } });
   }
 
   // Get tickets RAISED BY me (Outbound)
@@ -282,7 +286,6 @@ export class TicketsService {
     });
   }
 
-  // Update Ticket Status or Assignment
   async updateTicket(id: string, userId: string, organizationId: string, role: string, dto: any) {
     // `id` from frontend can be ticketCode (TKT-1338) or actual UUID
     const ticket = await this.prisma.ticket.findFirst({
@@ -348,4 +351,157 @@ export class TicketsService {
       data: updateData
     });
   }
+
+  // ─── TICKET SETTINGS ────────────────────────────────────────────────────────
+
+  async getTicketSettings(userId: string, organizationId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !user.departmentName) throw new NotFoundException('Department not found');
+
+    const dept = await this.prisma.department.findFirst({
+      where: { name: { equals: user.departmentName, mode: 'insensitive' }, organizationId }
+    });
+    if (!dept) throw new NotFoundException('Department not found');
+
+    // Get or create settings for this department
+    const settings = await (this.prisma as any).departmentTicketSettings.upsert({
+      where: { departmentId: dept.id },
+      create: {
+        organizationId,
+        departmentId: dept.id,
+        autoAssignEnabled: true,
+        rotationStaffIds: [],
+        lastAssignedIndex: 0
+      },
+      update: {}
+    });
+
+    // Also return list of dept employees (for staff selection UI)
+    const employees = await this.prisma.employee.findMany({
+      where: { departmentId: dept.id, organizationId, status: 'ACTIVE' },
+      select: { id: true, firstName: true, lastName: true, email: true, designation: true }
+    });
+
+    return { settings, employees };
+  }
+
+  async updateTicketSettings(userId: string, organizationId: string, dto: { autoAssignEnabled?: boolean; rotationStaffIds?: string[] }) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !user.departmentName) throw new NotFoundException('Department not found');
+
+    const dept = await this.prisma.department.findFirst({
+      where: { name: { equals: user.departmentName, mode: 'insensitive' }, organizationId }
+    });
+    if (!dept) throw new NotFoundException('Department not found');
+
+    const updated = await (this.prisma as any).departmentTicketSettings.upsert({
+      where: { departmentId: dept.id },
+      create: {
+        organizationId,
+        departmentId: dept.id,
+        autoAssignEnabled: dto.autoAssignEnabled ?? true,
+        rotationStaffIds: dto.rotationStaffIds ?? [],
+        lastAssignedIndex: 0
+      },
+      update: {
+        ...(dto.autoAssignEnabled !== undefined ? { autoAssignEnabled: dto.autoAssignEnabled } : {}),
+        ...(dto.rotationStaffIds !== undefined ? { rotationStaffIds: dto.rotationStaffIds, lastAssignedIndex: 0 } : {})
+      }
+    });
+
+    return updated;
+  }
+
+  // ─── HOD APPROVAL ───────────────────────────────────────────────────────────
+
+  async requestHODApproval(ticketId: string, userId: string, organizationId: string) {
+    const ticket = await this.prisma.ticket.findFirst({
+      where: { organizationId, OR: [{ id: ticketId }, { ticketCode: ticketId }] }
+    });
+    if (!ticket) throw new NotFoundException('Ticket not found');
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const employee = user ? await this.prisma.employee.findFirst({ where: { email: user.email, organizationId } }) : null;
+
+    // Only the assigned employee can request HOD approval
+    if (!employee || ticket.assignedToEmployeeId !== employee.id) {
+      throw new ForbiddenException('Only the assigned staff can request HOD approval.');
+    }
+
+    return this.prisma.ticket.update({
+      where: { id: ticket.id },
+      data: { hodApprovalStatus: 'PENDING' } as any
+    });
+  }
+
+  async hodDecision(ticketId: string, userId: string, organizationId: string, dto: { approved: boolean; note?: string }) {
+    const ticket = await this.prisma.ticket.findFirst({
+      where: { organizationId, OR: [{ id: ticketId }, { ticketCode: ticketId }] }
+    });
+    if (!ticket) throw new NotFoundException('Ticket not found');
+
+    return this.prisma.ticket.update({
+      where: { id: ticket.id },
+      data: {
+        hodApprovalStatus: dto.approved ? 'APPROVED' : 'REJECTED',
+        hodApprovalNote: dto.note || null
+      } as any
+    });
+  }
+
+  async rateTicket(id: string, userId: string, organizationId: string, rating: number, feedback?: string) {
+    const ticket = await this.prisma.ticket.findFirst({ where: { id, organizationId } });
+    if (!ticket) throw new NotFoundException('Ticket not found');
+    
+    // Allow if the ticket was raised by the user
+    // Note: To be safe, we check if the user is the creator or the raiser
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const employee = await this.prisma.employee.findFirst({ where: { email: user?.email, organizationId } });
+    const isRaiser = ticket.createdById === userId || ticket.raisedByEmployeeId === employee?.id;
+
+    if (!isRaiser) throw new BadRequestException('Only the person who raised the ticket can rate it');
+    if (ticket.status !== 'RESOLVED' && ticket.status !== 'CLOSED') throw new BadRequestException('Only resolved tickets can be rated');
+    if (ticket.rating) throw new BadRequestException('Ticket is already rated');
+    if (rating < 1 || rating > 5) throw new BadRequestException('Rating must be between 1 and 5');
+
+    return this.prisma.ticket.update({
+      where: { id },
+      data: {
+        rating,
+        ratingFeedback: feedback || null,
+        updatedById: userId
+      }
+    });
+  }
+
+  // 🔄 AUTO ASSIGN (Round-Robin) 🔄
+
+  private async autoAssignTicket(ticket: any, organizationId: string) {
+    const settings = await (this.prisma as any).departmentTicketSettings.findUnique({
+      where: { departmentId: ticket.assignedToDeptId }
+    });
+
+    if (!settings || !settings.autoAssignEnabled || !settings.rotationStaffIds?.length) {
+      return; // No auto-assign configured
+    }
+
+    const staffIds: string[] = settings.rotationStaffIds;
+    const nextIndex = settings.lastAssignedIndex % staffIds.length;
+    const assigneeId = staffIds[nextIndex];
+
+    await (this.prisma as any).departmentTicketSettings.update({
+      where: { departmentId: ticket.assignedToDeptId },
+      data: { lastAssignedIndex: nextIndex + 1 }
+    });
+
+    await this.prisma.ticket.update({
+      where: { id: ticket.id },
+      data: {
+        assignedToEmployeeId: assigneeId,
+        assignedAt: new Date(),
+        status: 'IN_PROGRESS'
+      }
+    });
+  }
 }
+

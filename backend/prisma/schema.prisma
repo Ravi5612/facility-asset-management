@@ -143,6 +143,7 @@ model Organization {
   attachments      Attachment[]
   notifications    Notification[]
   salaryHistories  SalaryHistory[]
+  ticketSettings   DepartmentTicketSettings[]
 }
 
 model Permission {
@@ -263,6 +264,7 @@ model Department {
   assets          Asset[]
   raisedTickets   Ticket[]   @relation("TicketRaisedByDept")
   assignedTickets Ticket[]   @relation("TicketAssignedToDept")
+  ticketSettings  DepartmentTicketSettings?
 
   @@unique([organizationId, code])
   @@unique([organizationId, name])
@@ -505,6 +507,10 @@ model Ticket {
   priority             TicketPriority @default(MEDIUM)
     resolutionNotes      String?
   resolvedAt           DateTime?
+  hodApprovalStatus    String?   // null | PENDING | APPROVED | REJECTED
+  hodApprovalNote      String?
+  rating               Int?      // 1 to 5 stars
+  ratingFeedback       String?
   createdById          String?
   updatedById          String?
   createdAt            DateTime       @default(now())
@@ -603,7 +609,7 @@ model AuditLog {
 // ---------------------------------------------------
 // RAW SQL MIGRATIONS (to be placed in prisma/migrations/*/migration.sql)
 // ---------------------------------------------------
-// Composite tenant‑consistent foreign keys (where Prisma cannot express them):
+// Composite tenantÃ¢â‚¬â€˜consistent foreign keys (where Prisma cannot express them):
 //
 // ALTER TABLE "User" ADD CONSTRAINT "fk_user_employee_tenant"
 //   FOREIGN KEY ("employeeId", "organizationId")
@@ -630,7 +636,7 @@ model AuditLog {
 // ON "AssetAssignment" ("assetId")
 // WHERE "status" = 'ACTIVE';
 //
-// Soft‑delete unique constraints (apply only to non‑deleted rows)
+// SoftÃ¢â‚¬â€˜delete unique constraints (apply only to nonÃ¢â‚¬â€˜deleted rows)
 // CREATE UNIQUE INDEX "unique_assetcode_active"
 // ON "Asset" ("organizationId", "assetCode")
 // WHERE "deletedAt" IS NULL;
@@ -684,3 +690,17 @@ model Inventory {
   accessories      String?
   updatedAt        DateTime @updatedAt
 }
+model DepartmentTicketSettings {
+  id                  String     @id @default(uuid())
+  organization        Organization @relation(fields: [organizationId], references: [id])
+  organizationId      String
+  department          Department @relation(fields: [departmentId], references: [id])
+  departmentId        String     @unique
+  autoAssignEnabled   Boolean    @default(true)
+  rotationStaffIds    String[]
+  lastAssignedIndex   Int        @default(0)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+}
+
+

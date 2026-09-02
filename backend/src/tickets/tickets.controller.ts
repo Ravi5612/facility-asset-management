@@ -52,6 +52,45 @@ export class TicketsController {
     return this.ticketsService.getAssignedToMeTickets(user.userId, user.organizationId);
   }
 
+  // ─── Ticket Settings ─────────────────────────────────────────────────────────
+
+  @Get('settings')
+  @Roles('HOD', 'SUPER_ADMIN', 'SUB_ADMIN')
+  getTicketSettings(@Req() req: Request) {
+    const user = req['user'] as any;
+    return this.ticketsService.getTicketSettings(user.userId, user.organizationId);
+  }
+
+  @Patch('settings')
+  @Roles('HOD', 'SUPER_ADMIN', 'SUB_ADMIN')
+  updateTicketSettings(@Req() req: Request, @Body() dto: { autoAssignEnabled?: boolean; rotationStaffIds?: string[] }) {
+    const user = req['user'] as any;
+    return this.ticketsService.updateTicketSettings(user.userId, user.organizationId, dto);
+  }
+
+  // ─── HOD Approval ────────────────────────────────────────────────────────────
+
+  @Post(':id/request-approval')
+  @Roles('HOD', 'EMPLOYEE', 'SUB_ADMIN', 'SUPER_ADMIN')
+  requestHODApproval(@Param('id') id: string, @Req() req: Request) {
+    const user = req['user'] as any;
+    return this.ticketsService.requestHODApproval(id, user.userId, user.organizationId);
+  }
+
+  @Patch(':id/hod-decision')
+  @Roles('HOD', 'SUPER_ADMIN', 'SUB_ADMIN')
+  hodDecision(@Param('id') id: string, @Req() req: Request, @Body() dto: { approved: boolean; note?: string }) {
+    const user = req['user'] as any;
+    return this.ticketsService.hodDecision(id, user.userId, user.organizationId, dto);
+  }
+
+  @Patch(':id/rate')
+  @Roles('SUPER_ADMIN', 'SUB_ADMIN', 'HOD', 'EMPLOYEE')
+  rateTicket(@Param('id') id: string, @Req() req: Request, @Body() dto: { rating: number; feedback?: string }) {
+    const user = req['user'] as any;
+    return this.ticketsService.rateTicket(id, user.userId, user.organizationId, dto.rating, dto.feedback);
+  }
+
   @Patch(':id')
   @Roles('SUPER_ADMIN', 'SUB_ADMIN', 'HOD', 'EMPLOYEE')
   updateTicket(@Param('id') id: string, @Req() req: Request, @Body() updateTicketDto: any) {

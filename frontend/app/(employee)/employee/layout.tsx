@@ -1,5 +1,6 @@
 import React from "react";
 import { EmployeeSidebar } from "@/components/layout/EmployeeSidebar";
+import Header from "@/components/layout/Header";
 
 export default function EmployeeLayout({
   children,
@@ -7,14 +8,16 @@ export default function EmployeeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen w-full bg-[var(--brand-gray)]">
-      <EmployeeSidebar />
-      <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Placeholder for a mobile header if needed later */}
-        <div className="flex-1 overflow-y-auto">
+    <div className="min-h-screen bg-background flex flex-col md:flex-row">
+      <div className="hidden md:flex w-72 flex-col fixed inset-y-0 z-50">
+        <EmployeeSidebar />
+      </div>
+      <div className="flex-1 min-w-0 flex flex-col md:pl-72 min-h-screen transition-all">
+        <Header />
+        <main className="flex-1 flex flex-col min-h-0 min-w-0 p-4 md:p-6 lg:p-8 mt-16 overflow-y-auto relative">
           {children}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

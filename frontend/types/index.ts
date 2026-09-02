@@ -51,6 +51,7 @@ export type Priority = "High" | "Medium" | "Low" | "URGENT" | "CRITICAL";
 
 export type InterDeptTicket = {
   id: string;
+  dbId?: string;
   subject: string;
   description: string;
   raisedByDept: string;
@@ -63,7 +64,11 @@ export type InterDeptTicket = {
   priority: Priority;
   dateRaised: string;
   timeRaised?: string;
+  assignedAt?: string;
+  resolvedAt?: string;
   resolutionMessage?: string;
+  rating?: number;
+  ratingFeedback?: string;
   history?: {
     action: string;
     date: string;

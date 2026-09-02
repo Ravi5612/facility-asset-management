@@ -5,13 +5,14 @@ import { useQuery } from "@tanstack/react-query";
 import { SummaryCard } from "@/components/ui/summary-card";
 import {
   Ticket, Clock, CheckCircle2,
-  AlertCircle, Loader2
+  AlertCircle, Loader2, Settings
 } from "lucide-react";
 
 import { TicketStatus } from "@/types";
 import { InterDeptTicket } from "@/types";
 import { TicketTable } from "@/components/features/tickets/TicketTable";
 import { TicketActionModal } from "@/components/features/tickets/TicketActionModal";
+import { TicketSettingsDrawer } from "@/components/features/tickets/TicketSettingsDrawer";
 import { ticketService } from "@/services/ticket.service";
 import { departmentService } from "@/services/department.service";
 import { PageSkeleton } from "@/components/ui/skeletons";
@@ -25,6 +26,7 @@ export function TicketsClientPage({ fetchMode = "inbound" }: { fetchMode?: "all"
   const [priorityFilter, setPriorityFilter] = useState("All");
   const [dateFilter, setDateFilter] = useState("All");
   const [customDate, setCustomDate] = useState("");
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const [selectedTicket, setSelectedTicket] = useState<InterDeptTicket | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,14 +58,12 @@ export function TicketsClientPage({ fetchMode = "inbound" }: { fetchMode?: "all"
   }, [rawData]);
 
   const formattedTickets: InterDeptTicket[] = useMemo(() => {
-    return rawTickets.map((t: { 
-      ticketCode?: string; id: string; subject: string; status: string; priority: string; 
-      raisedByDept?: { name: string }; assignedToDept?: { name: string }; createdAt: string; 
-      raisedByEmployee?: { firstName: string; lastName: string; email: string };
-      assignedToEmployee?: { firstName: string; lastName: string; email: string };
+    return rawTickets.map((t: any & { 
+      ticketCode?: string, 
       description?: string 
     }) => ({
       id: t.ticketCode || t.id,
+      dbId: t.id,
       subject: t.subject,
       description: t.description,
       raisedByDept: t.raisedByDept?.name || "Unknown",
@@ -77,6 +77,9 @@ export function TicketsClientPage({ fetchMode = "inbound" }: { fetchMode?: "all"
       timeRaised: new Date(t.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
       assignedAt: (t as any).assignedAt,
       resolvedAt: (t as any).resolvedAt,
+      resolutionMessage: (t as any).resolutionNotes,
+      rating: (t as any).rating,
+      ratingFeedback: (t as any).ratingFeedback,
       createdAt: t.createdAt
     }));
   }, [rawTickets]);
@@ -125,9 +128,9 @@ export function TicketsClientPage({ fetchMode = "inbound" }: { fetchMode?: "all"
 
   // Stats
   const total = deptTickets.length;
-  const pending = deptTickets.filter(t => t.status === "Pending").length;
-  const inProgress = deptTickets.filter(t => t.status === "In Progress").length;
-  const completed = deptTickets.filter(t => t.status === "Completed").length;
+  const pending = deptTickets.filter(t => t.status === "OPEN" || t.status === "Pending").length;
+  const inProgress = deptTickets.filter(t => t.status === "IN_PROGRESS" || t.status === "In Progress").length;
+  const completed = deptTickets.filter(t => t.status === "RESOLVED" || t.status === "CLOSED" || t.status === "Completed").length;
 
   if (fetchMode === "all" && !selectedDept) {
     return (
@@ -234,19 +237,29 @@ export function TicketsClientPage({ fetchMode = "inbound" }: { fetchMode?: "all"
     <div className="space-y-6">
 
       {/* 🔹 Page Header 🔹 */}
-      <div>
-        <div className="flex items-center gap-4 mb-2">
-          {fetchMode === "all" && selectedDept && (
-            <Button variant="ghost" size="sm" onClick={() => setSelectedDept(null)} className="p-2 h-8 w-8">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          )}
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            {selectedDept ? `${selectedDept.name} Tickets` : "Inter-Department Tickets"}
-          </h1>
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-4 mb-2">
+            {fetchMode === "all" && selectedDept && (
+              <Button variant="ghost" size="sm" onClick={() => setSelectedDept(null)} className="p-2 h-8 w-8">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            )}
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              {selectedDept ? `${selectedDept.name} Tickets` : "Inter-Department Tickets"}
+            </h1>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1 ml-12">Monitor issues and requests raised between different departments.</p>
         </div>
-        <p className="text-sm text-muted-foreground mt-1 ml-12">Monitor issues and requests raised between different departments.</p>
+        
+        {fetchMode === "inbound" && (
+          <Button variant="outline" className="gap-2" onClick={() => setIsSettingsOpen(true)}>
+            <Settings className="h-4 w-4" /> Ticket Settings
+          </Button>
+        )}
       </div>
+
+      <TicketSettingsDrawer isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
 
       {isLoading ? (
         <div className="pt-4"><PageSkeleton /></div>

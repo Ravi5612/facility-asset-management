@@ -10,10 +10,16 @@ const STATUS_COLORS: Record<string, string> = {
 
   // Pending / Repair
   Pending:   "bg-orange-100 text-orange-700",
+  OPEN:      "bg-orange-100 text-orange-700",
   Repair:    "bg-yellow-100 text-yellow-700",
 
   // In Progress
   "In Progress": "bg-blue-100 text-blue-700",
+  IN_PROGRESS:   "bg-blue-100 text-blue-700",
+
+  // Completed
+  RESOLVED:  "bg-green-100 text-green-700",
+  CLOSED:    "bg-slate-200 text-slate-800",
 
   // Inactive / Dump / Inactive sub-admin
   Inactive: "bg-slate-100 text-slate-700",

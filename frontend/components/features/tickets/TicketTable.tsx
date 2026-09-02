@@ -6,7 +6,7 @@ import { SearchInput } from "@/components/ui/search-input";
 import { StatusBadge } from "@/components/ui/status-badge";
 import {
   Filter, ChevronRight, Clock, CheckCircle2,
-  AlertTriangle, Mail, Phone, X, ChevronDown, ChevronUp
+  AlertTriangle, Mail, Phone, X, ChevronDown, ChevronUp, Star
 } from "lucide-react";
 import { InterDeptTicket, TicketStatus, Priority } from "@/types";
 import { TicketDetailsModal } from "./TicketDetailsModal";
@@ -140,11 +140,11 @@ export function TicketTable({
               <div 
                 key={ticket.id} 
                 onClick={() => onTicketClick && onTicketClick(ticket)}
-                className={`relative bg-card rounded-xl overflow-hidden flex flex-col shadow-sm transition-shadow ${onTicketClick ? 'cursor-pointer hover:shadow-md' : ''}`}
-                style={{ 
-                  borderWidth: '3px', 
-                  borderColor: ticket.priority?.toUpperCase() === 'HIGH' || ticket.priority?.toUpperCase() === 'CRITICAL' ? '#ea4335' : ticket.priority?.toUpperCase() === 'MEDIUM' ? '#fbbc04' : ticket.priority?.toUpperCase() === 'LOW' ? '#34a853' : '#9ca3af' 
-                }}
+                className={`relative bg-card rounded-xl overflow-hidden flex flex-col shadow-sm transition-shadow border-4 ${onTicketClick ? 'cursor-pointer hover:shadow-md' : ''} ${
+                  ticket.priority?.toUpperCase() === 'HIGH' || ticket.priority?.toUpperCase() === 'CRITICAL' ? 'border-brand-danger' : 
+                  ticket.priority?.toUpperCase() === 'MEDIUM' ? 'border-brand-warning' : 
+                  ticket.priority?.toUpperCase() === 'LOW' ? 'border-brand-success' : 'border-slate-400'
+                }`}
               >
                 
                 {/* Card Header: Dark Navy */}
@@ -157,13 +157,30 @@ export function TicketTable({
                           ? 'border-blue-500/30 bg-blue-500/10 text-blue-400'
                           : 'border-orange-500/30 bg-orange-500/10 text-orange-400'
                       }`}>
-                        {ticket.status === 'RESOLVED' || ticket.status === 'CLOSED' ? (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                        ) : ticket.status === 'IN_PROGRESS' ? (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-[spin_3s_linear_infinite]"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-                        ) : (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>
-                        )}
+                        <div className="flex flex-col items-center">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase border
+                            ${ticket.status === 'RESOLVED' || ticket.status === 'CLOSED' ? 'bg-green-100 text-green-700 border-green-200' 
+                              : ticket.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-700 border-blue-200' 
+                              : 'bg-orange-100 text-orange-700 border-orange-200'}`}
+                          >
+                            {ticket.status === 'OPEN' ? 'PENDING' : ticket.status?.replace('_', ' ')}
+                            {(ticket.status === 'RESOLVED' || ticket.status === 'CLOSED') && (
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            )}
+                          </span>
+                          {ticket.rating && (
+                            <div className="flex gap-[1px] mt-1.5">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star key={star} className={`h-2.5 w-2.5 ${star <= ticket.rating! ? "fill-yellow-400 text-yellow-400" : "text-green-900/20"}`} />
+                              ))}
+                            </div>
+                          )}
+                          {(ticket as any).hodApprovalStatus === 'PENDING' && (
+                            <div className="mt-1 inline-flex items-center gap-1 text-[9px] font-bold text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200">
+                              ⏳ Approval Req
+                            </div>
+                          )}
+                        </div>
                       </div>
                     <div>
                       <div className="text-[10px] font-bold tracking-wider text-white/60 uppercase">Ticket ID</div>
@@ -191,9 +208,16 @@ export function TicketTable({
                 <div className="bg-card flex-1 flex flex-col p-4">
                   <div className="mb-4">
                     <h3 className="font-bold text-xl text-slate-800 leading-tight mb-1.5">{ticket.subject}</h3>
-                    <p className="text-xs text-slate-500 flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5" /> Raised: {ticket.dateRaised} {ticket.timeRaised && `at ${ticket.timeRaised}`}
-                    </p>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-xs text-slate-500 flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5" /> Raised: {ticket.dateRaised} {ticket.timeRaised && `at ${ticket.timeRaised}`}
+                      </p>
+                      {(ticket.status === 'RESOLVED' || ticket.status === 'CLOSED') && (ticket as any).resolvedAt && (
+                        <p className="text-xs text-green-600 flex items-center gap-1 font-medium mt-1">
+                          <CheckCircle2 className="h-3.5 w-3.5" /> Resolved: {new Date((ticket as any).resolvedAt).toISOString().split('T')[0]} at {new Date((ticket as any).resolvedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
                   {ticket.description && (
@@ -211,7 +235,11 @@ export function TicketTable({
                   <div className="border border-slate-200/80 shadow-sm rounded-xl p-3.5 mb-3 flex flex-col">
                     <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center border border-red-100">
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center border ${
+                          ticket.priority?.toUpperCase() === 'HIGH' || ticket.priority?.toUpperCase() === 'CRITICAL' ? 'bg-brand-danger/10 text-brand-danger border-brand-danger/20' : 
+                          ticket.priority?.toUpperCase() === 'MEDIUM' ? 'bg-brand-warning/10 text-brand-warning border-brand-warning/20' : 
+                          ticket.priority?.toUpperCase() === 'LOW' ? 'bg-brand-success/10 text-brand-success border-brand-success/20' : 'bg-slate-100 text-slate-500 border-slate-200'
+                        }`}>
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         </div>
                         <div className="flex flex-col">
@@ -220,7 +248,11 @@ export function TicketTable({
                           <span className="text-xs text-slate-500 flex items-center gap-1 mt-0.5"><Mail className="h-3 w-3" /> {ticket.raisedByHodEmail || 'N/A'}</span>
                         </div>
                       </div>
-                      <div className="h-9 w-9 rounded-full border border-red-200 flex items-center justify-center text-red-500 bg-white shadow-sm">
+                      <div className={`h-9 w-9 rounded-full border flex items-center justify-center bg-white shadow-sm ${
+                        ticket.priority?.toUpperCase() === 'HIGH' || ticket.priority?.toUpperCase() === 'CRITICAL' ? 'text-brand-danger border-brand-danger/30' : 
+                        ticket.priority?.toUpperCase() === 'MEDIUM' ? 'text-brand-warning border-brand-warning/30' : 
+                        ticket.priority?.toUpperCase() === 'LOW' ? 'text-brand-success border-brand-success/30' : 'text-slate-500 border-slate-200'
+                      }`}>
                         <Phone className="h-4 w-4" />
                       </div>
                     </div>
@@ -231,7 +263,11 @@ export function TicketTable({
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">To Dept</span>
-                      <strong className="text-red-500 text-xs">{ticket.assignedToDept}</strong>
+                      <strong className={`text-xs ${
+                        ticket.priority?.toUpperCase() === 'HIGH' || ticket.priority?.toUpperCase() === 'CRITICAL' ? 'text-brand-danger' : 
+                        ticket.priority?.toUpperCase() === 'MEDIUM' ? 'text-brand-warning' : 
+                        ticket.priority?.toUpperCase() === 'LOW' ? 'text-brand-success' : 'text-slate-500'
+                      }`}>{ticket.assignedToDept}</strong>
                     </div>
                   </div>
 
@@ -248,8 +284,18 @@ export function TicketTable({
                     </div>
                     <div className="flex flex-col gap-1.5 items-start">
                       <span className="text-[9px] uppercase font-bold tracking-wider text-slate-400">Status</span>
-                      <div className="bg-blue-50/50 border border-blue-100 rounded text-blue-600 px-2 py-1 flex items-center gap-1.5">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="M12 2v4"></path><path d="M12 18v4"></path><path d="M4.93 4.93l2.83 2.83"></path><path d="M16.24 16.24l2.83 2.83"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><path d="M4.93 19.07l2.83-2.83"></path><path d="M16.24 7.76l2.83-2.83"></path></svg>
+                      <div className={`border rounded px-2 py-1 flex items-center gap-1.5
+                        ${ticket.status === 'RESOLVED' || ticket.status === 'CLOSED' ? 'bg-green-50/50 border-green-100 text-green-600' :
+                          ticket.status === 'IN_PROGRESS' ? 'bg-blue-50/50 border-blue-100 text-blue-600' :
+                          'bg-orange-50/50 border-orange-100 text-orange-600'}`}
+                      >
+                        {ticket.status === 'RESOLVED' || ticket.status === 'CLOSED' ? (
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-green-500"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        ) : ticket.status === 'IN_PROGRESS' ? (
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500 animate-[spin_3s_linear_infinite]"><path d="M12 2v4"></path><path d="M12 18v4"></path><path d="M4.93 4.93l2.83 2.83"></path><path d="M16.24 16.24l2.83 2.83"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><path d="M4.93 19.07l2.83-2.83"></path><path d="M16.24 7.76l2.83-2.83"></path></svg>
+                        ) : (
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange-500"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        )}
                         <span className="text-[10px] font-bold tracking-wider uppercase">{ticket.status}</span>
                       </div>
                     </div>
@@ -258,7 +304,11 @@ export function TicketTable({
                 
                 {/* Card Footer Button */}
                 <div 
-                  className={`w-full py-3 flex justify-center items-center gap-1 text-white text-sm font-bold tracking-wide transition-opacity ${ticket.priority?.toUpperCase() === 'HIGH' || ticket.priority?.toUpperCase() === 'CRITICAL' ? 'bg-[#ea4335] hover:bg-[#ea4335]/90' : ticket.priority?.toUpperCase() === 'MEDIUM' ? 'bg-[#fbbc04] hover:bg-[#fbbc04]/90' : ticket.priority?.toUpperCase() === 'LOW' ? 'bg-[#34a853] hover:bg-[#34a853]/90' : 'bg-slate-500 hover:bg-slate-500/90'}`}
+                  className={`w-full py-3 flex justify-center items-center gap-1 text-white text-sm font-bold tracking-wide transition-opacity hover:opacity-90 ${
+                    ticket.priority?.toUpperCase() === 'HIGH' || ticket.priority?.toUpperCase() === 'CRITICAL' ? 'bg-brand-danger' : 
+                    ticket.priority?.toUpperCase() === 'MEDIUM' ? 'bg-brand-warning' : 
+                    ticket.priority?.toUpperCase() === 'LOW' ? 'bg-brand-success' : 'bg-slate-500'
+                  }`}
                   onClick={(e) => {
                     e.stopPropagation();
                     const triggerBtn = e.currentTarget.querySelector('.hidden button');
