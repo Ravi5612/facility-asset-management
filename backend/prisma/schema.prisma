@@ -91,6 +91,8 @@ enum LocationType {
   FLOOR
   ROOM
   RACK
+  DESK
+  SEAT
   OTHER
 }
 
@@ -181,24 +183,18 @@ model RolePermission {
 }
 
 model User {
-  id                    String       @id @default(uuid())
-  organization          Organization @relation(fields: [organizationId], references: [id])
-  organizationId        String
-  employeeId            String?      @unique
-  employeeCode          String?      @unique // Auto-generated unique code
-  fullName              String? // Added for storing user's name
-  departmentName        String? // Which department this HOD belongs to
-  accessibleDepartments String[]     @default([]) // Added for Sub-Admin multiple departments
-  designation           String? // Added for employee designation
-  profileImage          String? // Cloudinary URL for profile picture
-  email                 String
-  passwordHash          String
-  status                UserStatus   @default(ACTIVE)
-  lastLoginAt           DateTime?
-  createdById           String?
-  createdAt             DateTime     @default(now())
-  updatedAt             DateTime     @updatedAt
-  deletedAt             DateTime?
+  id             String       @id @default(uuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  employeeId     String?      @unique
+  email          String       @unique
+  passwordHash   String
+  status         UserStatus   @default(ACTIVE)
+  lastLoginAt    DateTime?
+  createdById    String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  deletedAt      DateTime?
 
   // Relations
   employee      Employee?      @relation(fields: [employeeId], references: [id])
@@ -259,11 +255,11 @@ model Department {
   updatedAt      DateTime     @updatedAt
   deletedAt      DateTime?
 
-  employees       Employee[] @relation("DepartmentEmployees")
-  hod             Employee?  @relation("DepartmentHOD", fields: [hodId], references: [id])
+  employees       Employee[]                @relation("DepartmentEmployees")
+  hod             Employee?                 @relation("DepartmentHOD", fields: [hodId], references: [id])
   assets          Asset[]
-  raisedTickets   Ticket[]   @relation("TicketRaisedByDept")
-  assignedTickets Ticket[]   @relation("TicketAssignedToDept")
+  raisedTickets   Ticket[]                  @relation("TicketRaisedByDept")
+  assignedTickets Ticket[]                  @relation("TicketAssignedToDept")
   ticketSettings  DepartmentTicketSettings?
 
   @@unique([organizationId, code])
@@ -321,7 +317,6 @@ model Employee {
   subordinates     Employee[]        @relation("ManagerSubordinates")
   attendance       Attendance[]
   leaveRequests    LeaveRequest[]
-  assetsAssigned   Asset[]           @relation("CurrentAssignee")
   assetAssignments AssetAssignment[]
   departmentHOD    Department[]      @relation("DepartmentHOD")
   raisedTickets    Ticket[]          @relation("TicketRaisedByEmployee")
@@ -330,7 +325,6 @@ model Employee {
 
   @@unique([organizationId, employeeCode])
   @@unique([organizationId, email])
-
   @@index([organizationId, departmentId])
   @@index([organizationId, status])
 }
@@ -352,7 +346,6 @@ model Attendance {
   updatedAt      DateTime         @updatedAt
 
   @@unique([organizationId, employeeId, date])
-
   @@index([organizationId, date])
   @@index([organizationId, employeeId, date])
 }
@@ -416,43 +409,37 @@ model AssetCategory {
 }
 
 model Asset {
-  id                 String        @id @default(uuid())
-  organization       Organization  @relation(fields: [organizationId], references: [id])
+  id                 String                @id @default(uuid())
+  organization       Organization          @relation(fields: [organizationId], references: [id])
   organizationId     String
   assetCode          String
   name               String
-  category           AssetCategory @relation(fields: [categoryId], references: [id])
+  category           AssetCategory         @relation(fields: [categoryId], references: [id])
   categoryId         String
   serialNumber       String
   purchaseDate       DateTime
   purchasePrice      Decimal
   warrantyExpiryDate DateTime?
-  status             AssetStatus   @default(AVAILABLE)
-  currentAssigneeId  String?
+  status             AssetStatus           @default(AVAILABLE)
   ownerDepartmentId  String?
   locationId         String?
   notes              String?
-  hardwareDetails    Json?       @default("{}") // Stores actual specs mapping from customFields
+  hardwareDetails    Json?                 @default("{}") // Stores actual specs mapping from customFields
   createdById        String?
   updatedById        String?
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
   deletedAt          DateTime?
-    ipAddress          String?
-    hostname           String?
-    macAddress         String?
-    seatNumber         String?
-    floor              String?
-
-  currentAssignee Employee?             @relation("CurrentAssignee", fields: [currentAssigneeId], references: [id])
-  ownerDepartment Department?           @relation(fields: [ownerDepartmentId], references: [id])
-  location        Location?             @relation(fields: [locationId], references: [id])
-  assignments     AssetAssignment[]
-  maintenanceLogs AssetMaintenanceLog[]
+  ipAddress          String?
+  hostname           String?
+  macAddress         String?
+  ownerDepartment    Department?           @relation(fields: [ownerDepartmentId], references: [id])
+  location           Location?             @relation(fields: [locationId], references: [id])
+  assignments        AssetAssignment[]
+  maintenanceLogs    AssetMaintenanceLog[]
 
   @@unique([organizationId, assetCode])
   @@unique([organizationId, serialNumber])
-
   @@index([organizationId, categoryId])
   @@index([organizationId, ownerDepartmentId])
   @@index([organizationId, status])
@@ -502,14 +489,14 @@ model Ticket {
   raisedByEmployeeId   String
   assignedToDeptId     String
   assignedToEmployeeId String?
-    assignedAt           DateTime?
+  assignedAt           DateTime?
   status               TicketStatus   @default(OPEN)
   priority             TicketPriority @default(MEDIUM)
-    resolutionNotes      String?
+  resolutionNotes      String?
   resolvedAt           DateTime?
-  hodApprovalStatus    String?   // null | PENDING | APPROVED | REJECTED
+  hodApprovalStatus    String? // null | PENDING | APPROVED | REJECTED
   hodApprovalNote      String?
-  rating               Int?      // 1 to 5 stars
+  rating               Int? // 1 to 5 stars
   ratingFeedback       String?
   createdById          String?
   updatedById          String?
@@ -526,7 +513,6 @@ model Ticket {
   statusHistory TicketStatusHistory[]
 
   @@unique([organizationId, ticketCode])
-
   @@index([organizationId, raisedByDeptId])
   @@index([organizationId, assignedToDeptId])
   @@index([organizationId, status])
@@ -663,44 +649,15 @@ model SalaryHistory {
   @@index([organizationId, employeeId])
 }
 
-model Inventory {
-  id               String   @id @default(uuid())
-    seatNumber       String?
-    floor            String?
-    department       String?
-    hostname         String?
-  os               String?
-  ipAddress        String?
-  macAddress       String?
-  make             String?
-  modelName        String?
-  serialNumber     String?
-  ramGB            Int?
-  ramType          String?
-  processor        String?
-  driveConfig      String?
-  bitlocker        String?
-  symantec         String?
-  createdAt        DateTime @default(now())
-    monitor          String?
-  keyboard         String?
-  mouse            String?
-  headset          String?
-  cables           String?
-  accessories      String?
-  updatedAt        DateTime @updatedAt
-}
 model DepartmentTicketSettings {
-  id                  String     @id @default(uuid())
-  organization        Organization @relation(fields: [organizationId], references: [id])
-  organizationId      String
-  department          Department @relation(fields: [departmentId], references: [id])
-  departmentId        String     @unique
-  autoAssignEnabled   Boolean    @default(true)
-  rotationStaffIds    String[]
-  lastAssignedIndex   Int        @default(0)
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
+  id                String       @id @default(uuid())
+  organization      Organization @relation(fields: [organizationId], references: [id])
+  organizationId    String
+  department        Department   @relation(fields: [departmentId], references: [id])
+  departmentId      String       @unique
+  autoAssignEnabled Boolean      @default(true)
+  rotationStaffIds  String[]
+  lastAssignedIndex Int          @default(0)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
 }
-
-

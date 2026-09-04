@@ -4,7 +4,7 @@ import { AssetCategoryArraySchema } from "@/lib/validations/asset";
 export interface CreateAssetPayload {
   assetName: string;
   categoryId: string;
-  departmentId: string;
+  departmentId?: string;
   serialNumber: string;
   purchaseDate?: string;
   warrantyExpiry?: string;
@@ -113,6 +113,19 @@ export const assetService = {
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.message || 'Failed to shift asset');
+    }
+    return res.json();
+  },
+
+  async unassignAsset(assetId: string, notes?: string, returnedTo?: string): Promise<any> {
+    const res = await fetch(`/api/proxy/assets/${assetId}/unassign`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes, returnedTo })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to unassign asset');
     }
     return res.json();
   },

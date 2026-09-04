@@ -191,10 +191,10 @@ export function AssignAssetModal({ assetId, assetName, categoryName = 'CPU', ass
                   setDepartmentId(e.target.value);
                   setEmployeeId("");
                 }}
-                disabled={assignMutation.isPending || isLoadingDepartments}
-                className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                disabled={assignMutation.isPending || isLoadingDepartments || !floor}
+                className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <option value="">{floor ? "Select a department" : "Select a floor first (Optional)"}</option>
+                <option value="">{!floor ? "Select a floor first" : "Select a department"}</option>
                 {filteredDepartments.map((dept: any) => (
                   <option key={dept.id} value={dept.id}>
                     {dept.name}
@@ -212,9 +212,9 @@ export function AssignAssetModal({ assetId, assetName, categoryName = 'CPU', ass
                 value={employeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
                 disabled={assignMutation.isPending || isLoadingEmployees || !departmentId}
-                className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <option value="">{departmentId ? "Select an employee" : "Select a department first"}</option>
+                <option value="">{!departmentId ? "Select a department first" : "Select an employee"}</option>
                 {employees.map((emp: any) => (
                   <option key={emp.id} value={emp.id}>
                     {emp.firstName} {emp.lastName} ({emp.employeeCode})
@@ -240,7 +240,7 @@ export function AssignAssetModal({ assetId, assetName, categoryName = 'CPU', ass
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="seatNumber">Seat Number</Label>
-              <input id="seatNumber" type="text" placeholder="e.g. N-25" value={seatNumber} onChange={(e) => setSeatNumber(e.target.value.toUpperCase())} className="w-full px-3 py-2 border rounded-md" disabled={assignMutation.isPending} />
+              <input id="seatNumber" type="text" placeholder={!departmentId ? "Select department first" : "e.g. N-25"} value={seatNumber} onChange={(e) => setSeatNumber(e.target.value.toUpperCase())} className="w-full px-3 py-2 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed" disabled={assignMutation.isPending || !departmentId} />
               {seatStatus && (
                 <div className={`flex items-center gap-1.5 text-xs mt-1.5 ${seatStatus.type === 'success' ? 'text-emerald-600' : seatStatus.type === 'loading' ? 'text-blue-600' : 'text-amber-600'}`}>
                   {seatStatus.type === 'loading' && <Loader2 className="h-3 w-3 animate-spin" />}

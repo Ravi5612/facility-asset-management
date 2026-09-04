@@ -46,6 +46,13 @@ export class AssetsController {
     return this.assetsService.assignAsset(user.organizationId, assetId, dto.employeeId, user.userId, dto);
   }
 
+  @Post(':id/unassign')
+  @Roles('HOD')
+  unassignAsset(@Req() req: Request, @Param('id') assetId: string, @Body() dto: { notes?: string, returnedTo?: string }) {
+    const user = req['user'] as any;
+    return this.assetsService.unassignAsset(user.organizationId, assetId, user.userId, dto.notes, dto.returnedTo);
+  }
+
   @Post(':id/shift')
   @Roles('HOD')
   shiftAsset(@Req() req: Request, @Param('id') assetId: string, @Body() dto: any) {

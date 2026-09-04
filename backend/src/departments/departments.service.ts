@@ -51,14 +51,14 @@ export class DepartmentsService {
         organizationId,
         userRoles: { some: { role: { name: 'HOD' } } }
       },
-      select: { fullName: true, departmentName: true }
+      include: { employee: { include: { department: true } } }
     });
 
     return departments.map(dept => {
-      const hod = hods.find(h => h.departmentName?.toLowerCase() === dept.name.toLowerCase());
+      const hod = hods.find(h => h.employee?.department?.name?.toLowerCase() === dept.name.toLowerCase());
       return {
         ...dept,
-        hodName: hod?.fullName || null,
+        hodName: hod?.employee ? `${hod.employee.firstName} ${hod.employee.lastName}`.trim() : null,
         employeeCount: dept._count.employees
       };
     });

@@ -23,6 +23,9 @@ export class AuthService {
           include: { role: true },
         },
         organization: { select: { themeColor: true } },
+        employee: {
+          include: { department: true }
+        }
       },
     });
 
@@ -99,7 +102,7 @@ export class AuthService {
         email: user.email,
         organizationId: user.organizationId,
         role: primaryRole,
-        departmentName: user.departmentName,
+        departmentName: user.employee?.department?.name || null,
       },
     };
   }
@@ -126,6 +129,7 @@ export class AuthService {
           include: {
             userRoles: { include: { role: true } },
             organization: { select: { themeColor: true } },
+            employee: { include: { department: true } }
           },
         },
       },
@@ -198,7 +202,11 @@ export class AuthService {
     return { 
       accessToken, 
       refreshToken: newRefreshToken, 
-      user: { ...user, themeColor: user.organization?.themeColor || "blue" } 
+      user: { 
+        ...user, 
+        themeColor: user.organization?.themeColor || "blue",
+        departmentName: user.employee?.department?.name || null
+      } 
     };
   }
   async logout(refreshToken: string) {

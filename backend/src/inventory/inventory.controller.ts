@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Req, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -44,124 +44,107 @@ export class InventoryController {
   }
 
   @Get('by-seat')
-  async getBySeat(@Query('seatNumber') seatNumber: string, @Query('floor') floor: string) {
+  async getBySeat(@Query('seatNumber') seatNumber: string, @Req() req: any) {
     if (!seatNumber) return {};
-    const entry = await this.prisma.inventory.findFirst({
-      where: { 
-        seatNumber: { equals: seatNumber, mode: 'insensitive' },
-        ...(floor ? { floor } : {})
-      },
-      orderBy: { updatedAt: 'desc' }
-    });
+    const user = req.user as { organizationId: string };
     
-    if (!entry) return {};
-
-    const serialNumbers: string[] = [];
-    if (entry.serialNumber) serialNumbers.push(entry.serialNumber);
-    if (entry.keyboard) serialNumbers.push(entry.keyboard);
-    if (entry.mouse) serialNumbers.push(entry.mouse);
-    if (entry.monitor) serialNumbers.push(entry.monitor);
-    if (entry.headset) serialNumbers.push(entry.headset);
-    if (entry.cables) serialNumbers.push(entry.cables);
-
-    if (serialNumbers.length === 0) return entry;
-
-    const assets = await this.prisma.asset.findMany({
-      where: { serialNumber: { in: serialNumbers } },
-      include: { 
-        category: true,
-        assignments: {
-          orderBy: { assignedAt: 'desc' },
-          take: 1
-        }
-      }
+    const seat = await this.prisma.location.findFirst({
+      where: { 
+        name: { equals: seatNumber, mode: 'insensitive' }, 
+        type: 'DESK', 
+        organizationId: user.organizationId 
+      },
+      include: { assets: true }
     });
 
-    const assetMap = new Map();
-    assets.forEach(a => {
-      // First try to find an active assignment, if not, just use the most recent one we fetched
-      const activeAssign = a.assignments?.find(as => as.status === 'ACTIVE') || a.assignments?.[0];
-      assetMap.set(a.serialNumber, {
-        id: a.assetCode || a.id,
-        name: a.name,
-        category: a.category?.name,
-        purchaseDate: a.purchaseDate,
-        warrantyExpiry: a.warrantyExpiryDate,
-        status: a.status,
-        assignedAt: activeAssign ? activeAssign.assignedAt : null
-      });
-    });
+    if (!seat) {
+      throw new NotFoundException("Seat not found in inventory. Please add it in the Locations/Inventory first.");
+    }
+
+    const cpu = seat.assets.find(a => a.name.includes('CPU') || a.hardwareDetails) || seat.assets[0];
+    const hardware = (cpu?.hardwareDetails as any) || {};
 
     return {
-      ...entry,
-      cpuDetails: entry.serialNumber ? assetMap.get(entry.serialNumber) : null,
-      keyboardDetails: entry.keyboard ? assetMap.get(entry.keyboard) : null,
-      mouseDetails: entry.mouse ? assetMap.get(entry.mouse) : null,
-      monitorDetails: entry.monitor ? assetMap.get(entry.monitor) : null,
-      headsetDetails: entry.headset ? assetMap.get(entry.headset) : null,
-      cablesDetails: entry.cables ? assetMap.get(entry.cables) : null,
+      exists: true,
+      hostname: cpu?.name || "",
+      ipAddress: hardware.ip || hardware.ipAddress || "",
+      macAddress: hardware.mac || hardware.macAddress || "",
     };
   }
 
   @Get()
-  async getAll() {
-    const inventories = await this.prisma.inventory.findMany();
-    const serialNumbers: string[] = [];
+  async getAll(@Req() req: any) {
+    const user = req.user as { organizationId: string };
     
-    for (const inv of inventories) {
-      if (inv.serialNumber) serialNumbers.push(inv.serialNumber);
-      if (inv.keyboard) serialNumbers.push(inv.keyboard);
-      if (inv.mouse) serialNumbers.push(inv.mouse);
-      if (inv.monitor) serialNumbers.push(inv.monitor);
-      if (inv.headset) serialNumbers.push(inv.headset);
-      if (inv.cables) serialNumbers.push(inv.cables);
-    }
-    
-    const assets = await this.prisma.asset.findMany({
-      where: { serialNumber: { in: serialNumbers } },
-      include: { 
-        category: true,
-        assignments: {
-          orderBy: { assignedAt: 'desc' },
-          take: 1
-        }
+    // Fetch all locations of type DESK with all assigned assets and their categories
+    const desks = await this.prisma.location.findMany({
+      where: { type: 'DESK', organizationId: user.organizationId },
+      include: {
+        parent: { include: { parent: true } },
+        assets: {
+          where: { status: { not: 'RETIRED' } },
+          include: { category: true }
+        },
       }
     });
-    
-    const userIds = assets.flatMap(a => a.assignments.map(assign => assign.assignedById)).filter(Boolean);
-    const users = await this.prisma.user.findMany({
-      where: { id: { in: userIds } },
-      select: { id: true, email: true, departmentName: true }
-    });
-    const userMap = new Map();
-    users.forEach(u => userMap.set(u.id, u));
-    
-    const assetMap = new Map();
-    assets.forEach(a => {
-      const activeAssign = a.assignments?.[0];
-      const assignedByUser = activeAssign ? userMap.get(activeAssign.assignedById) : null;
+
+    const result = desks.map(desk => {
+      // Helper to find asset by category name keyword
+      const findAsset = (keyword: string) =>
+        desk.assets.find(a => a.category?.name?.toLowerCase().includes(keyword.toLowerCase()));
+
+      const cpu = findAsset('cpu') || desk.assets.find(a => (a.hardwareDetails as any)?.processor) || desk.assets[0];
+      const mouseAsset = findAsset('mouse');
+      const keyboardAsset = findAsset('keyboard');
+      const monitorAsset = findAsset('monitor');
+      const headsetAsset = findAsset('headset');
+      const cableAsset = findAsset('cable') || findAsset('accessory');
+
+      const hardware = (cpu?.hardwareDetails as any) || {};
       
-      assetMap.set(a.serialNumber, {
-        id: a.assetCode || a.id,
-        name: a.name,
-        category: a.category?.name,
-        purchaseDate: a.purchaseDate,
-        warrantyExpiry: a.warrantyExpiryDate,
-        status: a.status,
-        notes: a.notes,
-        assignedAt: activeAssign ? activeAssign.assignedAt : null,
-        assignedBy: assignedByUser ? `${assignedByUser.email} (${assignedByUser.departmentName || 'Staff'})` : null
-      });
+      const rawFloor = desk.parent?.parent?.name || hardware.floor || '-';
+      let floorStr = rawFloor;
+      if (rawFloor.toUpperCase() === '1ST') floorStr = '1st Floor';
+      else if (rawFloor.toUpperCase() === '2ND') floorStr = '2nd Floor';
+      else if (rawFloor.toUpperCase() === '3RD') floorStr = '3rd Floor';
+      else if (rawFloor.toUpperCase() === '4TH') floorStr = '4th Floor';
+      else if (rawFloor.toUpperCase() === '5TH') floorStr = '5th Floor';
+      else if (rawFloor.toUpperCase() === '6TH') floorStr = '6th Floor';
+      else if (rawFloor.toUpperCase().includes('BASEMENT')) floorStr = 'Basement';
+      else if (rawFloor.toUpperCase().includes('GROUND')) floorStr = 'Ground (0)';
+
+      return {
+        id: desk.id,
+        seatNumber: desk.name,
+        floor: floorStr,
+        department: desk.parent?.name || hardware.process || '-',
+        hostname: cpu?.name || '-',
+        assetCode: cpu?.assetCode || '-',
+        serialNumber: cpu?.serialNumber || hardware.serialNumber || '-',
+        purchaseDate: cpu?.purchaseDate ? cpu.purchaseDate.toISOString().split('T')[0] : '-',
+        warrantyExpiryDate: cpu?.warrantyExpiryDate ? cpu.warrantyExpiryDate.toISOString().split('T')[0] : '-',
+        bitlocker: hardware.bitlocker || '-',
+        symantec: hardware.symantec || '-',
+        make: hardware.make || '-',
+        model: hardware.model || '-',
+        processor: hardware.processor || '-',
+        ram: hardware.ram || '-',
+        hdd: hardware.drive || '-',
+        ipAddress: hardware.ip || '-',
+        macAddress: hardware.mac || '-',
+        // Peripherals — show asset code/name if assigned, else '-'
+        mouse: mouseAsset ? (mouseAsset.assetCode || mouseAsset.name) : '-',
+        mouseDetails: mouseAsset ? { name: mouseAsset.name, code: mouseAsset.assetCode, serial: mouseAsset.serialNumber, purchaseDate: mouseAsset.purchaseDate?.toISOString().split('T')[0], warrantyExpiryDate: mouseAsset.warrantyExpiryDate?.toISOString().split('T')[0] } : null,
+        keyboard: keyboardAsset ? (keyboardAsset.assetCode || keyboardAsset.name) : '-',
+        keyboardDetails: keyboardAsset ? { name: keyboardAsset.name, code: keyboardAsset.assetCode, serial: keyboardAsset.serialNumber, purchaseDate: keyboardAsset.purchaseDate?.toISOString().split('T')[0], warrantyExpiryDate: keyboardAsset.warrantyExpiryDate?.toISOString().split('T')[0] } : null,
+        monitor: monitorAsset ? (monitorAsset.assetCode || monitorAsset.name) : '-',
+        monitorDetails: monitorAsset ? { name: monitorAsset.name, code: monitorAsset.assetCode, serial: monitorAsset.serialNumber, purchaseDate: monitorAsset.purchaseDate?.toISOString().split('T')[0], warrantyExpiryDate: monitorAsset.warrantyExpiryDate?.toISOString().split('T')[0] } : null,
+        headset: headsetAsset ? (headsetAsset.assetCode || headsetAsset.name) : '-',
+        headsetDetails: headsetAsset ? { name: headsetAsset.name, code: headsetAsset.assetCode, serial: headsetAsset.serialNumber, purchaseDate: headsetAsset.purchaseDate?.toISOString().split('T')[0], warrantyExpiryDate: headsetAsset.warrantyExpiryDate?.toISOString().split('T')[0] } : null,
+        cables: cableAsset ? (cableAsset.assetCode || cableAsset.name) : '-',
+      };
     });
 
-    return inventories.map(inv => ({
-      ...inv,
-      cpuDetails: inv.serialNumber ? assetMap.get(inv.serialNumber) : null,
-      keyboardDetails: inv.keyboard ? assetMap.get(inv.keyboard) : null,
-      mouseDetails: inv.mouse ? assetMap.get(inv.mouse) : null,
-      monitorDetails: inv.monitor ? assetMap.get(inv.monitor) : null,
-      headsetDetails: inv.headset ? assetMap.get(inv.headset) : null,
-      cablesDetails: inv.cables ? assetMap.get(inv.cables) : null,
-    }));
+    return result;
   }
 }

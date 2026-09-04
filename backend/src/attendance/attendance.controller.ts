@@ -100,11 +100,11 @@ export class AttendanceController {
 
     const fullUser = await this.prisma.user.findUnique({
       where: { id: user.userId },
-      select: { accessibleDepartments: true }
+      include: { employee: { include: { department: true } } }
     });
 
     if (user.role !== 'SUPER_ADMIN') {
-      const allowedDepts = fullUser?.accessibleDepartments || [];
+      const allowedDepts = fullUser?.employee?.department ? [fullUser.employee.department.name] : [];
       if (!allowedDepts.includes(deptName)) {
         throw new ForbiddenException(`You do not have permission to view attendance for the '${deptName}' department.`);
       }
@@ -123,7 +123,7 @@ export class AttendanceController {
         employee: { departmentId: dept.id }
       },
       include: {
-        employee: { select: { employeeCode: true, user: { select: { fullName: true } } } }
+        employee: { select: { employeeCode: true, firstName: true, lastName: true } }
       }
     });
 

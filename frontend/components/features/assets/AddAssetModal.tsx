@@ -113,11 +113,13 @@ export function AddAssetModal({ allCategories, onAddCategory, getNextId, generat
     addAssetMutation.mutate({
       assetName: data.assetName,
       categoryId: data.category,
-      departmentId: data.departmentId || "",
+      departmentId: data.departmentId || undefined,
       serialNumber: data.serialNumber,
       purchaseDate: data.purchaseDate,
       warrantyExpiry: data.warrantyExpiry,
       notes: data.notes
+    }, {
+      onError: () => setIsLoading(false)
     });
   };
 

@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { SearchInput } from "@/components/ui/search-input";
 import { Badge } from "@/components/ui/badge";
-import { Package, Search, MonitorPlay, UserCheck, Wrench, Trash2, ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { Package, Search, MonitorPlay, UserCheck, Wrench, Trash2, ChevronLeft, ChevronRight, Eye, Printer, RotateCcw } from "lucide-react";
 import { SummaryCard } from "@/components/ui/summary-card";
 import { Button } from "@/components/ui/button";
 import { UserPlus } from "lucide-react";
@@ -14,6 +14,8 @@ import { AssignAssetModal } from "@/components/features/assets/AssignAssetModal"
 import { AllocateToDeptModal } from "@/components/features/assets/AllocateToDeptModal";
 import { ShiftAssetModal } from "@/components/features/assets/ShiftAssetModal";
 import { UpdateStatusModal } from "@/components/features/assets/UpdateStatusModal";
+import { BarcodePrintModal } from "@/components/features/assets/BarcodePrintModal";
+import { UnassignAssetModal } from "@/components/features/assets/UnassignAssetModal";
 import { AddAssetModal } from "@/components/features/assets/AddAssetModal";
 import { AssetCategoryCard } from "@/components/features/assets/AssetCategoryCard";
 import { AssetDetailModal } from "@/components/features/assets/AssetDetailModal";
@@ -173,9 +175,28 @@ export function HodAssetsClientPage({ initialAssets, isStockView = false, onAsse
   const [allocateAssetId, setAllocateAssetId] = useState<string | null>(null);
   const [shiftAssetId, setShiftAssetId] = useState<string | null>(null);
   const [updateStatusAssetId, setUpdateStatusAssetId] = useState<string | null>(null);
+  const [printBarcodeAsset, setPrintBarcodeAsset] = useState<any>(null);
+  const [unassignAssetId, setUnassignAssetId] = useState<string | null>(null);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {unassignAssetId && (
+        <UnassignAssetModal
+          assetId={unassignAssetId}
+          assetName={filteredItems.find(i => (i as any).rawId === unassignAssetId)?.name || ""}
+          isOpen={!!unassignAssetId}
+          setIsOpen={(open) => !open && setUnassignAssetId(null)}
+        />
+      )}
+      <BarcodePrintModal 
+        isOpen={!!printBarcodeAsset} 
+        onClose={() => setPrintBarcodeAsset(null)} 
+        asset={printBarcodeAsset ? {
+          id: printBarcodeAsset.id,
+          name: printBarcodeAsset.name,
+          serialNumber: printBarcodeAsset.serialNumber
+        } : null} 
+      />
       {allocateAssetId && (
         <AllocateToDeptModal
           assetId={allocateAssetId}
@@ -366,10 +387,18 @@ export function HodAssetsClientPage({ initialAssets, isStockView = false, onAsse
                                 </Button>
                               )}
                               {(item.status === "Available" || item.status === "Repair") && item.canAction !== false && (
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-primary" onClick={() => setUpdateStatusAssetId(item.rawId)}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-primary" onClick={() => setUpdateStatusAssetId(item.rawId)} title="Update Status">
                                   <Wrench className="h-4 w-4" />
                                 </Button>
                               )}
+                              {item.status === "Assigned" && item.canAction !== false && (
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-warning" onClick={() => setUnassignAssetId(item.rawId)} title="Unassign & Return">
+                                  <RotateCcw className="h-4 w-4" />
+                                </Button>
+                              )}
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-primary" onClick={() => setPrintBarcodeAsset(item)} title="Print Barcode">
+                                <Printer className="h-4 w-4" />
+                              </Button>
                             </div>
                           </td>
                         </tr>

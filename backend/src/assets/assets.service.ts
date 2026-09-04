@@ -12,10 +12,10 @@ export class AssetsService {
     if (role === 'SUB_ADMIN') {
       const dbUser = await this.prisma.user.findUnique({
         where: { id: userId },
-        select: { accessibleDepartments: true }
+        include: { employee: { include: { department: true } } }
       });
-      if (dbUser?.accessibleDepartments) {
-        accessibleDepartments = dbUser.accessibleDepartments;
+      if (dbUser?.employee?.department) {
+        accessibleDepartments = [dbUser.employee.department.name];
       }
     }
 
@@ -45,7 +45,8 @@ export class AssetsService {
             warrantyExpiryDate: true,
             status: true,
             notes: true,
-            seatNumber: true,
+            location: { select: { name: true } },
+            
             assignments: {
               take: 10,
               orderBy: { assignedAt: 'desc' },
@@ -80,7 +81,7 @@ export class AssetsService {
             purchaseDate: asset.purchaseDate.toISOString().split('T')[0],
             warrantyExpiry: asset.warrantyExpiryDate ? asset.warrantyExpiryDate.toISOString().split('T')[0] : null,
             status: asset.status === 'AVAILABLE' ? 'Available' : asset.status === 'ASSIGNED' ? 'Assigned' : asset.status === 'IN_MAINTENANCE' ? 'Repair' : 'Dump',
-            assignedTo: activeAssign ? (activeAssign.employee ? `${activeAssign.employee.firstName} ${activeAssign.employee.lastName}` : (asset.seatNumber ? `Seat: ${asset.seatNumber}` : 'Seat')) : null,
+            assignedTo: activeAssign ? (activeAssign.employee ? `${activeAssign.employee.firstName} ${activeAssign.employee.lastName}` : (asset.location?.name ? `Seat: ${asset.location?.name}` : 'Seat')) : null,
             assignedOn: activeAssign ? activeAssign.assignedAt.toISOString().split('T')[0] : null,
             dumpedOn: null,
             repairedOn: null,
@@ -102,7 +103,7 @@ export class AssetsService {
               }
               events.push({
                 action: 'Assigned',
-                person: a.employee ? `To Employee: ${a.employee.firstName} ${a.employee.lastName}` : (a.conditionOnAssign?.includes('Seat:') ? `To ${a.conditionOnAssign}` : (asset.seatNumber ? `To Seat: ${asset.seatNumber}` : 'Assigned')),
+                person: a.employee ? `To Employee: ${a.employee.firstName} ${a.employee.lastName}` : (a.conditionOnAssign?.includes('Seat:') ? `To ${a.conditionOnAssign}` : (asset.location?.name ? `To Seat: ${asset.location?.name}` : 'Assigned')),
                 date: a.assignedAt.toISOString().split('T')[0],
                 note: a.conditionOnAssign || 'No notes provided'
               });
@@ -132,8 +133,8 @@ export class AssetsService {
 
   
   async createCategory(organizationId: string, userId: string, dto: CreateAssetCategoryDto) {
-    const dbUser = await this.prisma.user.findUnique({ where: { id: userId }, select: { departmentName: true } });
-    if (dbUser?.departmentName?.toLowerCase() !== 'store') {
+    const dbUser = await this.prisma.user.findUnique({ where: { id: userId }, include: { employee: { include: { department: true } } } });
+    if (dbUser?.employee?.department?.name?.toLowerCase() !== 'store') {
       throw new ForbiddenException('Only Store HOD can add asset categories.');
     }
 
@@ -157,16 +158,21 @@ export class AssetsService {
 
   async getDepartmentAssets(organizationId: string, userId: string, viewMode?: string) {
     const user = await this.prisma.user.findUnique({
-      where: { id: userId }
+      where: { id: userId },
+      include: {
+        employee: {
+          include: { department: true }
+        }
+      }
     });
 
-    if (!user || !user.departmentName) {
+    if (!user || !(user as any).employee?.department?.name) {
       throw new BadRequestException("No department associated with this user.");
     }
 
     // ── Business rule: Store/Inventory HOD can see all org assets ──────────────
-    const isStoreHOD = user.departmentName.toLowerCase().includes('store') || 
-                       user.departmentName.toLowerCase().includes('inventory');
+    const isStoreHOD = (user as any).employee?.department?.name.toLowerCase().includes('store') || 
+                       (user as any).employee?.department?.name.toLowerCase().includes('inventory');
     let seatDeptMap = new Map<string, string>();
     let assignedByMap = new Map<string, {name: string, email: string}>();
 
@@ -184,7 +190,7 @@ export class AssetsService {
                 asset.status === 'RETIRED' ? 'Dump' : 'Available',
         assignee: asset.currentAssignee 
           ? (asset.currentAssignee.user?.fullName || `${asset.currentAssignee.firstName} ${asset.currentAssignee.lastName}`.trim()) 
-          : (asset.seatNumber ? `Seat: ${asset.seatNumber}` : null),
+          : (asset.location?.name ? `Seat: ${asset.location?.name}` : null),
         assigneeDetails: asset.currentAssignee ? {
           name: asset.currentAssignee.user?.fullName || `${asset.currentAssignee.firstName} ${asset.currentAssignee.lastName}`.trim(),
           employeeCode: asset.currentAssignee.employeeCode,
@@ -192,10 +198,10 @@ export class AssetsService {
           designation: asset.currentAssignee.designation,
           department: asset.ownerDepartment?.name || null,
         } : null,
-        seatDetails: asset.seatNumber ? {
-          seatNumber: asset.seatNumber,
-          floor: asset.floor,
-          department: seatDeptMap.get(asset.seatNumber.toLowerCase()) || asset.ownerDepartment?.name || deptName || null,
+        seatDetails: asset.location?.name ? {
+          seatNumber: asset.location?.name,
+          floor: asset.location?.parentId,
+          department: seatDeptMap.get(asset.location?.name.toLowerCase()) || asset.ownerDepartment?.name || deptName || null,
           assignedBy: actionUser?.name || 'Unknown',
           assignedByEmail: actionUser?.email || '',
           assignedAt: activeAssign?.assignedAt?.toISOString() || null,
@@ -223,7 +229,7 @@ export class AssetsService {
           }
           events.push({
             action: 'Assigned',
-            person: a.employee ? `To Employee: ${a.employee.firstName} ${a.employee.lastName}` : (a.conditionOnAssign?.includes('Seat:') ? `To ${a.conditionOnAssign}` : (asset.seatNumber ? `To Seat: ${asset.seatNumber}` : 'Assigned')),
+            person: a.employee ? `To Employee: ${a.employee.firstName} ${a.employee.lastName}` : (a.conditionOnAssign?.includes('Seat:') ? `To ${a.conditionOnAssign}` : (asset.location?.name ? `To Seat: ${asset.location?.name}` : 'Assigned')),
             date: a.assignedAt.toISOString().split('T')[0],
             note: a.conditionOnAssign || 'No notes provided'
           });
@@ -235,7 +241,7 @@ export class AssetsService {
     // ── Store HOD: return all OR own based on viewMode ──────────────────────────
     if (isStoreHOD) {
       const ownDept = await this.prisma.department.findFirst({
-        where: { organizationId, name: { equals: user.departmentName, mode: 'insensitive' } }
+        where: { organizationId, name: { equals: (user as any).employee?.department?.name, mode: 'insensitive' } }
       });
 
       const whereClause = (viewMode === 'stock')
@@ -247,36 +253,25 @@ export class AssetsService {
         include: {
           category: true,
           ownerDepartment: true,
-          currentAssignee: { include: { user: true } },
           assignments: { include: { employee: true }, orderBy: { assignedAt: 'desc' } }
         },
         orderBy: { createdAt: 'desc' },
       });
 
-      const seatNumbers = assets.map((a: any) => a.seatNumber).filter(Boolean);
-      if (seatNumbers.length > 0) {
-        const invs = await this.prisma.inventory.findMany({
-          where: { seatNumber: { in: seatNumbers, mode: 'insensitive' } },
-          select: { seatNumber: true, department: true }
-        });
-        invs.forEach(inv => {
-          if (inv.seatNumber && inv.department) seatDeptMap.set(inv.seatNumber.toLowerCase(), inv.department);
-        });
-      }
       const activeAssignIds = assets.map((a: any) => a.assignments?.find((asg: any) => asg.status === 'ACTIVE')?.assignedById).filter(Boolean);
       if (activeAssignIds.length > 0) {
         const users = await this.prisma.user.findMany({
           where: { id: { in: activeAssignIds } },
-          select: { id: true, fullName: true, email: true }
+          include: { employee: true }
         });
-        users.forEach(u => assignedByMap.set(u.id, { name: u.fullName || 'Unknown', email: u.email }));
+        users.forEach(u => assignedByMap.set(u.id, { name: (u.employee ? `${u.employee.firstName} ${u.employee.lastName}` : "") || 'Unknown', email: u.email }));
       }
       return assets.map(a => mapAsset(a));
     }
 
     // ── Normal HOD: return only their department's assets ───────────────────────
     const department = await this.prisma.department.findFirst({
-      where: { organizationId, name: { equals: user.departmentName, mode: 'insensitive' } }
+      where: { organizationId, name: { equals: (user as any).employee?.department?.name, mode: 'insensitive' } }
     });
 
     if (!department) {
@@ -288,29 +283,18 @@ export class AssetsService {
       include: {
         category: true,
         ownerDepartment: true,
-        currentAssignee: { include: { user: true } },
         assignments: { include: { employee: true }, orderBy: { assignedAt: 'desc' } }
       },
       orderBy: { createdAt: 'desc' },
     });
 
-    const seatNumbers = assets.map((a: any) => a.seatNumber).filter(Boolean);
-    if (seatNumbers.length > 0) {
-      const invs = await this.prisma.inventory.findMany({
-        where: { seatNumber: { in: seatNumbers, mode: 'insensitive' } },
-        select: { seatNumber: true, department: true }
-      });
-      invs.forEach(inv => {
-        if (inv.seatNumber && inv.department) seatDeptMap.set(inv.seatNumber.toLowerCase(), inv.department);
-      });
-    }
-    const activeAssignIds = assets.map((a: any) => a.assignments?.find((asg: any) => asg.status === 'ACTIVE')?.assignedById).filter(Boolean);
+      const activeAssignIds = assets.map((a: any) => a.assignments?.find((asg: any) => asg.status === 'ACTIVE')?.assignedById).filter(Boolean);
     if (activeAssignIds.length > 0) {
       const users = await this.prisma.user.findMany({
         where: { id: { in: activeAssignIds } },
-        select: { id: true, fullName: true, email: true }
+        include: { employee: true }
       });
-      users.forEach(u => assignedByMap.set(u.id, { name: u.fullName || 'Unknown', email: u.email }));
+      users.forEach(u => assignedByMap.set(u.id, { name: (u.employee ? `${u.employee.firstName} ${u.employee.lastName}` : "") || 'Unknown', email: u.email }));
     }
     return assets.map(a => mapAsset(a, department.name));
   }
@@ -322,8 +306,8 @@ export class AssetsService {
       }
     }
 
-    const dbUser = await this.prisma.user.findUnique({ where: { id: userId }, select: { departmentName: true } });
-    if (dbUser?.departmentName?.toLowerCase() !== 'store') {
+    const dbUser = await this.prisma.user.findUnique({ where: { id: userId }, include: { employee: { include: { department: true } } } });
+    if (dbUser?.employee?.department?.name?.toLowerCase() !== 'store') {
       throw new ForbiddenException('Only Store HOD can add assets.');
     }
 
@@ -371,6 +355,66 @@ export class AssetsService {
     });
 
     return asset;
+  }
+
+  async unassignAsset(organizationId: string, assetId: string, userId: string, notes?: string, returnedTo?: string) {
+    const asset = await this.prisma.asset.findFirst({
+      where: { id: assetId, organizationId },
+      include: { location: true }
+    });
+
+    if (!asset) throw new BadRequestException("Asset not found");
+    if (asset.status !== 'ASSIGNED') throw new BadRequestException("Asset is not assigned");
+
+    const activeAssignment = await this.prisma.assetAssignment.findFirst({
+      where: { assetId, status: 'ACTIVE' }
+    });
+
+    // Fetch the user to get their name
+    const user = await this.prisma.user.findUnique({ 
+      where: { id: userId }, 
+      include: { employee: true } 
+    });
+    const unassignedBy = user?.employee ? `${user.employee.firstName} ${user.employee.lastName}` : 'Unknown IT Person';
+    
+    const oldLocation = asset.location?.name || 'Unknown Seat';
+    const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
+    
+    const placement = returnedTo || 'IT Room';
+    const detailedNote = `[Unassigned on ${timestamp} by ${unassignedBy}]\n- Removed from: ${oldLocation}\n- Placed in: ${placement}\n- Notes: ${notes || 'None'}`;
+
+    const updates: any[] = [];
+    
+    if (activeAssignment) {
+      updates.push(
+        this.prisma.assetAssignment.update({
+          where: { id: activeAssignment.id },
+          data: {
+            status: 'RETURNED',
+            returnedAt: new Date(),
+            returnedById: userId,
+            conditionOnReturn: detailedNote,
+          }
+        })
+      );
+    }
+
+    updates.push(
+      this.prisma.asset.update({
+        where: { id: asset.id },
+        data: {
+          status: placement === 'Store' ? 'IN_MAINTENANCE' : 'AVAILABLE',
+          locationId: null, // Remove from seat
+          ipAddress: null,
+          hostname: null,
+          macAddress: null,
+          notes: asset.notes ? asset.notes + '\n\n' + detailedNote : detailedNote
+        }
+      })
+    );
+
+    await this.prisma.$transaction(updates);
+    return { message: "Asset returned successfully" };
   }
 
   async shiftAsset(organizationId: string, assetId: string, userId: string, dto: any) {
@@ -432,19 +476,21 @@ export class AssetsService {
                        : swapAction === 'STORE_DAMAGED' ? '[Swap]: Returned to Store (Damaged - For Repair/Dump)'
                        : '[Swap]: Returned to Store (Available)';
         
-        const actionUser = await this.prisma.user.findUnique({ where: { id: assignedBy } });
-        const actionUserName = actionUser?.fullName || 'HOD';
+        const actionUser = await this.prisma.user.findUnique({ 
+          where: { id: assignedBy },
+          include: { employee: true }
+        });
+        const actionUserName = actionUser?.employee ? `${actionUser.employee.firstName} ${actionUser.employee.lastName}` : 'HOD';
 
         await this.prisma.asset.update({
           where: { id: oldAsset.id },
           data: {
             status: swapStatus,
-            currentAssigneeId: null,
+            
             ipAddress: null,
             hostname: null,
             macAddress: null,
-            seatNumber: null,
-            floor: null,
+            
             // STORE (device OK) → company pool (null) → IT ka count kam, store stock mein aaye
             // STORE_DAMAGED → ownerDept IT ka hi rahe → IT ka total count same rahe, Returned mein dikh
             // IT_ROOM → ownerDept IT ka hi rahe
@@ -457,12 +503,23 @@ export class AssetsService {
           data: {
             status: 'RETURNED',
             returnedAt: new Date(),
-            conditionOnReturn: oldAsset.seatNumber ? `Swapped out from Seat: ${oldAsset.seatNumber} (by ${actionUserName})` : `Swapped out (by ${actionUserName})`,
+            conditionOnReturn: `Swapped out (by ${actionUserName})`,
             returnedById: assignedBy,
           }
         });
       }
     }
+
+    // Get assigner's name
+    const assigner = await this.prisma.user.findUnique({
+      where: { id: assignedBy },
+      include: { employee: true }
+    });
+    const assignerName = assigner?.employee ? `${assigner.employee.firstName} ${assigner.employee.lastName}` : 'IT';
+    const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
+
+    let seatMsg = dto.seatNumber ? `Seat: ${dto.seatNumber}` : (employee ? `User: ${employee.firstName} ${employee.lastName}` : 'Unknown location');
+    const detailedAssignNote = `[Assigned on ${timestamp} by ${assignerName}]\n- Assigned to: ${seatMsg}\n- Notes: ${dto.condition || 'None'}`;
 
     const [assignment, updatedAsset] = await this.prisma.$transaction([
       this.prisma.assetAssignment.create({
@@ -471,7 +528,7 @@ export class AssetsService {
           assetId: asset.id,
           employeeId: employee?.id || null,
           assignedById: assignedBy,
-          conditionOnAssign: dto.condition,
+          conditionOnAssign: detailedAssignNote,
           status: 'ACTIVE'
         }
       }),
@@ -479,41 +536,25 @@ export class AssetsService {
         where: { id: asset.id },
         data: { 
           status: 'ASSIGNED', 
-          currentAssigneeId: employee?.id || null,
           ipAddress: dto.ipAddress || null,
           hostname: dto.hostname || null,
           macAddress: dto.macAddress || null,
-          seatNumber: dto.seatNumber || null,
-          floor: dto.floor || null
+          notes: asset.notes ? asset.notes + '\n\n' + detailedAssignNote : detailedAssignNote
         }
       })
     ]);
 
-    const category = await this.prisma.assetCategory.findUnique({ where: { id: asset.categoryId } });
-    const catName = category?.name?.toLowerCase() || 'cpu';
-    let existingInv = await this.prisma.inventory.findFirst({
-      where: { seatNumber: { equals: dto.seatNumber || "UNKNOWN_SEAT", mode: "insensitive" } }
-    });
-    
-    if (existingInv) {
-      const updateData: any = {};
-      if (catName === 'cpu') {
-         updateData.serialNumber = updatedAsset.serialNumber;
-         if (dto.ipAddress) updateData.ipAddress = dto.ipAddress;
-         if (dto.macAddress) updateData.macAddress = dto.macAddress;
-         if (dto.hostname) updateData.hostname = dto.hostname;
-      } else if (catName === 'keyboard') {
-         updateData.keyboard = updatedAsset.serialNumber;
-      } else if (catName === 'mouse') {
-         updateData.mouse = updatedAsset.serialNumber;
-      } else if (catName === 'monitor') {
-         updateData.monitor = updatedAsset.serialNumber;
-      } else if (catName === 'headset') {
-         updateData.headset = updatedAsset.serialNumber;
-      } else {
-         updateData.cables = updatedAsset.serialNumber;
+    // Link asset to seat location so inventory page can find it by desk
+    if (dto.seatNumber) {
+      const seatLoc = await this.prisma.location.findFirst({
+        where: { name: { equals: dto.seatNumber, mode: 'insensitive' }, type: 'DESK', organizationId }
+      });
+      if (seatLoc) {
+        await this.prisma.asset.update({
+          where: { id: asset.id },
+          data: { locationId: seatLoc.id }
+        });
       }
-      await this.prisma.inventory.update({ where: { id: existingInv.id }, data: updateData });
     }
 
     return { message: "Asset assigned successfully", assignment, asset: updatedAsset };
@@ -521,7 +562,7 @@ export class AssetsService {
 
   // Get assets assigned to the logged-in employee
   async getAssignedToMeAssets(userId: string, organizationId: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { employee: { include: { department: true } } } });
     if (!user || !user.email) return [];
 
     const employee = await this.prisma.employee.findFirst({
@@ -532,7 +573,7 @@ export class AssetsService {
 
     return this.prisma.asset.findMany({
       where: { 
-        currentAssigneeId: employee.id,
+        assignments: { some: { employeeId: employee.id, status: "ACTIVE" } },
         organizationId,
         deletedAt: null
       },

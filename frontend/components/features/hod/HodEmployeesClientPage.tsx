@@ -9,6 +9,7 @@ import { ErrorAlert } from "@/components/ui/alert-box";
 import { StatusBadge } from "@/components/ui/status-badge";
 import RegisterEmployeeModal from "./RegisterEmployeeModal";
 import { TableSkeleton } from "@/components/ui/skeletons";
+import { ImageZoom } from "@/components/ui/image-zoom";
 
 
 
@@ -122,7 +123,7 @@ export default function HodEmployeesClientPage() {
                   <td className="px-6 py-4">
                     <div className="h-10 w-10 rounded-full bg-muted border overflow-hidden flex items-center justify-center">
                       {(emp as any).profileImage ? (
-                        <img src={(emp as any).profileImage} alt="Profile" className="h-full w-full object-cover" />
+                        <ImageZoom isCircle={true} src={(emp as any).profileImage} alt="Profile" className="h-full w-full object-cover" />
                       ) : (
                         <span className="text-muted-foreground font-semibold text-xs uppercase">
                           {emp.name ? emp.name.substring(0, 2) : "U"}

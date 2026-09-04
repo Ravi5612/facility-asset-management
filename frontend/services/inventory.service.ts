@@ -12,7 +12,10 @@ export const inventoryService = {
     if (floor) url.searchParams.append("floor", floor);
     
     const res = await fetch(url.toString());
-    if (!res.ok) throw new Error("Failed to fetch seat details");
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.message || "not found");
+    }
     return res.json();
   }
 };

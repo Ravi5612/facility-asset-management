@@ -121,9 +121,14 @@ export class DashboardService {
 
     // Optional Check: verify permission
     if (user.role !== 'SUPER_ADMIN') {
+      const employee = await this.prisma.employee.findFirst({
+        where: { user: { id: user.userId } },
+        include: { department: true }
+      });
+      const userDeptName = employee?.department?.name || "";
       const allowedDepts = user.accessibleDepartments || [];
       const deptMatch = allowedDepts.some(d => d.toLowerCase() === deptName.toLowerCase()) || 
-                        (user.departmentName && user.departmentName.toLowerCase() === deptName.toLowerCase());
+                        (userDeptName.toLowerCase() === deptName.toLowerCase());
       
       if (!deptMatch) {
         console.log('FORBIDDEN:', { user, deptName, allowedDepts, deptMatch });
@@ -213,7 +218,6 @@ export class DashboardService {
       },
       recentTickets
     };
-    console.log('getHodDashboardData returning:', JSON.stringify(result, null, 2));
     return result;
   }
 }

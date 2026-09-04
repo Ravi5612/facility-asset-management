@@ -366,29 +366,101 @@ export default function InventoryClientPage() {
                       {isExpanded && (
                         <tr>
                           <td colSpan={9} className="px-4 py-4 bg-slate-50 dark:bg-slate-900 border-b border-slate-200">
-                            <pre className="text-xs text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 p-4 rounded-md border border-slate-200 shadow-sm overflow-x-auto whitespace-pre-wrap">
-{JSON.stringify({
-  System: {
-    Hostname: item.hostname || "N/A",
-    IP_Address: item.ipAddress || "N/A",
-    MAC_Address: item.macAddress || "N/A",
-    OS: item.os || "N/A"
-  },
-  CPU: {
-    Processor: item.processor || "N/A",
-    RAM: item.ramGB ? `${item.ramGB}GB ${item.ramType||''}` : "N/A",
-    Storage: item.driveConfig || "N/A",
-    Make: item.make || "N/A",
-    SerialNumber: item.serialNumber || "N/A",
-    ...(item.cpuDetails ? { Details: item.cpuDetails } : {})
-  },
-  ...(item.monitorDetails ? { Monitor: item.monitorDetails } : {}),
-  ...(item.keyboardDetails ? { Keyboard: item.keyboardDetails } : {}),
-  ...(item.mouseDetails ? { Mouse: item.mouseDetails } : {}),
-  ...(item.headsetDetails ? { Headset: item.headsetDetails } : {}),
-  ...(item.cablesDetails ? { Cables: item.cablesDetails } : {})
-}, null, 2)}
-                            </pre>
+                              <div className="bg-white dark:bg-slate-950 rounded-md border border-slate-200 shadow-sm overflow-hidden">
+                                <table className="w-full text-xs text-left">
+                                  <thead className="bg-slate-100 dark:bg-slate-800 text-slate-500 border-b border-slate-200">
+                                    <tr>
+                                      <th className="px-4 py-2 font-semibold">Component</th>
+                                      <th className="px-4 py-2 font-semibold">Details / Name</th>
+                                      <th className="px-4 py-2 font-semibold">Code / Model</th>
+                                      <th className="px-4 py-2 font-semibold">Serial / Specs</th>
+                                      <th className="px-4 py-2 font-semibold">Purchase & Warranty</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                                    {/* System & CPU */}
+                                    <tr className="hover:bg-slate-50/50">
+                                      <td className="px-4 py-2 font-medium text-slate-700">🖥️ System & CPU</td>
+                                      <td className="px-4 py-2 text-slate-600">
+                                        <div><span className="text-slate-400">Host:</span> {item.hostname || 'N/A'}</div>
+                                        <div><span className="text-slate-400">IP:</span> {item.ipAddress || 'N/A'}</div>
+                                        <div><span className="text-slate-400">MAC:</span> {item.macAddress || 'N/A'}</div>
+                                      </td>
+                                      <td className="px-4 py-2 text-slate-600">
+                                        <div><span className="text-slate-400">Code:</span> {item.assetCode || 'N/A'}</div>
+                                        <div><span className="text-slate-400">Make:</span> {item.make || 'N/A'}</div>
+                                        <div><span className="text-slate-400">Model:</span> {item.model || 'N/A'}</div>
+                                        <div><span className="text-slate-400">Processor:</span> {item.processor || 'N/A'}</div>
+                                      </td>
+                                      <td className="px-4 py-2 text-slate-600">
+                                        <div><span className="text-slate-400">S/N:</span> {item.serialNumber || 'N/A'}</div>
+                                        <div><span className="text-slate-400">RAM:</span> {item.ram ? `${item.ram}GB` : 'N/A'}</div>
+                                        <div><span className="text-slate-400">Storage:</span> {item.hdd || 'N/A'}</div>
+                                      </td>
+                                      <td className="px-4 py-2 text-slate-600">
+                                        <div><span className="text-slate-400">Purchased:</span> {item.purchaseDate || 'N/A'}</div>
+                                        <div><span className="text-slate-400">Warranty Exp:</span> {item.warrantyExpiryDate || 'N/A'}</div>
+                                      </td>
+                                    </tr>
+                                    {/* Security & Env */}
+                                    <tr className="hover:bg-slate-50/50">
+                                      <td className="px-4 py-2 font-medium text-slate-700">🔒 Security & Env</td>
+                                      <td className="px-4 py-2 text-slate-600">
+                                        <div><span className="text-slate-400">BitLocker:</span> {item.bitlocker || 'N/A'}</div>
+                                        <div><span className="text-slate-400">Symantec:</span> {item.symantec || 'N/A'}</div>
+                                      </td>
+                                      <td className="px-4 py-2 text-slate-600">
+                                        <div><span className="text-slate-400">Department:</span> {item.department || 'N/A'}</div>
+                                      </td>
+                                      <td className="px-4 py-2 text-slate-600">
+                                        <div><span className="text-slate-400">Floor:</span> {item.floor || 'N/A'}</div>
+                                      </td>
+                                      <td className="px-4 py-2 text-slate-600">-</td>
+                                    </tr>
+                                    {/* Peripherals */}
+                                    {item.monitorDetails && <tr className="hover:bg-slate-50/50">
+                                      <td className="px-4 py-2 font-medium text-slate-700">🖵 Monitor</td>
+                                      <td className="px-4 py-2 text-slate-600">{item.monitorDetails.name}</td>
+                                      <td className="px-4 py-2 text-slate-600">{item.monitorDetails.code}</td>
+                                      <td className="px-4 py-2 text-slate-600">{item.monitorDetails.serial}</td>
+                                      <td className="px-4 py-2 text-slate-600">
+                                        <div><span className="text-slate-400">Purchased:</span> {item.monitorDetails.purchaseDate || 'N/A'}</div>
+                                        <div><span className="text-slate-400">Warranty:</span> {item.monitorDetails.warrantyExpiryDate || 'N/A'}</div>
+                                      </td>
+                                    </tr>}
+                                    {item.keyboardDetails && <tr className="hover:bg-slate-50/50">
+                                      <td className="px-4 py-2 font-medium text-slate-700">⌨️ Keyboard</td>
+                                      <td className="px-4 py-2 text-slate-600">{item.keyboardDetails.name}</td>
+                                      <td className="px-4 py-2 text-slate-600">{item.keyboardDetails.code}</td>
+                                      <td className="px-4 py-2 text-slate-600">{item.keyboardDetails.serial}</td>
+                                      <td className="px-4 py-2 text-slate-600">
+                                        <div><span className="text-slate-400">Purchased:</span> {item.keyboardDetails.purchaseDate || 'N/A'}</div>
+                                        <div><span className="text-slate-400">Warranty:</span> {item.keyboardDetails.warrantyExpiryDate || 'N/A'}</div>
+                                      </td>
+                                    </tr>}
+                                    {item.mouseDetails && <tr className="hover:bg-slate-50/50">
+                                      <td className="px-4 py-2 font-medium text-slate-700">🖱️ Mouse</td>
+                                      <td className="px-4 py-2 text-slate-600">{item.mouseDetails.name}</td>
+                                      <td className="px-4 py-2 text-slate-600">{item.mouseDetails.code}</td>
+                                      <td className="px-4 py-2 text-slate-600">{item.mouseDetails.serial}</td>
+                                      <td className="px-4 py-2 text-slate-600">
+                                        <div><span className="text-slate-400">Purchased:</span> {item.mouseDetails.purchaseDate || 'N/A'}</div>
+                                        <div><span className="text-slate-400">Warranty:</span> {item.mouseDetails.warrantyExpiryDate || 'N/A'}</div>
+                                      </td>
+                                    </tr>}
+                                    {item.headsetDetails && <tr className="hover:bg-slate-50/50">
+                                      <td className="px-4 py-2 font-medium text-slate-700">🎧 Headset</td>
+                                      <td className="px-4 py-2 text-slate-600">{item.headsetDetails.name}</td>
+                                      <td className="px-4 py-2 text-slate-600">{item.headsetDetails.code}</td>
+                                      <td className="px-4 py-2 text-slate-600">{item.headsetDetails.serial}</td>
+                                      <td className="px-4 py-2 text-slate-600">
+                                        <div><span className="text-slate-400">Purchased:</span> {item.headsetDetails.purchaseDate || 'N/A'}</div>
+                                        <div><span className="text-slate-400">Warranty:</span> {item.headsetDetails.warrantyExpiryDate || 'N/A'}</div>
+                                      </td>
+                                    </tr>}
+                                  </tbody>
+                                </table>
+                              </div>
                             
                             {/* NEW SEAT HISTORY VIEW */}
                             <div className="mt-4 bg-white dark:bg-slate-950 p-4 rounded-md border border-slate-200 shadow-sm">

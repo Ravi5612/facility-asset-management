@@ -83,11 +83,15 @@ export class AuthController {
       select: {
         id: true,
         email: true,
-        fullName: true,
-        employeeCode: true,
-        departmentName: true,
-          profileImage: true,
-        accessibleDepartments: true,
+        employee: {
+          select: {
+            employeeCode: true,
+            profilePhoto: true,
+            firstName: true,
+            lastName: true,
+            department: { select: { name: true } }
+          }
+        },
         organizationId: true,
         status: true,
         organization: { select: { themeColor: true } },
@@ -109,6 +113,7 @@ export class AuthController {
         profilePhoto: true,
         departmentId: true,
         status: true,
+        department: { select: { name: true } }
       }
     }) : null;
 

@@ -50,7 +50,7 @@ export default function HodDashboardClientPage() {
     return () => clearInterval(timer);
   }, []);
 
-  const deptName = user?.departmentName || "";
+  const deptName = user?.employee?.department?.name || user?.departmentName || "";
   const today = format(new Date(), "yyyy-MM-dd");
 
   const { data: dashboardInfo, isLoading: loadingDash } = useQuery({
@@ -112,12 +112,14 @@ export default function HodDashboardClientPage() {
   const employeeDesigData = data.chartData?.employeeDesigData || [];
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#ffc658', '#ef4444'];
 
+  const firstName = user?.employee?.firstName || user?.fullName?.split(" ")[0] || "HOD";
+
   return (
     <div className="space-y-8 pb-10">
       <div className="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-sidebar)] rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-bold mb-2">{greeting}, {user?.fullName?.split(" ")[0] || "HOD"}! 👋</h1>
+            <h1 className="text-3xl font-bold mb-2">{greeting}, {firstName}! 👋</h1>
             <p className="text-white/80 text-lg">Here is what is happening in the {deptName} department today.</p>
           </div>
           

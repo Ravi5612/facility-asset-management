@@ -130,10 +130,7 @@ export function AssetDetailModal({ selectedItem, setSelectedItem }: AssetDetailM
                         <span className="text-xs font-bold">{h.action}</span>
                         <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" />{h.date}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <User className="h-3 w-3" />{h.person}
-                        {h.note && <span className="ml-2">— {h.note}</span>}
-                      </div>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground"><User className="h-3 w-3" />{h.person}</div>{h.note && (<div className="mt-2 pt-2 border-t text-xs text-slate-600 dark:text-slate-400 whitespace-pre-wrap font-mono bg-background/50 p-2 rounded">{h.note}</div>)}
                     </div>
                   </div>
                 ))
@@ -147,3 +144,4 @@ export function AssetDetailModal({ selectedItem, setSelectedItem }: AssetDetailM
     </Dialog>
   );
 }
+

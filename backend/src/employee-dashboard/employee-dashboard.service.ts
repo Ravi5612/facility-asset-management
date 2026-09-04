@@ -16,9 +16,7 @@ export class EmployeeDashboardService {
       where: { id: user.id }, // We set Employee.id = User.id during creation
       include: {
         department: true,
-        assetsAssigned: {
-          include: { category: true }
-        },
+        assetAssignments: { include: { asset: { include: { category: true } } } },
         raisedTickets: true,
         salaryHistories: {
           orderBy: { createdAt: 'desc' },
@@ -51,7 +49,7 @@ export class EmployeeDashboardService {
         name: `${employee.firstName} ${employee.lastName}`,
         employeeCode: employee.employeeCode,
         designation: employee.designation,
-        department: employee.department.name,
+        department: employee.department ? employee.department.name : "",
         email: employee.email,
         phone: employee.phone,
         joiningDate: employee.joiningDate.toDateString(),
@@ -63,11 +61,11 @@ export class EmployeeDashboardService {
         leaves,
         totalWorkingDays: 22, // Static approx for now
       },
-      myAssets: employee.assetsAssigned.map(a => ({
+      myAssets: employee.assetAssignments.map(aa => aa.asset).map(a => ({
         id: a.assetCode,
         name: a.name,
-        type: a.category.name,
-        assignedOn: a.purchaseDate.toDateString(), // Mocking assignment date as purchase date
+        type: a.category?.name,
+        assignedOn: a.purchaseDate?.toDateString(),
         status: a.status
       })),
       myTickets: employee.raisedTickets.map(t => ({

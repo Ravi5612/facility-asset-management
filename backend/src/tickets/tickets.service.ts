@@ -18,7 +18,7 @@ export class TicketsService {
     // 1. Get the raiser's employee record
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      include: { userRoles: { include: { role: true } } }
+      include: { userRoles: { include: { role: true } }, employee: { include: { department: true } } }
     });
 
     if (!user) throw new NotFoundException('User not found');
@@ -41,9 +41,9 @@ export class TicketsService {
     let raisedByDeptId: string | null = null;
     
     // Find department by user's departmentName
-    if (user.departmentName) {
+    if (user.employee?.department?.name) {
       const dept = await this.prisma.department.findFirst({
-        where: { name: { equals: user.departmentName, mode: 'insensitive' }, organizationId }
+        where: { name: { equals: user.employee?.department?.name, mode: 'insensitive' }, organizationId }
       });
       if (dept) raisedByDeptId = dept.id;
     } else {
@@ -95,7 +95,7 @@ export class TicketsService {
   // Get tickets RAISED BY me (Outbound)
   async getMyTickets(userId: string, organizationId: string) {
     // First find the user to get their email
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { employee: { include: { department: true } } } });
     
     // Then find the employee record for this user
     let employee: any = null;
@@ -194,17 +194,17 @@ export class TicketsService {
     if (role === 'SUB_ADMIN') {
       const user = await this.prisma.user.findUnique({
         where: { id: userId },
-        select: { accessibleDepartments: true }
+        include: { employee: { include: { department: true } } }
       });
 
-      if (!user || !user.accessibleDepartments || user.accessibleDepartments.length === 0) {
+      if (!user || !user.employee?.department?.name) {
         return { data: [], total: 0, page, limit, totalPages: 0 };
       }
 
       const depts = await this.prisma.department.findMany({
         where: {
           organizationId,
-          name: { in: user.accessibleDepartments }
+          name: { in: (user.employee?.department?.name ? [user.employee.department.name] : []) }
         },
         select: { id: true }
       });
@@ -242,11 +242,11 @@ export class TicketsService {
 
   // Get tickets ASSIGNED TO my department (Inbound)
   async getDepartmentTickets(userId: string, organizationId: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user || !user.departmentName) return [];
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { employee: { include: { department: true } } } });
+    if (!user || !user.employee?.department?.name) return [];
 
     const dept = await this.prisma.department.findFirst({
-      where: { name: { equals: user.departmentName, mode: 'insensitive' }, organizationId }
+      where: { name: { equals: user.employee?.department?.name, mode: 'insensitive' }, organizationId }
     });
 
     if (!dept) return [];
@@ -265,7 +265,7 @@ export class TicketsService {
 
   // Get tickets ASSIGNED TO ME (for Employee Dashboard)
   async getAssignedToMeTickets(userId: string, organizationId: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { employee: { include: { department: true } } } });
     if (!user || !user.email) return [];
 
     const employee = await this.prisma.employee.findFirst({
@@ -299,7 +299,7 @@ export class TicketsService {
     });
     if (!ticket) throw new NotFoundException('Ticket not found');
 
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { employee: { include: { department: true } } } });
     let employee: any = null;
     if (user && user.email) {
       employee = await this.prisma.employee.findFirst({
@@ -355,11 +355,11 @@ export class TicketsService {
   // ─── TICKET SETTINGS ────────────────────────────────────────────────────────
 
   async getTicketSettings(userId: string, organizationId: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user || !user.departmentName) throw new NotFoundException('Department not found');
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { employee: { include: { department: true } } } });
+    if (!user || !user.employee?.department?.name) throw new NotFoundException('Department not found');
 
     const dept = await this.prisma.department.findFirst({
-      where: { name: { equals: user.departmentName, mode: 'insensitive' }, organizationId }
+      where: { name: { equals: user.employee?.department?.name, mode: 'insensitive' }, organizationId }
     });
     if (!dept) throw new NotFoundException('Department not found');
 
@@ -386,11 +386,11 @@ export class TicketsService {
   }
 
   async updateTicketSettings(userId: string, organizationId: string, dto: { autoAssignEnabled?: boolean; rotationStaffIds?: string[] }) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user || !user.departmentName) throw new NotFoundException('Department not found');
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { employee: { include: { department: true } } } });
+    if (!user || !user.employee?.department?.name) throw new NotFoundException('Department not found');
 
     const dept = await this.prisma.department.findFirst({
-      where: { name: { equals: user.departmentName, mode: 'insensitive' }, organizationId }
+      where: { name: { equals: user.employee?.department?.name, mode: 'insensitive' }, organizationId }
     });
     if (!dept) throw new NotFoundException('Department not found');
 
@@ -420,7 +420,7 @@ export class TicketsService {
     });
     if (!ticket) throw new NotFoundException('Ticket not found');
 
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { employee: { include: { department: true } } } });
     const employee = user ? await this.prisma.employee.findFirst({ where: { email: user.email, organizationId } }) : null;
 
     // Only the assigned employee can request HOD approval
@@ -455,7 +455,7 @@ export class TicketsService {
     
     // Allow if the ticket was raised by the user
     // Note: To be safe, we check if the user is the creator or the raiser
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { employee: { include: { department: true } } } });
     const employee = await this.prisma.employee.findFirst({ where: { email: user?.email, organizationId } });
     const isRaiser = ticket.createdById === userId || ticket.raisedByEmployeeId === employee?.id;
 

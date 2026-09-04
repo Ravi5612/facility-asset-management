@@ -18,12 +18,12 @@ export class UsersService {
   async getMyDepartments(userId: string, organizationId: string) {
     const user = await this.prisma.user.findFirst({
       where: { id: userId, organizationId },
-      select: { accessibleDepartments: true, fullName: true, email: true },
+      include: { employee: { include: { department: true } } },
     });
     if (!user) throw new NotFoundException('User not found');
     return {
-      departments: user.accessibleDepartments,
-      assignedTo: user.fullName || user.email,
+      departments: user.employee?.department ? [user.employee.department.name] : [],
+      assignedTo: user.employee ? `${user.employee.firstName} ${user.employee.lastName}` : user.email,
     };
   }
 
@@ -74,7 +74,7 @@ export class UsersService {
     while (!isUnique) {
       const randomNum = Math.floor(1000 + Math.random() * 9000); // 4 digit random number
       employeeCode = `EMP-${randomNum}`;
-      const codeExists = await this.prisma.user.findUnique({
+      const codeExists = await this.prisma.employee.findFirst({
         where: { employeeCode },
       });
       if (!codeExists) {
@@ -87,14 +87,27 @@ export class UsersService {
       data: {
         organizationId,
         email: dto.email,
-        fullName: dto.name,
-        employeeCode, // Save the generated code
-        accessibleDepartments: dto.departmentIds,
         passwordHash,
         status: 'ACTIVE',
         createdById,
-        profileImage: profileImageUrl,
       },
+    });
+
+    // Create Employee
+    const departmentId = dto.departmentIds?.[0]; // Approximate primary department
+    await this.prisma.employee.create({
+      data: {
+        id: user.id,
+        organizationId,
+        firstName: dto.name.split(' ')[0],
+        lastName: dto.name.split(' ').slice(1).join(' '),
+        email: dto.email,
+        employeeCode,
+        designation: 'Sub Admin',
+        departmentId: departmentId,
+        joiningDate: new Date(),
+        profilePhoto: profileImageUrl,
+      }
     });
 
     // Assign SUB_ADMIN role
@@ -109,13 +122,13 @@ export class UsersService {
     return {
       id: user.id,
       email: user.email,
-      name: user.fullName,
-      employeeCode: user.employeeCode,
+      name: dto.name,
+      employeeCode: employeeCode,
       role: 'SUB_ADMIN',
       status: 'ACTIVE',
-      departments: user.accessibleDepartments,
+      departments: dto.departmentIds,
       createdAt: user.createdAt,
-      profileImage: user.profileImage,
+      profileImage: profileImageUrl,
     };
   }
 
@@ -134,17 +147,12 @@ export class UsersService {
         user: { deletedAt: null }
       },
       include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            fullName: true,
-            employeeCode: true,
-            accessibleDepartments: true,
-            status: true,
-            createdAt: true,
-            profileImage: true,
-          },
+        user: { 
+          include: { 
+            employee: { 
+              include: { department: true } 
+            } 
+          } 
         },
       },
     });
@@ -152,13 +160,13 @@ export class UsersService {
     return userRoles.map((ur) => ({
       id: ur.user.id,
       email: ur.user.email,
-      name: ur.user.fullName,
-      employeeCode: ur.user.employeeCode,
-      departments: ur.user.accessibleDepartments,
+      name: ur.user.employee ? `${ur.user.employee.firstName} ${ur.user.employee.lastName}` : "",
+      employeeCode: ur.user.employee?.employeeCode,
+      departments: ur.user.employee?.department ? [ur.user.employee.department.id] : [],
       status: ur.user.status,
       role: 'SUB_ADMIN',
       createdAt: ur.user.createdAt,
-      profileImage: ur.user.profileImage,
+      profileImage: ur.user.employee?.profilePhoto,
     }));
   }
 
@@ -198,25 +206,36 @@ export class UsersService {
   async updateSubAdmin(userId: string, dto: import('./dto/update-sub-admin.dto').UpdateSubAdminDto, organizationId: string) {
     const user = await this.prisma.user.findFirst({
       where: { id: userId, organizationId, deletedAt: null },
+      include: { employee: true }
     });
     if (!user) throw new NotFoundException('Sub admin not found');
 
-    const updated = await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        ...(dto.name && { fullName: dto.name }),
-        ...(dto.email && { email: dto.email }),
-        ...(dto.departmentIds && { accessibleDepartments: dto.departmentIds }),
-      },
-    });
+    if (dto.email) {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { email: dto.email }
+      });
+    }
+
+    let updatedEmployee: any = user.employee;
+    if (user.employeeId) {
+      updatedEmployee = await this.prisma.employee.update({
+        where: { id: user.employeeId },
+        data: {
+          ...(dto.name && { firstName: dto.name.split(' ')[0], lastName: dto.name.split(' ').slice(1).join(' ') }),
+          ...(dto.email && { email: dto.email }),
+          ...(dto.departmentIds && { departmentId: dto.departmentIds[0] })
+        }
+      });
+    }
 
     return {
-      id: updated.id,
-      email: updated.email,
-      name: updated.fullName,
-      departments: updated.accessibleDepartments,
-      status: updated.status,
-      employeeCode: updated.employeeCode,
+      id: user.id,
+      email: dto.email || user.email,
+      name: updatedEmployee ? `${updatedEmployee.firstName} ${updatedEmployee.lastName}` : "",
+      departments: updatedEmployee ? [updatedEmployee.departmentId] : [], // Rough approximation
+      status: user.status,
+      employeeCode: updatedEmployee?.employeeCode,
     };
   }
 
@@ -224,11 +243,12 @@ export class UsersService {
   async createHod(dto: import('./dto/create-hod.dto').CreateHodDto, createdById: string, organizationId: string) {
     const creator = await this.prisma.user.findUnique({
       where: { id: createdById },
-      include: { userRoles: { include: { role: true } } }
+      include: { userRoles: { include: { role: true } }, employee: { include: { department: true } } }
     });
 
-    const allowedDepts = creator?.accessibleDepartments || [];
-    if (!allowedDepts.includes(dto.departmentName)) {
+    const allowedDepts = creator?.employee?.department ? [creator.employee.department.name] : [];
+    const isSuperAdmin = creator?.userRoles.some(ur => ur.role.name === 'SUPER_ADMIN');
+    if (!isSuperAdmin && !allowedDepts.includes(dto.departmentName)) {
       throw new ForbiddenException(`You do not have permission to create an HOD for the '${dto.departmentName}' department. Please ensure this department is assigned to you.`);
     }
 
@@ -245,13 +265,15 @@ export class UsersService {
     const randomNum = Math.floor(1000 + Math.random() * 9000);
     const employeeCode = `HOD-${randomNum}`;
 
+    const department = await this.prisma.department.findFirst({
+      where: { name: { equals: dto.departmentName, mode: 'insensitive' }, organizationId }
+    });
+    if (!department) throw new NotFoundException(`Department "${dto.departmentName}" not found. HOD not created.`);
+
     const user = await this.prisma.user.create({
       data: {
         organizationId,
         email: dto.email,
-        fullName: dto.name,
-        employeeCode,
-        departmentName: dto.departmentName,
         passwordHash,
         status: 'ACTIVE',
         createdById,
@@ -259,17 +281,6 @@ export class UsersService {
       },
     });
 
-    const department = await this.prisma.department.findFirst({
-      where: { name: { equals: dto.departmentName, mode: 'insensitive' }, organizationId }
-    });
-
-    if (!department) {
-      // Rollback: delete the user we just created
-      await this.prisma.user.delete({ where: { id: user.id } });
-      throw new NotFoundException(`Department "${dto.departmentName}" not found. HOD not created.`);
-    }
-
-    // Create the Employee record for the HOD so foreign keys work (needed for tickets etc.)
     await this.prisma.employee.create({
       data: {
         id: user.id,
@@ -284,13 +295,12 @@ export class UsersService {
       }
     });
 
-    // Set hodId in Department
     await this.prisma.department.update({
       where: { id: department.id },
       data: { hodId: user.id }
     });
 
-    return { id: user.id, email: user.email, name: user.fullName, departmentName: user.departmentName };
+    return { id: user.id, email: user.email, name: dto.name, departmentName: dto.departmentName };
   }
 
 
@@ -312,15 +322,12 @@ export class UsersService {
     const updated = await this.prisma.user.update({
       where: { id },
       data: {
-        ...(dto.name && { fullName: dto.name }),
         ...(dto.email && { email: dto.email }),
         ...(dto.status && { status: dto.status as any }),
-        ...(dto.profilePic !== undefined && { profileImage: dto.profilePic })
       }
     });
 
-    // Update the Employee record too if name/email changed
-    if (dto.name || dto.email) {
+    if (dto.name || dto.email || dto.profilePic !== undefined) {
       const emp = await this.prisma.employee.findFirst({ where: { id } });
       if (emp) {
         await this.prisma.employee.update({
@@ -330,7 +337,8 @@ export class UsersService {
               firstName: dto.name.split(' ')[0],
               lastName: dto.name.split(' ').slice(1).join(' ') || ''
             }),
-            ...(dto.email && { email: dto.email })
+            ...(dto.email && { email: dto.email }),
+            ...(dto.profilePic !== undefined && { profilePhoto: dto.profilePic })
           }
         });
       }
@@ -348,16 +356,22 @@ export class UsersService {
     const userRoles = await this.prisma.userRole.findMany({
       where: { roleId: hodRole.id, revokedAt: null, user: { deletedAt: null } },
       include: {
-        user: { select: { id: true, email: true, fullName: true, employeeCode: true, departmentName: true, status: true, createdAt: true, profileImage: true } },
+        user: {
+          include: {
+            employee: {
+              include: { department: true }
+            }
+          }
+        },
       },
     });
 
     return userRoles.map((ur) => ({
       id: ur.user.id,
       email: ur.user.email,
-      name: ur.user.fullName,
-      employeeCode: ur.user.employeeCode,
-      departmentName: ur.user.departmentName,
+      name: ur.user.employee ? `${ur.user.employee.firstName} ${ur.user.employee.lastName}` : "",
+      employeeCode: ur.user.employee?.employeeCode,
+      departmentName: ur.user.employee?.department?.name,
       status: ur.user.status,
       role: 'HOD',
       createdAt: ur.user.createdAt,
@@ -376,8 +390,11 @@ export class UsersService {
       salaryProofPhoto?: Express.Multer.File[],
     }
   ) {
-    const hod = await this.prisma.user.findFirst({ where: { id: hodId, organizationId } });
-    if (!hod || !hod.departmentName) throw new NotFoundException('HOD or department not found');
+    const hod = await this.prisma.user.findFirst({ 
+      where: { id: hodId, organizationId },
+      include: { employee: { include: { department: true } } }
+    });
+    if (!hod || !hod.employee?.department?.name) throw new NotFoundException('HOD or department not found');
 
     const existing = await this.prisma.user.findFirst({ where: { email: dto.email } });
     if (existing) throw new ConflictException('A user with this email already exists');
@@ -406,14 +423,9 @@ export class UsersService {
       data: {
         organizationId,
         email: dto.email,
-        fullName: dto.name,
-        employeeCode,
-        departmentName: dto.departmentName,
-        designation: dto.designation,
         passwordHash,
         status: 'ACTIVE',
         createdById: hodId,
-        profileImage: profilePhoto,
         userRoles: { create: { roleId: role.id, assignedById: hodId } },
       },
     });
@@ -463,13 +475,16 @@ export class UsersService {
       });
     }
 
-    return { id: user.id, email: user.email, name: user.fullName, departmentName: user.departmentName };
+    return { id: user.id, email: user.email, name: dto.name, departmentName: dto.departmentName };
   }
 
   // ─── Get My Employees (for HOD) ─────────────────────────────────────────────
   async getMyEmployees(hodId: string, organizationId: string) {
-    const hod = await this.prisma.user.findFirst({ where: { id: hodId, organizationId } });
-    if (!hod || !hod.departmentName) throw new NotFoundException('HOD or department not found');
+    const hod = await this.prisma.user.findFirst({ 
+      where: { id: hodId, organizationId },
+      include: { employee: { include: { department: true } } }
+    });
+    if (!hod || !hod.employee?.department?.name) throw new NotFoundException('HOD or department not found');
 
     const employeeRole = await this.prisma.role.findUnique({
       where: { organizationId_name: { organizationId, name: 'EMPLOYEE' } },
@@ -482,23 +497,24 @@ export class UsersService {
         revokedAt: null, 
         user: { 
           deletedAt: null, 
-          departmentName: { equals: hod.departmentName, mode: 'insensitive' }
         } 
       },
       include: {
-        user: { select: { id: true, email: true, fullName: true, employeeCode: true, departmentName: true, designation: true, status: true, createdAt: true, profileImage: true } },
+        user: { include: { employee: { include: { department: true } } } },
       },
     });
 
-    return userRoles.map((ur) => ({
+    const filteredRoles = userRoles.filter(ur => ur.user.employee?.department?.name === hod.employee!.department!.name);
+
+    return filteredRoles.map((ur) => ({
       id: ur.user.id,
       email: ur.user.email,
-      name: ur.user.fullName,
-      employeeCode: ur.user.employeeCode,
-      departmentName: ur.user.departmentName,
-      designation: ur.user.designation,
-        profileImage: ur.user.profileImage,
-        status: ur.user.status,
+      name: ur.user.employee ? `${ur.user.employee.firstName} ${ur.user.employee.lastName}` : "",
+      employeeCode: ur.user.employee?.employeeCode,
+      departmentName: ur.user.employee?.department?.name,
+      designation: ur.user.employee?.designation,
+      profileImage: ur.user.employee?.profilePhoto,
+      status: ur.user.status,
       role: 'EMPLOYEE',
       createdAt: ur.user.createdAt,
     }));
@@ -529,12 +545,11 @@ export class UsersService {
       await this.prisma.user.update({ where: { id: user.id }, data: { passwordHash: user.passwordHash } });
     }
 
-    let profileImageUrl = user.profileImage;
+    let profileImageUrl = user.employee?.profilePhoto;
     if (profileImageFile) {
       try {
         const uploadResult = await this.cloudinary.uploadImage(profileImageFile);
         profileImageUrl = uploadResult.secure_url;
-        await this.prisma.user.update({ where: { id: user.id }, data: { profileImage: profileImageUrl } });
       } catch (e) {}
     }
 
@@ -542,7 +557,7 @@ export class UsersService {
       const employeeUpdateData: any = {};
       if (dto.phone !== undefined) employeeUpdateData.phone = dto.phone;
       if (dto.address !== undefined) employeeUpdateData.currentAddress = dto.address;
-      if (profileImageUrl !== user.profileImage) employeeUpdateData.profilePhoto = profileImageUrl;
+      if (profileImageUrl !== user.employee?.profilePhoto) employeeUpdateData.profilePhoto = profileImageUrl;
       
       if (Object.keys(employeeUpdateData).length > 0) {
         await this.prisma.employee.update({
