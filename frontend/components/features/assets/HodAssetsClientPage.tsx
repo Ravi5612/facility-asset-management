@@ -30,13 +30,7 @@ interface HodAssetsClientPageProps {
 }
 
 export function HodAssetsClientPage({ initialAssets, isStockView = false, onAssetAdded }: HodAssetsClientPageProps) {
-  const [user, setUser] = useState<any>(null);
-  useEffect(() => {
-    const stored = localStorage.getItem("auth_user");
-    if (stored) {
-      try { setUser(JSON.parse(stored)); } catch (e) {}
-    }
-  }, []);
+  const { user } = useAuth();
 
   const isStoreHOD = user?.role === "HOD" && (user?.departmentName?.toLowerCase().includes("store") || user?.departmentName?.toLowerCase().includes("inventory"));
 

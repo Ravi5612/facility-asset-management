@@ -1,3 +1,4 @@
+import { useAuth } from "@/components/providers/AuthProvider";
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -18,49 +19,18 @@ export default function HodEmployeesClientPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHr, setIsHr] = useState(false);
   
+  const { user } = useAuth();
+  
   React.useEffect(() => {
-    async function checkHrStatus() {
-      // 1. Try local storage first for immediate rendering
-      try {
-        const authData = localStorage.getItem("auth_user");
-        if (authData) {
-          const user = JSON.parse(authData);
-          if (user?.departmentName) {
-            const dept = user.departmentName.toLowerCase();
-            if (dept === "hr" || dept.includes("human resource")) {
-              setIsHr(true);
-            }
-          }
-        }
-      } catch (e) { console.error("Error occurred:", e); }
-
-      // 2. Always fetch fresh profile to be safe (in case localStorage is stale)
-      try {
-        const res = await fetch("/api/auth/me", { cache: "no-store" });
-        if (res.ok) {
-          const data = await res.json();
-          // Backend returns { success: true, user: { ... } }
-          const fetchedUser = data.user || data;
-          const dept = (fetchedUser.departmentName || "").toLowerCase();
-
-          if (dept === "hr" || dept.includes("human resource")) {
-            setIsHr(true);
-            // Optionally update local storage
-            const authData = localStorage.getItem("auth_user");
-            if (authData) {
-              const user = JSON.parse(authData);
-              user.departmentName = fetchedUser.departmentName;
-              localStorage.setItem("auth_user", JSON.stringify(user));
-            }
-          } else {
-            setIsHr(false); // Make sure it's correct
-          }
-        }
-      } catch (e) { console.error("Error occurred:", e); }
+    if (user?.departmentName) {
+      const dept = user.departmentName.toLowerCase();
+      if (dept === "hr" || dept.includes("human resource")) {
+        setIsHr(true);
+      } else {
+        setIsHr(false);
+      }
     }
-
-    checkHrStatus();
-  }, []);
+  }, [user]);
 
   const { data: employees, isLoading, error } = useQuery({
     queryKey: ["employees"],

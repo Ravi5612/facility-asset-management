@@ -32,8 +32,19 @@ export function AssetDetailModal({ selectedItem, setSelectedItem }: AssetDetailM
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <div>
-              <DialogTitle className="text-lg font-bold">{selectedItem.id}</DialogTitle>
-              <DialogDescription className="font-mono text-xs">{selectedItem.serialNumber}</DialogDescription>
+              <DialogTitle className="text-lg font-bold">
+                {selectedItem.id} { (selectedItem as any).name ? `- ${(selectedItem as any).name}` : '' }
+              </DialogTitle>
+              <DialogDescription className="font-mono text-xs flex flex-col gap-1 mt-1">
+                <span>{selectedItem.serialNumber}</span>
+                {Object.keys((selectedItem as any).hardwareDetails || {}).length > 0 && (
+                  <span className="text-slate-500 leading-relaxed block mt-1">
+                    {Object.entries((selectedItem as any).hardwareDetails)
+                      .filter(([k]) => !['ip', 'seat', 'floor', 'process', 'mac'].includes(k.toLowerCase()))
+                      .map(([k, v]) => <span key={k} className="inline-block mr-2 bg-slate-100 px-1.5 py-0.5 rounded text-[11px] border border-slate-200"><b>{k}</b>: {v as React.ReactNode}</span>)}
+                  </span>
+                )}
+              </DialogDescription>
             </div>
           </div>
         </DialogHeader>

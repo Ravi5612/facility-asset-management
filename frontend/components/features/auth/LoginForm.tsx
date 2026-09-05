@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginSchema, LoginFormData } from "@/lib/validations/auth";
 import { authService } from "@/services/auth.service";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { ErrorAlert } from "@/components/ui/alert-box";
 import { cn } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
@@ -38,17 +39,17 @@ export default function LoginForm() {
     defaultValues: { email: "", password: "" },
   });
 
+  const { refetch } = useAuth();
+
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     setError(null);
     try {
       const response = await authService.login(data);
       if (response.success) {
-        // Cookie is set by Next.js API route (/api/auth/login) as httpOnly
-        // No localStorage, no document.cookie needed here — Rule #20 ✅
-        // Save user profile for UI (Header) - No secrets/tokens stored here
-        localStorage.setItem("auth_user", JSON.stringify(response.user));
-
+        // Refetch user data via Context API instead of using localStorage
+        await refetch();
+        
         const role = response.user.role;
         if (role === "SUB_ADMIN") {
           router.push("/sub-admin/dashboard");

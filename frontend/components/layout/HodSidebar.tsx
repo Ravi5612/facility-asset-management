@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Users, CalendarCheck, FileText, Monitor, Ticket, HelpCircle, Package, Archive } from "lucide-react";
 import React from "react";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export function HodSidebar() {
   const pathname = usePathname();
@@ -27,18 +28,8 @@ export function HodSidebar() {
     { title: "Help", href: `/hod/${deptSegment}/help`, icon: HelpCircle },
   ];
 
-  React.useEffect(() => {
-    // Read the user's department from localStorage (set during login)
-    const storedUser = localStorage.getItem("auth_user");
-    if (storedUser) {
-      try {
-        const u = JSON.parse(storedUser);
-        if (u.departmentName) setDeptName(u.departmentName);
-      } catch (e) {
-        // ignore
-      }
-    }
-  }, []);
+  const { user } = useAuth();
+  React.useEffect(() => { if (user?.departmentName) setDeptName(user.departmentName); }, [user]);
 
   return (
     <div className="flex h-full flex-col border-r border-border" style={{ background: "var(--brand-sidebar)" }}>

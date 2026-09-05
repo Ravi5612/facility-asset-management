@@ -1,3 +1,4 @@
+import { useAuth } from "@/components/providers/AuthProvider";
 "use client";
 
 import { useState } from "react";
@@ -65,8 +66,7 @@ export function TicketDetailsModal({ ticket }: TicketDetailsModalProps) {
     }
   });
 
-  const authUserStr = typeof window !== 'undefined' ? localStorage.getItem('auth_user') : null;
-  const user = authUserStr ? JSON.parse(authUserStr) : null;
+  const { user } = useAuth();
   const isRaiser = user?.email === ticket.raisedByHodEmail;
 
   return (

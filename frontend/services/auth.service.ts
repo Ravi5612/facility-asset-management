@@ -41,7 +41,6 @@ export const authService = {
   },
 
   logout: async (): Promise<void> => {
-    localStorage.removeItem("auth_user");
     await fetch("/api/auth/logout", { method: "POST" });
   },
 

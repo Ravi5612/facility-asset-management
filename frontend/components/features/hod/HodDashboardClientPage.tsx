@@ -16,14 +16,7 @@ import { AnalogClock } from "@/components/ui/analog-clock";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 
 export default function HodDashboardClientPage() {
-  const [user, setUser] = useState<any>(null);
-  
-  useEffect(() => {
-    const stored = localStorage.getItem("auth_user");
-    if (stored) {
-      try { setUser(JSON.parse(stored)); } catch (e) {}
-    }
-  }, []);
+  const { user } = useAuth();
 
     const [currentDate, setCurrentDate] = useState("");
   const [timeObj, setTimeObj] = useState<Date | null>(null);

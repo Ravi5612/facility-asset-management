@@ -5,7 +5,7 @@ import { Bell, HelpCircle, ChevronDown, Menu, LogOut, User } from "lucide-react"
 import { SearchInput } from "@/components/ui/search-input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SidebarContent } from "@/components/layout/Sidebar";
-import { authService } from "@/services/auth.service";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { usePathname, useRouter } from "next/navigation";
 
 import { useQuery } from "@tanstack/react-query";
@@ -16,25 +16,9 @@ export default function Header() {
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
-  const { data: serverUser } = useQuery({
-    queryKey: ["auth-me"],
-    queryFn: authService.getMe,
-  });
+  
 
-  const [localUser, setLocalUser] = React.useState<any>(null);
-
-  React.useEffect(() => {
-    const storedUser = localStorage.getItem("auth_user");
-    if (storedUser) {
-      try {
-        setLocalUser(JSON.parse(storedUser));
-      } catch {
-        // ignore
-      }
-    }
-  }, []);
-
-  const user = serverUser || localUser;
+  const { user, logout } = useAuth();
 
   // Close dropdown on outside click
   React.useEffect(() => {
@@ -48,8 +32,7 @@ export default function Header() {
   }, []);
 
   const handleLogout = async () => {
-    await authService.logout();
-    router.push("/login");
+    logout();
   };
 
   // Format Display Data
