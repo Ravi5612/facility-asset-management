@@ -5,6 +5,9 @@ import { Bell, HelpCircle, ChevronDown, Menu, LogOut, User } from "lucide-react"
 import { SearchInput } from "@/components/ui/search-input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SidebarContent } from "@/components/layout/Sidebar";
+import { HodSidebar } from "@/components/layout/HodSidebar";
+import SubAdminSidebar from "@/components/layout/SubAdminSidebar";
+import { EmployeeSidebar } from "@/components/layout/EmployeeSidebar";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -63,7 +66,15 @@ export default function Header() {
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-0 border-r-0" style={{ background: "var(--brand-sidebar)" }}>
             <div className="flex flex-col h-full">
-              <SidebarContent />
+              {user?.role === "SUPER_ADMIN" ? (
+                <SidebarContent />
+              ) : user?.role === "HOD" ? (
+                <HodSidebar />
+              ) : user?.role === "SUB_ADMIN" ? (
+                <SubAdminSidebar />
+              ) : user?.role === "EMPLOYEE" ? (
+                <EmployeeSidebar />
+              ) : null}
             </div>
           </SheetContent>
         </Sheet>

@@ -13,21 +13,27 @@ const ROUTE_ROLE_MAP: Record<string, string[]> = {
 };
 
 // Manual JWT decode — works in Edge Runtime without any package
-function getRoleFromToken(token: string): string | null {
+function getTokenPayload(token: string): any {
   try {
     const payload = token.split(".")[1];
-    const decoded = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
-    return decoded?.role || null;
+    return JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
   } catch {
     return null;
   }
 }
 
-function getRedirectUrlForRole(role: string, baseUrl: string): string {
-  switch (role) {
+function getRedirectUrlForRole(payload: any, baseUrl: string): string {
+  if (!payload || !payload.role) return new URL("/login", baseUrl).toString();
+  
+  switch (payload.role) {
     case "SUPER_ADMIN": return new URL("/superadmin", baseUrl).toString();
     case "SUB_ADMIN":   return new URL("/sub-admin/dashboard", baseUrl).toString();
-    case "HOD":         return new URL("/hod", baseUrl).toString();
+    case "HOD": {
+      const deptSlug = payload.departmentName 
+        ? payload.departmentName.toLowerCase().replace(/\s+/g, '-') 
+        : "general";
+      return new URL(`/hod/${deptSlug}/dashboard`, baseUrl).toString();
+    }
     case "EMPLOYEE":    return new URL("/employee/dashboard", baseUrl).toString();
     default:            return new URL("/login", baseUrl).toString();
   }
@@ -98,15 +104,14 @@ export async function middleware(request: NextRequest) {
   }
 
   // ✅ ROLE CHECK: Decode token and verify the user has the right role for this route
-  const userRole = getRoleFromToken(tokenValue);
+  const userPayload = getTokenPayload(tokenValue);
+  const userRole = userPayload?.role;
 
   for (const [routePrefix, allowedRoles] of Object.entries(ROUTE_ROLE_MAP)) {
     if (pathname.startsWith(routePrefix)) {
       if (!userRole || !allowedRoles.includes(userRole)) {
         // User is logged in but wrong role — redirect to their actual dashboard
-        const redirectUrl = userRole
-          ? getRedirectUrlForRole(userRole, request.url)
-          : new URL("/login", request.url).toString();
+        const redirectUrl = getRedirectUrlForRole(userPayload, request.url);
         return NextResponse.redirect(redirectUrl);
       }
       break;
