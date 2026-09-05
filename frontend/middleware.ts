@@ -44,6 +44,8 @@ export async function middleware(request: NextRequest) {
   let tokenValue = request.cookies.get("auth_token")?.value;
   const refreshTokenCookie = request.cookies.get("refresh_token");
 
+  console.log(`[Middleware] Path: ${pathname} | HasAuthToken: ${!!tokenValue} | HasRefreshToken: ${!!refreshTokenCookie}`);
+
   // If no auth token, but we have a refresh token → attempt silent refresh
   if (!tokenValue && refreshTokenCookie?.value) {
     try {
