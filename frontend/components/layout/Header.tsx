@@ -17,11 +17,17 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
   
 
   const { user, logout } = useAuth();
+
+  // Close mobile sidebar on route change
+  React.useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [pathname]);
 
   // Close dropdown on outside click
   React.useEffect(() => {
@@ -60,7 +66,7 @@ export default function Header() {
   return (
     <header className={`fixed top-0 right-0 left-0 ${isEmployeeRoute ? 'md:left-72' : 'md:left-56'} z-40 h-16 flex items-center justify-between gap-4 border-b border-border bg-card px-4 md:px-6`}>
       <div className="flex items-center gap-2 md:hidden">
-        <Sheet>
+        <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
           <SheetTrigger className="flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted transition-colors">
             <Menu className="h-5 w-5 text-foreground" />
           </SheetTrigger>
