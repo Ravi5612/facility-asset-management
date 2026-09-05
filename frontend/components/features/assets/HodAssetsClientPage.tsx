@@ -1,5 +1,6 @@
 // @ts-nocheck
 "use client";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 import { useState, useMemo, useEffect } from "react";
 import { SearchInput } from "@/components/ui/search-input";
