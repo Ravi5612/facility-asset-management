@@ -55,22 +55,33 @@ export async function middleware(request: NextRequest) {
       });
 
       if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.accessToken) {
-          tokenValue = data.accessToken;
-          const response = NextResponse.next();
-          response.cookies.set("auth_token", data.accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            maxAge: 15 * 60,
-            path: "/",
-          });
-          if (data.user?.themeColor) {
-            response.cookies.set("app-theme-color", data.user.themeColor, { path: "/", maxAge: 365 * 24 * 60 * 60 });
+        // Backend sets auth_token via Set-Cookie header (not in body)
+        // Forward those cookies and extract the new auth_token value
+        const setCookies = res.headers.getSetCookie?.() ?? 
+          (res.headers.get("set-cookie") ? [res.headers.get("set-cookie")!] : []);
+
+        const response = NextResponse.next();
+
+        for (const cookieStr of setCookies) {
+          response.headers.append("Set-Cookie", cookieStr);
+
+          // Extract auth_token value so we can proceed with role check
+          const authMatch = cookieStr.match(/^auth_token=([^;]+)/);
+          if (authMatch) {
+            tokenValue = authMatch[1];
           }
-          return response;
         }
+
+        if (tokenValue) {
+          // Successfully refreshed — continue to role check below
+        } else {
+          // Refresh endpoint returned ok but no auth_token cookie — redirect to login
+          const loginUrl = new URL("/login", request.url);
+          loginUrl.searchParams.set("from", pathname);
+          return NextResponse.redirect(loginUrl);
+        }
+
+        return response;
       }
     } catch (err) {
       console.error("Silent refresh failed in middleware", err);
