@@ -136,8 +136,7 @@ export default function InventoryClientPage() {
   }
 
   return (
-    <div className="absolute inset-0">
-      <div className="h-full w-full flex flex-col overflow-hidden bg-card border rounded-xl shadow-sm">
+    <div className="flex flex-col bg-card border rounded-xl shadow-sm min-h-[calc(100vh-8rem)]">
         
         {/* Header Section */}
         <div className="p-4 border-b flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-50/50 dark:bg-slate-900/20 shrink-0">
@@ -526,7 +525,6 @@ export default function InventoryClientPage() {
           </div>
         )}
       </div>
-    </div>
   );
 }
 
