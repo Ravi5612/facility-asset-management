@@ -1,5 +1,5 @@
-import { useAuth } from "@/components/providers/AuthProvider";
 "use client";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";

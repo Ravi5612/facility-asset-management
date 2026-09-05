@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
 import { Users, UserCheck, CalendarCheck, Package, Ticket, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 import { employeeApi } from "@/services/employeeApi.service";

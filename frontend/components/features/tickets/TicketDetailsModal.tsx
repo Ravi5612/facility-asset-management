@@ -1,5 +1,5 @@
-import { useAuth } from "@/components/providers/AuthProvider";
 "use client";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 import { useState } from "react";
 import {
