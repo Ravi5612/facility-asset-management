@@ -380,6 +380,7 @@ model Location {
   code             String
   type             LocationType @default(OTHER)
   address          String?
+  ipAddress        String?
   parentLocationId String?
   status           RecordStatus @default(ACTIVE)
   createdAt        DateTime     @default(now())

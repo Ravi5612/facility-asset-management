@@ -67,7 +67,7 @@ export class InventoryController {
     return {
       exists: true,
       hostname: cpu?.name || "",
-      ipAddress: hardware.ip || hardware.ipAddress || "",
+      ipAddress: seat.ipAddress || hardware.ip || hardware.ipAddress || "",
       macAddress: hardware.mac || hardware.macAddress || "",
     };
   }
@@ -83,15 +83,49 @@ export class InventoryController {
         parent: { include: { parent: true } },
         assets: {
           where: { status: { not: 'RETIRED' } },
-          include: { category: true }
+          include: { 
+            category: true,
+            assignments: {
+              where: { status: 'ACTIVE' },
+              take: 1,
+              orderBy: { assignedAt: 'desc' }
+            }
+          }
         },
       }
+    });
+
+    // Collect all unique assigner IDs
+    const assignerIds = new Set<string>();
+    desks.forEach(d => d.assets.forEach(a => {
+      if ((a as any).assignments?.length > 0) {
+        assignerIds.add((a as any).assignments[0].assignedById);
+      }
+    }));
+
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: Array.from(assignerIds) } },
+      include: { employee: true }
+    });
+    
+    const assignerMap = new Map<string, string>();
+    users.forEach(u => {
+      assignerMap.set(u.id, u.employee ? `${u.employee.firstName} ${u.employee.lastName} (${u.employee.employeeCode})` : 'IT');
     });
 
     const result = desks.map(desk => {
       // Helper to find asset by category name keyword
       const findAsset = (keyword: string) =>
         desk.assets.find(a => a.category?.name?.toLowerCase().includes(keyword.toLowerCase()));
+
+      const getAssignInfo = (asset: any) => {
+        if (!asset || !asset.assignments || asset.assignments.length === 0) return null;
+        const assignment = asset.assignments[0];
+        return {
+          date: new Date(assignment.assignedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' }),
+          by: assignerMap.get(assignment.assignedById) || 'IT'
+        };
+      };
 
       const cpu = findAsset('cpu') || desk.assets.find(a => (a.hardwareDetails as any)?.processor) || desk.assets[0];
       const mouseAsset = findAsset('mouse');
@@ -130,17 +164,18 @@ export class InventoryController {
         processor: hardware.processor || '-',
         ram: hardware.ram || '-',
         hdd: hardware.drive || '-',
-        ipAddress: hardware.ip || '-',
+        ipAddress: desk.ipAddress || hardware.ip || '-',
         macAddress: hardware.mac || '-',
+        cpuAssignInfo: getAssignInfo(cpu),
         // Peripherals — show asset code/name if assigned, else '-'
         mouse: mouseAsset ? (mouseAsset.assetCode || mouseAsset.name) : '-',
-        mouseDetails: mouseAsset ? { name: mouseAsset.name, code: mouseAsset.assetCode, serial: mouseAsset.serialNumber, purchaseDate: mouseAsset.purchaseDate?.toISOString().split('T')[0], warrantyExpiryDate: mouseAsset.warrantyExpiryDate?.toISOString().split('T')[0] } : null,
+        mouseDetails: mouseAsset ? { name: mouseAsset.name, code: mouseAsset.assetCode, serial: mouseAsset.serialNumber, purchaseDate: mouseAsset.purchaseDate?.toISOString().split('T')[0], warrantyExpiryDate: mouseAsset.warrantyExpiryDate?.toISOString().split('T')[0], assignInfo: getAssignInfo(mouseAsset) } : null,
         keyboard: keyboardAsset ? (keyboardAsset.assetCode || keyboardAsset.name) : '-',
-        keyboardDetails: keyboardAsset ? { name: keyboardAsset.name, code: keyboardAsset.assetCode, serial: keyboardAsset.serialNumber, purchaseDate: keyboardAsset.purchaseDate?.toISOString().split('T')[0], warrantyExpiryDate: keyboardAsset.warrantyExpiryDate?.toISOString().split('T')[0] } : null,
+        keyboardDetails: keyboardAsset ? { name: keyboardAsset.name, code: keyboardAsset.assetCode, serial: keyboardAsset.serialNumber, purchaseDate: keyboardAsset.purchaseDate?.toISOString().split('T')[0], warrantyExpiryDate: keyboardAsset.warrantyExpiryDate?.toISOString().split('T')[0], assignInfo: getAssignInfo(keyboardAsset) } : null,
         monitor: monitorAsset ? (monitorAsset.assetCode || monitorAsset.name) : '-',
-        monitorDetails: monitorAsset ? { name: monitorAsset.name, code: monitorAsset.assetCode, serial: monitorAsset.serialNumber, purchaseDate: monitorAsset.purchaseDate?.toISOString().split('T')[0], warrantyExpiryDate: monitorAsset.warrantyExpiryDate?.toISOString().split('T')[0] } : null,
+        monitorDetails: monitorAsset ? { name: monitorAsset.name, code: monitorAsset.assetCode, serial: monitorAsset.serialNumber, purchaseDate: monitorAsset.purchaseDate?.toISOString().split('T')[0], warrantyExpiryDate: monitorAsset.warrantyExpiryDate?.toISOString().split('T')[0], assignInfo: getAssignInfo(monitorAsset) } : null,
         headset: headsetAsset ? (headsetAsset.assetCode || headsetAsset.name) : '-',
-        headsetDetails: headsetAsset ? { name: headsetAsset.name, code: headsetAsset.assetCode, serial: headsetAsset.serialNumber, purchaseDate: headsetAsset.purchaseDate?.toISOString().split('T')[0], warrantyExpiryDate: headsetAsset.warrantyExpiryDate?.toISOString().split('T')[0] } : null,
+        headsetDetails: headsetAsset ? { name: headsetAsset.name, code: headsetAsset.assetCode, serial: headsetAsset.serialNumber, purchaseDate: headsetAsset.purchaseDate?.toISOString().split('T')[0], warrantyExpiryDate: headsetAsset.warrantyExpiryDate?.toISOString().split('T')[0], assignInfo: getAssignInfo(headsetAsset) } : null,
         cables: cableAsset ? (cableAsset.assetCode || cableAsset.name) : '-',
       };
     });

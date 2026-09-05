@@ -184,6 +184,7 @@ export class AssetsService {
         id: asset.assetCode || asset.id,
         rawId: asset.id,
         name: asset.name,
+        hardwareDetails: asset.hardwareDetails || {},
         categoryName: asset.category.name,
         status: asset.status === 'ASSIGNED' ? 'Assigned' :
                 asset.status === 'IN_MAINTENANCE' ? 'Repair' :
@@ -333,7 +334,7 @@ export class AssetsService {
 
     const count = await this.prisma.asset.count({ where: { categoryId: category.id } });
     const prefix = (category.description || category.name.slice(0,3)).toUpperCase();
-    const nextNum = (count + 1).toString().padStart(3, '0');
+    const nextNum = (count + 1000).toString(); // Sequential 4-digit starting at 1000
     const assetCode = `${prefix}-${nextNum}`;
 
     const asset = await this.prisma.asset.create({
@@ -519,7 +520,24 @@ export class AssetsService {
     const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
 
     let seatMsg = dto.seatNumber ? `Seat: ${dto.seatNumber}` : (employee ? `User: ${employee.firstName} ${employee.lastName}` : 'Unknown location');
-    const detailedAssignNote = `[Assigned on ${timestamp} by ${assignerName}]\n- Assigned to: ${seatMsg}\n- Notes: ${dto.condition || 'None'}`;
+    
+    if (dto.seatNumber) {
+      const seatRec = await this.prisma.location.findFirst({
+        where: { name: dto.seatNumber, type: 'DESK', organizationId },
+        include: { parent: { include: { parent: true } } }
+      });
+      if (seatRec) {
+        const process = seatRec.parent;
+        const floor = process ? process.parent : null;
+        if (floor && process) {
+          seatMsg = `Seat: ${seatRec.name} (Floor: ${floor.name}, Process: ${process.name})`;
+        }
+      }
+    }
+
+    const detailedAssignNote = dto.condition 
+      ? `${seatMsg}\nNote: ${dto.condition}` 
+      : seatMsg;
 
     const [assignment, updatedAsset] = await this.prisma.$transaction([
       this.prisma.assetAssignment.create({

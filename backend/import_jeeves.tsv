@@ -1,0 +1,337 @@
+JEEVES	6TH	Cabin-1	DRITM-LAPTOP-23	Microsoft Windows 11 Pro	172.24.232.222	E0:D4:E8:BA:FE:A0	Lenovo	Thinkpad T14	16	DDR4	Intel(R) Core(TM) i5-10210U CPU @ 1.60GHz	SSD(256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	Cabin-2	DRITM-LAPTOP-36	Microsoft Windows 11 Pro	172.24.232.234	D0:3C:1F:6C:55:7F	Lenovo	Thinkpad T14	16	DDR4	Intel(R) Core(TM) i5-10210U CPU @ 1.60GHz	SSD(512GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	Cabin-3	DRITM-LAPTOP-38	Microsoft Windows 11 Pro	172.24.232.178	28:D0:EA:C6:93:0F	Lenovo	Thinkpad T14	16	DDR4	Intel(R) Core(TM) i5-10210U CPU @ 1.60GHz	SSD(512GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	Breifing Room	DRITM-2498	Microsoft Windows 11 Pro	172.24.232.12	9C:7B:EF:2F:E8:C6	HP	HP Desktop Pro G2	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-1	DRITM-2662	Microsoft Windows 11 Pro	172.24.232.189	8C:EC:4B:C2:4D:8D	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-2	DRITM-2665	Microsoft Windows 11 Pro	172.24.232.192	E4:54:E8:C3:B3:52	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-3	DRITM-2867	Microsoft Windows 11 Pro	172.24.234.80	9C:7B:EF:AB:58:53	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-4	DRITM-2874	Microsoft Windows 11 Pro	172.24.234.87	9C:7B:EF:AE:F7:4A	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-5	DRITM-2865	Microsoft Windows 11 Pro	172.24.234.78	F4:39:09:09:43:5A	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-6	DRITM-2931	Microsoft Windows 11 Pro N	172.24.234.105	9C:7B:EF:B4:84:C4	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-7	DRITM-1720	Microsoft Windows 11 Pro	172.24.232.74	10:62:E5:0F:A2:B2	HP	HP 280 G4 MT Business PC	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-8	DRITM-1711	Microsoft Windows 11 Pro	172.24.232.77	C4:65:16:29:44:5F	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-9	DRITM-2936	Microsoft Windows 11 Pro N	172.24.234.110	9C:7B:EF:B4:84:AB	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-10	DRITM-1172	Microsoft Windows 11 Pro	172.24.232.68	D4:BE:D9:A3:C9:1B	Dell	OptiPlex 790	8	DDR3	Intel(R) Core(TM) i5-2400S CPU @ 2.50GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-11	Empty Seat											
+JEEVES	6TH	F-12	DRITM-2871	Microsoft Windows 11 Pro	172.24.234.84	F4:39:09:1B:66:ED	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-13	DRITM-2942	Microsoft Windows 11 Pro	172.24.234.116	9C:7B:EF:B4:85:B4	HP	HP ProDesk 400 G6 SFF	4	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-14	DRITM-2882	Microsoft Windows 11 Pro	172.24.234.95	54:BF:64:88:21:17	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-15	DRITM-2663	Microsoft Windows 11 Pro	172.24.232.190	F4:39:09:16:A2:3D	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-16	DRITM-1128	Microsoft Windows 11 Pro	172.24.232.233	F4:39:09:0A:9F:8E	HP	HP ProDesk 600 G4 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-17	DRITM-1525	Microsoft Windows 11 Pro	172.24.232.213	C4:65:16:1F:E8:ED	HP	HP 280 G4 MT Business PC	8	DDR4	Intel(R) Core(TM) i5-9600K CPU @ 3.70GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-18	DRITM-3330	Microsoft Windows 11 Pro	172.24.232.214	C4:65:16:1E:C0:1C	HP	HP 280 G4 MT Business PC	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-19	DRITM-2937	Microsoft Windows 11 Pro N	172.24.234.111	F4:39:09:0B:A8:B3	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-20	DRITM-2389	Microsoft Windows 11 Pro	172.24.232.140	8C:EC:4B:74:69:DB	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-21	DRITM-2753	Microsoft Windows 11 Pro	172.24.232.224	8C:EC:4B:A0:4A:84	Dell	Vostro 3470	4	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-22	DRITM-2934	Microsoft Windows 11 Pro N	172.24.234.108	9C:7B:EF:B4:89:CA	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-23	Empty Seat											
+JEEVES	6TH	F-24	DRITM-2923	Microsoft Windows 11 Pro	172.24.234.97	F4:39:09:13:26:A1	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-25	DRITM-2754	Microsoft Windows 11 Pro	172.24.232.225	8C:EC:4B:BF:82:C9	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-26	DRITM-2935	Microsoft Windows 11 Pro	172.24.234.109	F4:39:09:14:B4:BF	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-27	DRITM-2481	Microsoft Windows 11 Pro	172.24.232.150	9C:7B:EF:53:A2:41	HP	HP ProDesk 400 G6 MT	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-28	DRITM-2815	Microsoft Windows 11 Pro	172.24.234.28	9C:7B:EF:B4:83:5D	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-29	DRITM-2944	Microsoft Windows 11 Pro	172.24.234.118	9C:7B:EF:B4:53:D7	HP	HP ProDesk 600 G4 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-30	DRITM-2941	Microsoft Windows 11 Pro	172.24.234.115	9C:7B:EF:AF:9F:6F	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-31	DRITM-2958	Microsoft Windows 11 Pro	172.24.232.180	9C:7B:EF:34:4B:1F	HP	HP Desktop Pro G2	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-32	DRITM-2682	Microsoft Windows 11 Pro	172.24.232.209	E4:54:E8:C2:CF:91	Dell	Vostro 3471	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-33	DRITM-2385	Microsoft Windows 11 Pro	172.24.232.124	8C:EC:4B:91:16:73	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-34	DRITM-2752	Microsoft Windows 11 Pro	172.24.232.223	8C:EC:4B:A0:4B:94	Dell	Vostro 3470	4	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-35	DRITM-2394	Microsoft Windows 11 Pro	172.24.232.135	8C:EC:4B:91:16:9E	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-36	DRITM-2943	Microsoft Windows 11 Pro	172.24.234.117	9C:7B:EF:B4:84:51	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-37	DRITM-2655	Microsoft Windows 11 Pro	172.24.232.182	54:BF:64:70:A7:72	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-38	DRITM-2677	Microsoft Windows 11 Pro	172.24.232.204	54:BF:64:68:B8:AF	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-39	DRITM-2425	Microsoft Windows 11 Pro	172.24.232.117	E4:54:E8:92:CB:35	Dell	OptiPlex 3070	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-40	DRITM-2930	Microsoft Windows 11 Pro	172.24.234.104	9C:7B:EF:B3:39:F7	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-41	DRITM-2961	Microsoft Windows 11 Pro	172.24.234.135	F4:39:09:04:6D:DF	HP	HP ProDesk 400 G5 SFF	4	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-42	DRITM-2423	Microsoft Windows 11 Pro	172.24.232.149	8C:EC:4B:A0:4C:20	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-43	DRITM-2664	Microsoft Windows 11 Pro	172.24.232.191	E4:54:E8:C3:B2:0F	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-44	DRITM-2673	Microsoft Windows 11 Pro	172.24.232.200	F4:39:09:4C:52:DD	HP	HP 280 G3 SFF Business PC	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-45	DRITM-2868	Microsoft Windows 11 Pro	172.24.234.81	F4:39:09:19:90:89	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-46	DRITM-2843	Microsoft Windows 11 Pro	172.24.234.57	9C:7B:EF:B4:86:6D	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-47	DRITM-2419	Microsoft Windows 11 Pro	172.24.232.31	E4:54:E8:93:05:CD	Dell	OptiPlex 3070	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-48	DRITM-2873	Microsoft Windows 11 Pro	172.24.234.86	F4:39:09:10:39:D3	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-49	DRITM-2386	Microsoft Windows 11 Pro	172.24.232.123	8C:EC:4B:A0:47:E6	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-50	DRITM-2674	Microsoft Windows 11 Pro	172.24.232.201	10:E7:C6:B7:30:84	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-51	DRITM-2680	Microsoft Windows 11 Pro	172.24.232.207	80:E8:2C:CE:68:E8	HP	HP Engage Flex Pro	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-52	DRITM-2939	Microsoft Windows 11 Pro	172.24.234.113	9C:7B:EF:B4:65:65	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-53	DRITM-2411	Microsoft Windows 11 Pro	172.24.232.147	8C:EC:4B:88:77:42	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-54	DRITM-2661	Microsoft Windows 11 Pro	172.24.232.188	E4:54:E8:A0:CF:D8	Dell	Vostro 3470	4	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-55	DRITM-1459	Microsoft Windows 11 Pro	172.24.232.41	8C:EC:4B:A0:4B:93	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-56	DRITM-2750	Microsoft Windows 11 Pro	172.24.232.221	8C:EC:4B:CE:78:D7	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-57	DRITM-2667	Microsoft Windows 11 Pro	172.24.232.194	E4:54:E8:E2:DB:DB	Dell	Vostro 3471	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-58	DRITM-2875	Microsoft Windows 11 Pro	172.24.234.88	9C:7B:EF:AE:F8:19	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-59	DRITM-2761	Microsoft Windows 11 Pro	172.24.232.232	9C:7B:EF:B4:82:14	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-60	DRITM-2756	Microsoft Windows 11 Pro	172.24.232.227	9C:7B:EF:B4:8A:73	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-61	DRITM-2842	Microsoft Windows 11 Pro	172.24.234.56	9C:7B:EF:B4:87:30	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-62	DRITM-2878	Microsoft Windows 11 Pro	172.24.234.91	F4:39:09:0D:5C:7B	HP	HP ProDesk 400 G5 SFF	4	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-63	DRITM-2671	Microsoft Windows 11 Pro	172.24.232.198	54:BF:64:82:34:5D	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-64	DRITM-2925	Microsoft Windows 11 Pro	172.24.234.99	9C:7B:EF:B4:83:D6	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-65	DRITM-2396	Microsoft Windows 11 Pro	172.24.232.17	8C:EC:4B:7E:B5:97	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-66	DRITM-2775	Microsoft Windows 11 Pro N	172.24.234.83	9C:7B:EF:B4:8F:35	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-67	DRITM-2654	Microsoft Windows 11 Pro	172.24.232.181	54:BF:64:69:1E:93	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-68	DRITM-2872	Microsoft Windows 11 Pro	172.24.234.85	9C:7B:EF:A7:27:A2	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-69	DRITM-408	Microsoft Windows 11 Pro	172.24.232.95	08:2E:5F:2A:82:D6	HP	HP Compaq 6200 Pro SFF PC	8	DDR3	Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-70	DRITM-2744	Microsoft Windows 11 Pro	172.24.232.215	8C:EC:4B:BD:D9:97	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-71	DRITM-1692	Microsoft Windows 11 Pro	172.24.232.88	84:A9:3E:75:AD:90	HP	HP ProDesk 600 G4 PCI MT	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-72	DRITM-2869	Microsoft Windows 11 Pro	172.24.234.82	9C:7B:EF:AF:1F:EE	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-73	DRITM-2949	Microsoft Windows 11 Pro	172.24.234.123	9C:7B:EF:B4:86:11	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-74	DRITM-2817	Microsoft Windows 11 Pro	172.24.234.30	9C:7B:EF:B4:83:1C	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-75	DRITM-2746	Microsoft Windows 11 Pro	172.24.232.217	C4:65:16:20:A4:13	HP	HP 280 G4 MT Business PC	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-76	DRITM-2668	Microsoft Windows 11 Pro	172.24.232.195	9C:7B:EF:AE:96:7F	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-77	DRITM-2841	Microsoft Windows 11 Pro	172.24.234.55	9C:7B:EF:B4:89:B8	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-78	DRITM-2881	Microsoft Windows 11 Pro	172.24.234.94	84:A9:3E:7C:BA:8E	HP	HP Desktop Pro G2	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-79	DRITM-2814	Microsoft Windows 11 Pro	172.24.234.27	9C:7B:EF:B3:3C:1E	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-80	DRITM-2657	Microsoft Windows 11 Pro	172.24.232.184	E4:54:E8:5F:B2:5F	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-81	DRITM-2956	Microsoft Windows 11 Pro	172.24.232.229	F4:39:09:0D:47:96	HP	HP ProDesk 400 G5 SFF	4	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-82	DRITM-2450	Microsoft Windows 11 Pro	172.24.232.143	8C:EC:4B:9F:C7:A0	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-83	DRITM-2880	Microsoft Windows 11 Pro	172.24.234.93	9C:7B:EF:AF:24:AC	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-84	DRITM-2471	Microsoft Windows 11 Pro	172.24.232.153	80:E8:2C:E9:09:77	HP	HP ProDesk 400 G6 MT	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-85	DRITM-2866	Microsoft Windows 11 Pro	172.24.234.79	F4:39:09:11:85:26	HP	HP ProDesk 400 G5 SFF	4	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-86	DRITM-2473	Microsoft Windows 11 Pro	172.24.232.155	9C:7B:EF:2F:E9:8A	HP	HP Desktop Pro G2	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-87	DRITM-2439	Microsoft Windows 11 Pro	172.24.232.148	8C:EC:4B:88:76:B6	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-88	DRITM-2806	Microsoft Windows 11 Pro	172.24.234.19	9C:7B:EF:B4:82:95	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-89	DRITM-2372	Microsoft Windows 11 Pro	172.24.232.119	8C:EC:4B:9F:C7:D1	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-90	DRITM-3033	Microsoft Windows 11 Pro	172.24.232.236	C4:65:16:19:79:10	HP	HP 280 G4 MT Business PC	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-91	DRITM-2755	Microsoft Windows 11 Pro	172.24.232.226	8C:EC:4B:74:6E:1B	Dell	Vostro 3470	4	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-92	DRITM-2760	Microsoft Windows 11 Pro	172.24.232.231	8C:EC:4B:A0:46:E0	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-93	DRITM-2762	Microsoft Windows 11 Pro	172.24.232.220	8C:EC:4B:9F:C7:FB	Dell	Vostro 3470	4	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-94	DRITM-2840	Microsoft Windows 11 Pro	172.24.234.54	9C:7B:EF:B4:88:D1	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-95	DRITM-2758	Microsoft Windows 11 Pro	172.24.232.33	8C:EC:4B:9A:D0:FD	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-96	DRITM-2879	Microsoft Windows 11 Pro	172.24.234.92	10:E7:C6:1A:EF:84	HP	HP EliteDesk 800 G4 SFF	4	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-97	DRITM-2839	Microsoft Windows 11 Pro	172.24.234.53	9C:7B:EF:B4:87:47	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-98	DRITM-2480	Microsoft Windows 11 Pro	172.24.232.162	9C:7B:EF:2F:ED:C6	HP	HP Desktop Pro G2	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-99	DRITM-2380	Microsoft Windows 11 Pro	172.24.232.129	8C:EC:4B:A0:49:FB	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-100	DRITM-1587	Microsoft Windows 11 Pro	172.24.232.211	E8:D8:D1:B8:6D:C9	HP	HP ProDesk 600 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-101	DRITM-1351	Microsoft Windows 11 Pro	172.24.232.59	8C:EC:4B:A0:49:39	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-102	DRITM-2838	Microsoft Windows 11 Pro	172.24.234.52	9C:7B:EF:B3:34:B1	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-103	DRITM-2678	Microsoft Windows 11 Pro	172.24.232.205	F4:39:09:09:D2:A3	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-104	DRITM-2683	Microsoft Windows 11 Pro	172.24.232.210	E4:54:E8:A0:D5:17	Dell	Vostro 3470	4	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-105	DRITM-2384	Microsoft Windows 11 Pro	172.24.232.125	8C:EC:4B:91:16:11	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-106	DRITM-2757	Microsoft Windows 11 Pro	172.24.232.228	8C:EC:4B:9A:0D:D8	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-107	DRITM-2836	Microsoft Windows 11 Pro	172.24.234.50	9C:7B:EF:B4:80:75	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-108	DRITM-2747	Microsoft Windows 11 Pro	172.24.232.23	F4:39:09:26:B7:85	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-109	DRITM-2748	Microsoft Windows 11 Pro	172.24.232.219	8C:EC:4B:91:17:76	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-110	DRITM-2742	Microsoft Windows 11 Pro N	172.24.234.77	9C:7B:EF:B4:92:CC	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-111	DRITM-2445	Microsoft Windows 11 Pro	172.24.232.116	8C:EC:4B:88:76:AF	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-112	DRITM-1565	Microsoft Windows 11 Pro	172.24.232.71	10:62:E5:05:E0:0E	HP	HP 280 G4 MT Business PC	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-113	DRITM-2490	Microsoft Windows 11 Pro	172.24.232.172	9C:7B:EF:2F:EE:6B	HP	HP Desktop Pro G2	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-114	DRITM-2375	Microsoft Windows 11 Pro	172.24.232.121	8C:EC:4B:CE:33:72	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-115	DRITM-2828	Microsoft Windows 11 Pro	172.24.234.41	9C:7B:EF:B3:32:F7	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-116	DRITM-2824	Microsoft Windows 11 Pro	172.24.234.37	9C:7B:EF:B4:85:A4	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-117	DRITM-1699	Microsoft Windows 11 Pro	172.24.232.84	84:A9:3E:75:AD:D9	HP	HP ProDesk 600 G4 PCI MT	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-118	DRITM-629	Microsoft Windows 11 Pro	172.24.232.92	10:E7:C6:3E:48:9C	HP	HP EliteDesk 800 G3 SFF	8	DDR4	Intel(R) Core(TM) i5-7500T CPU @ 2.70GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-119	DRITM-1094	Microsoft Windows 11 Pro	172.24.234.120	6C:2B:59:F8:25:72	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-120	DRITM-2388	Microsoft Windows 11 Pro	172.24.232.141	8C:EC:4B:9F:C8:06	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-121	DRITM-1705	Microsoft Windows 11 Pro	172.24.232.80	10:62:E5:10:6A:F2	HP	HP 280 G4 MT Business PC	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-122	DRITM-1706	Microsoft Windows 11 Pro	172.24.232.79	10:62:E5:0F:A1:25	HP	HP 280 G4 MT Business PC	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-123	DRITM-1703	Microsoft Windows 11 Pro	172.24.232.81	84:A9:3E:7A:CF:5B	HP	HP ProDesk 400 G5 MT	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-124	DRITM-1211	Microsoft Windows 11 Pro	172.24.232.82	90:B1:1C:94:11:9B	Dell	OptiPlex 9010	8	DDR3	Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-125	DRITM-1704	Microsoft Windows 11 Pro	172.24.232.85	84:A9:3E:80:46:DA	HP	HP ProDesk 600 G4 PCI MT	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-126	DRITM-1713	Microsoft Windows 11 Pro	172.24.232.87	84:A9:3E:75:AD:C2	HP	HP ProDesk 600 G4 PCI MT	4	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-127	DRITM-3032	Microsoft Windows 11 Pro	172.24.232.75	9C:7B:EF:35:23:D5	HP	HP Desktop Pro G2	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-128	DRITM-2837	Microsoft Windows 11 Pro	172.24.234.51	9C:7B:EF:B4:85:C9	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-129	DRITM-2834	Microsoft Windows 11 Pro	172.24.234.48	9C:7B:EF:B4:82:F7	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-130	DRITM-1693	Microsoft Windows 11 Pro	172.24.232.76	84:A9:3E:80:47:3A	HP	HP ProDesk 600 G4 PCI MT	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-131	DRITM-1781	Microsoft Windows 11 Pro	172.24.232.169	E8:D8:D1:B8:5C:14	HP	HP ProDesk 600 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-132	DRITM-2947	Microsoft Windows 11 Pro	172.24.234.121	9C:7B:EF:A8:CB:31	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-133	DRITM-2948	Microsoft Windows 11 Pro	172.24.234.122	F4:39:09:14:2E:78	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-134	DRITM-1695	Microsoft Windows 11 Pro	172.24.232.83	E8:D8:D1:B8:74:7E	HP	HP ProDesk 600 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-135	DRITM-1213	Microsoft Windows 11 Pro	172.24.232.94	FC:4D:D4:3B:D8:3F	LENOVO	3227A3Q	8	DDR3	Intel(R) Core(TM) i5-2310 CPU @ 2.90GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-136	DRITM-2724	Microsoft Windows 11 Pro	172.24.232.45	9C:7B:EF:B4:8E:06	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-137	DRITM-2393	Microsoft Windows 11 Pro	172.24.232.136	8C:EC:4B:6B:F9:96	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-138	DRITM-2933	Microsoft Windows 11 Pro N	172.24.234.107	9C:7B:EF:B3:39:52	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-139	DRITM-2397	Microsoft Windows 11 Pro	172.24.232.69	8C:EC:4B:88:75:BE	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-140	DRITM-2876	Microsoft Windows 11 Pro	172.24.234.89	10:E7:C6:B8:02:2E	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-141	DRITM-2484	Microsoft Windows 11 Pro	172.24.232.166	9C:7B:EF:2F:E9:5A	HP	HP Desktop Pro G2	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-142	DRITM-2927	Microsoft Windows 11 Pro	172.24.234.101	F4:39:09:12:FC:7D	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-143	DRITM-2373	Microsoft Windows 11 Pro	172.24.232.120	8C:EC:4B:93:5E:39	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-144	DRITM-2928	Microsoft Windows 11 Pro	172.24.234.102	E8:D8:D1:B6:E8:32	HP	HP ProDesk 600 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-145	DRITM-2727	Microsoft Windows 11 Pro	172.24.232.142	8C:EC:4B:CE:31:E4	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-146	DRITM-2670	Microsoft Windows 11 Pro	172.24.232.197	54:BF:64:69:3D:A6	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-147	DRITM-2441	Microsoft Windows 11 Pro	172.24.232.151	8C:EC:4B:91:15:4B	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-148	DRITM-2679	Microsoft Windows 11 Pro	172.24.232.206	F4:39:09:19:EF:CB	HP	HP ProDesk 600 G4 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-149	DRITM-2666	Microsoft Windows 11 Pro	172.24.232.193	54:BF:64:68:B5:09	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-150	DRITM-2822	Microsoft Windows 11 Pro	172.24.234.35	9C:7B:EF:B4:8E:2D	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-151	DRITM-2764											
+JEEVES	6TH	F-152	Empty Seat											
+JEEVES	6TH	F-153	Empty Seat											
+JEEVES	6TH	F-154	Empty Seat											
+JEEVES	6TH	F-155	DRITM-2926	Microsoft Windows 11 Pro	172.24.234.100	9C:7B:EF:B4:7F:E7	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-156	Empty Seat											
+JEEVES	6TH	F-157	Empty Seat											
+JEEVES	6TH	F-158	Empty Seat											
+JEEVES	6TH	F-159	Empty Seat											
+JEEVES	6TH	F-160	Empty Seat											
+JEEVES	6TH	F-161	Empty Seat											
+JEEVES	6TH	F-162	Empty Seat											
+JEEVES	6TH	F-163	Empty Seat											
+JEEVES	6TH	F-164	Empty Seat											
+JEEVES	6TH	F-165	DRITM-2390	Microsoft Windows 11 Pro	172.24.232.139	8C:EC:4B:CE:33:49	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-166	Empty Seat											
+JEEVES	6TH	F-167	DRITM-2759	Microsoft Windows 11 Pro	172.24.232.230	9C:7B:EF:B4:89:DB	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-168	Empty Seat											
+JEEVES	6TH	F-169	Empty Seat											
+JEEVES	6TH	F-170	Empty Seat											
+JEEVES	6TH	F-171	DRITM-2940	Microsoft Windows 11 Pro	172.24.234.114	9C:7B:EF:B4:85:47	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-172	Empty Seat											
+JEEVES	6TH	F-173	Empty Seat											
+JEEVES	6TH	F-174	Empty Seat											
+JEEVES	6TH	F-175	DRITM-2835	Microsoft Windows 11 Pro	172.24.234.49	9C:7B:EF:B4:91:02	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-176	DRITM-2829	Microsoft Windows 11 Pro	172.24.234.43	9C:7B:EF:B3:3A:46	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-177	DRITM-1690	Microsoft Windows 11 Pro	172.24.232.91	8C:EC:4B:CF:C9:9C	Dell	OptiPlex 5060	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-178	DRITM-2398	Microsoft Windows 11 Pro	172.24.232.15	54:BF:64:A5:71:CC	Dell	OptiPlex 5060	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-179	DRITM-1701	Microsoft Windows 11 Pro	172.24.232.86	C8:D9:D2:02:55:BF	HP	HP ProDesk 600 G4 PCI MT	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-180	DRITM-1083	Microsoft Windows 11 Pro	172.24.232.93	E4:54:E8:99:5C:DC	Dell	OptiPlex 5060	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-181	DRITM-3328	Microsoft Windows 11 Pro	172.24.232.212	C4:65:16:1B:EA:D0	HP	HP 280 G4 MT Business PC	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-182	DRITM-1300	HR SYSTEM										
+JEEVES	6TH	F-183	DRITM-2790	Microsoft Windows 11 Pro	172.24.234.3	9C:7B:EF:B4:89:C6	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-184	DRITM-2794	Microsoft Windows 11 Pro	172.24.234.7	9C:7B:EF:B4:89:D3	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-185	DRITM-1700	Microsoft Windows 11 Pro	172.24.232.73	70:F3:95:1B:98:17	LENOVO	ThinkCentre M91p	8	DDR3	Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-186	DRITM-2791	Microsoft Windows 11 Pro	172.24.234.4	9C:7B:EF:B4:87:97	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-187	DRITM-2793	Microsoft Windows 11 Pro	172.24.234.6	C4:65:16:19:CE:D7	HP	HP 280G3 SSF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-188	DRITM-2831	Microsoft Windows 11 Pro	172.24.234.45	9C:7B:EF:B4:85:79	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-189	DRITM-2805	Microsoft Windows 11 Pro	172.24.234.18	9C:7B:EF:B4:81:1E	HP	HP ProDesk 400 G6 SFF	4	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-190	DRITM-2807	Microsoft Windows 11 Pro	172.24.234.20	9C:7B:EF:B4:89:14	HP	HP ProDesk 400 G6 SFF	4	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-191	DRITM-2825	Microsoft Windows 11 Pro	172.24.234.38	9C:7B:EF:B4:72:CD	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-192	DRITM-2799	Microsoft Windows 11 Pro	172.24.234.12	9C:7B:EF:B3:39:CC	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-193	DRITM-2826	Microsoft Windows 11 Pro	172.24.234.39	9C:7B:EF:B3:39:B6	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-194	DRITM-2797	Microsoft Windows 11 Pro	172.24.234.10	9C:7B:EF:B4:84:1C	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-195	DRITM-2819	Microsoft Windows 11 Pro	172.24.234.32	9C:7B:EF:B4:88:58	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-196	DRITM-2669	Microsoft Windows 11 Pro	172.24.232.196	54:BF:64:6F:8F:53	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-197	DRITM-2798	Microsoft Windows 11 Pro	172.24.234.11	9C:7B:EF:B3:3A:69	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-198	DRITM-2800	Microsoft Windows 11 Pro	172.24.234.13	9C:7B:EF:B0:0B:DC	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-199	DRITM-2803	Microsoft Windows 11 Pro	172.24.234.16	9C:7B:EF:B4:85:0A	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-200	DRITM-2488	Microsoft Windows 11 Pro	172.24.232.170	C4:65:16:14:C6:00	HP	HP Pavilion Gaming Desktop 690-00xx	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-201	DRITM-2809	Microsoft Windows 11 Pro	172.24.234.22	9C:7B:EF:B3:38:38	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-202	DRITM-2818	Microsoft Windows 11 Pro	172.24.234.31	9C:7B:EF:B4:87:5E	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-203	DRITM-1420	Microsoft Windows 11 Pro	172.24.232.70	8C:EC:4B:91:13:BB	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-204	DRITM-2827	Microsoft Windows 11 Pro	172.24.234.40	9C:7B:EF:B8:47:0B	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-205	DRITM-2832	Microsoft Windows 11 Pro	172.24.234.46	9C:7B:EF:B3:3E:C7	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-206	DRITM-2830	Microsoft Windows 11 Pro	172.24.234.44	9C:7B:EF:B3:3A:3F	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-207	DRITM-2810	Microsoft Windows 11 Pro	172.24.234.23	9C:7B:EF:B3:15:0E	HP	HP ProDesk 400 G6 SFF	4	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-208	DRITM-2789	Microsoft Windows 11 Pro	172.24.234.2	9C:7B:EF:B4:87:80	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-209	DRITM-2802	Microsoft Windows 11 Pro	172.24.234.15	C4:65:16:19:CF:98	HP	HP 280 G3 SFF Business PC	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-210	DRITM-2808	Microsoft Windows 11 Pro	172.24.234.21	9C:7B:EF:B3:3B:96	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-211	DRITM-2792	Microsoft Windows 11 Pro	172.24.234.5	9C:7B:EF:B4:8F:57	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-212	DRITM-2795	Microsoft Windows 11 Pro	172.24.234.8	9C:7B:EF:B4:91:C2	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-213	DRITM-2796	Microsoft Windows 11 Pro	172.24.234.9	9C:7B:EF:B4:84:50	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-214	DRITM-2821	Microsoft Windows 11 Pro	172.24.234.34	9C:7B:EF:B3:3A:55	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-215	DRITM-2833	Microsoft Windows 11 Pro	172.24.234.47	9C:7B:EF:B4:85:40	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-216	DRITM-2556	Microsoft Windows 11 Pro	172.24.233.223	9C:7B:EF:BB:6F:EB	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-217	DRITM-2811	Microsoft Windows 11 Pro	172.24.234.24	9C:7B:EF:B4:88:9B	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-218	DRITM-2466	Microsoft Windows 11 Pro	172.24.234.240	F4:39:09:2E:3E:D8	HP	HP 280 G4 MT Business PC	4	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	C: Off	
+JEEVES	6TH	F-219	DRITM-2545	Microsoft Windows 11 Pro	172.24.234.241	F4:39:09:3D:00:AC	HP	HP 280G3 SFF	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (128GB)	C: Off	
+JEEVES	6TH	F-220	DRITM-2459	Microsoft Windows 11 Pro	172.24.233.220	E4:54:E8:A1:73:CD	Dell Inc.	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	C: Off	
+JEEVES	6TH	F-221	DRITM-2192	Microsoft Windows 11 Pro	172.24.232.235	F4:39:09:06:37:95	HP	HP ProDesk 600 G3 SFF	8	DDR4	Intel(R) Core(TM) i5-7400T CPU @ 2.40GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-222	DRITM-2737	Microsoft Windows 11 Pro	172.24.233.200	F4:39:09:17:00:74	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-223	Empty Seat											
+JEEVES	6TH	F-224	Empty Seat											
+JEEVES	6TH	F-225	Empty Seat											
+JEEVES	6TH	F-226	Empty Seat											
+JEEVES	6TH	F-227	Empty Seat											
+JEEVES	6TH	F-228	DRITM-2740	Microsoft Windows 11 Pro	172.24.233.214	54:BF:64:70:B6:C2	Dell Inc.	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-229	DRITM-3406	Microsoft Windows 11 Pro	172.24.233.207	8C:EC:4B:A0:7F:4F	Dell Inc.	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-230	DRITM-2508	Microsoft Windows 11 Pro	172.24.233.212	9C:7B:EF:35:AE:D6	HP	HP 280 Pro G5 MT Business PC	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-231	DRITM-2801	Microsoft Windows 11 Pro	172.24.234.26	9C:7B:EF:B3:39:31	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-232	DRITM-2729	Microsoft Windows 11 Pro	172.24.233.221	54:BF:64:8A:17:12	Dell Inc.	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-233	DRITM-2561	Microsoft Windows 11 Pro	172.24.233.222	8C:EC:4B:D3:EB:8F	Dell Inc.	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	C: Off	
+JEEVES	6TH	F-234	DRITM-2587	Microsoft Windows 11 Pro	172.24.233.202	70:B5:E8:2A:6F:FB	Dell Inc.	Vostro 3671	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-235	DRITM-3405	Microsoft Windows 11 Pro	172.24.233.203	E8:D8:D1:B9:67:4D	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-236	DRITM-2725	Microsoft Windows 11 Pro	172.24.232.64	8C:EC:4B:A0:48:C3	Dell Inc.	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-237	DRITM-2449	Microsoft Windows 11 Pro	172.24.233.255	8C:EC:4B:93:5F:D9	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-238	DRITM-3338	Microsoft Windows 11 Pro	172.24.233.204	E8:D8:D1:B9:39:FA	HP	HP ProDesk 400 G6 SFF	4	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-239	DRITM-2734	Microsoft Windows 11 Pro	172.24.233.208	C4:65:16:13:76:F2	HP	HP 280 G4 MT Business PC	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	C: Off	
+JEEVES	6TH	F-240	DRITM-2446	Microsoft Windows 11 Pro	172.24.233.217	9C:7B:EF:B4:85:34	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i3-8100 CPU @ 3.60GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-241	DRITM-2736	Microsoft Windows 11 Pro	172.24.233.216	E4:54:E8:6A:02:9F	Dell Inc.	OptiPlex 5060	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-242	DRITM-2823	Microsoft Windows 11 Pro	172.24.234.36	9C:7B:EF:B3:3A:7D	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-243	DRITM-1726	Microsoft Windows 11 Pro	172.24.233.206	9C:7B:EF:B2:17:06	HP	HP ProDesk 600 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-244	DRITM-3407	Microsoft Windows 11 Pro	172.24.233.201	9C:7B:EF:4B:6D:75	HP	HP ProDesk 400 G6 MT	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-245	DRITM-2460	Microsoft Windows 11 Pro	172.24.233.213	54:BF:64:A3:86:4B	Dell Inc.	OptiPlex 5060	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-246	DRITM-2877	Microsoft Windows 11 Pro	172.24.234.90	9C:7B:EF:AF:25:CF	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	F-247	DRITM-2428	Microsoft Windows 11 Pro	172.24.233.219	F4:39:09:0A:38:97	HP	HP ProDesk 400 G5	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-248	DRITM-2963	Microsoft Windows 11 Pro	172.24.233.205	9C:7B:EF:34:F8:C4	HP	HP Desktop Pro G2	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	C: Encrypted	
+JEEVES	6TH	F-249	Empty Seat											
+JEEVES	6TH	F-250	Empty Seat											
+JEEVES	6TH	M-1	Empty Seat											
+JEEVES	6TH	M-2	Empty Seat											
+JEEVES	6TH	M-3	Empty Seat											
+JEEVES	6TH	M-4	Empty Seat											
+JEEVES	6TH	M-5	Empty Seat											
+JEEVES	6TH	M-6	Empty Seat											
+JEEVES	6TH	M-7	DRITM-2658	Microsoft Windows 11 Pro	172.24.232.185	70:B5:E8:25:7E:FE	Dell	Vostro 3471	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-8	Empty Seat											
+JEEVES	6TH	M-9	Empty Seat											
+JEEVES	6TH	M-10	Empty Seat											
+JEEVES	6TH	M-11	Empty Seat											
+JEEVES	6TH	M-12	DRITM-1392	Microsoft Windows 11 Pro	172.24.232.50	8C:EC:4B:91:16:B8	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-13	Empty Seat											
+JEEVES	6TH	M-14	Empty Seat											
+JEEVES	6TH	M-15	DRITM-2371	Microsoft Windows 11 Pro	172.24.232.133	8C:EC:4B:91:13:C0	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-16	DRITM-1482	Microsoft Windows 11 Pro	172.24.232.36	8C:EC:4B:93:5E:54	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-17	DRITM-2774	Microsoft Windows 11 Pro	172.24.232.46	9C:7B:EF:B4:93:1B	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-18	DRITM-2414	Microsoft Windows 11 Pro	172.24.232.26	8C:EC:4B:9F:C5:A6	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-19	DRITM-1054	Microsoft Windows 11 Pro	172.24.234.134	E8:D8:D1:B7:6C:3C	HP	HP ProDesk 600 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-20	DRITM-1393	Microsoft Windows 11 Pro	172.24.232.49	8C:EC:4B:9F:C8:E7	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-21	DRITM-2443	Microsoft Windows 11 Pro	172.24.232.152	54:BF:64:87:65:9B	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-22	DRITM-2378	Microsoft Windows 11 Pro	172.24.232.131	E4:54:E8:93:0A:7B	Dell	OptiPlex 3070	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-23	DRITM-1444	Microsoft Windows 11 Pro	172.24.232.43	8C:EC:4B:CF:29:AB	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-24	DRITM-2407	Microsoft Windows 11 Pro	172.24.232.22	2C:EA:7F:FF:4B:6F	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-25	DRITM-1749	Microsoft Windows 11 Pro	172.24.232.168	E8:D8:D1:BA:AB:83	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-26	DRITM-2382	Microsoft Windows 11 Pro	172.24.232.127	8C:EC:4B:9F:C6:14	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-27	DRITM-1757	Microsoft Windows 11 Pro	172.24.232.14	E8:D8:D1:C8:1D:EA	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-28	DRITM-1480	Microsoft Windows 11 Pro	172.24.232.38	8C:EC:4B:91:17:69	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-29	DRITM-2953	Microsoft Windows 11 Pro	172.24.234.127	F4:39:09:12:FB:45	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-30	DRITM-2404	Microsoft Windows 11 Pro	172.24.232.19	8C:EC:4B:74:67:B4	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-31	Empty Seat											
+JEEVES	6TH	M-32	DRITM-1724	Microsoft Windows 11 Pro	172.24.232.114	E8:D8:D1:B6:00:1B	HP	HP ProDesk 600 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-33	DRITM-1063	Microsoft Windows 11 Pro	172.24.234.128	9C:7B:EF:B3:30:F8	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-34	DRITM-3011	Microsoft Windows 11 Pro	172.24.232.16	9C:7B:EF:34:F6:7C	HP	HP Desktop Pro G2	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-35	DRITM-1071	Microsoft Windows 11 Pro	172.24.232.158	C4:65:16:28:77:7E	HP	HP 280 G3 SFF Business PC	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-36	DRITM-1064	Microsoft Windows 11 Pro	172.24.232.164	E8:D8:D1:B7:6C:04	HP	HP ProDesk 600 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-37	DRITM-1729	Microsoft Windows 11 Pro	172.24.232.167	E8:D8:D1:B8:73:E6	HP	HP ProDesk 600 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-38	DRITM-1448	Microsoft Windows 11 Pro	172.24.232.42	8C:EC:4B:A0:4B:60	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-39	DRITM-1698	Microsoft Windows 11 Pro	172.24.232.89	C8:D9:D2:02:56:D5	HP	HP ProDesk 600 G4 PCI MT	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-40	DRITM-2965	Microsoft Windows 11 Pro	172.24.234.139	9C:7B:EF:B4:84:D6	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-41	DRITM-1479	Microsoft Windows 11 Pro	172.24.232.39	8C:EC:4B:73:4B:86	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-42	DRITM-2474	Microsoft Windows 11 Pro	172.24.232.156	9C:7B:EF:2F:ED:6E	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-43	DRITM-2957	Microsoft Windows 11 Pro	172.24.234.131	9C:7B:EF:34:4B:60	HP	HP Desktop Pro G2	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-44	DRITM-2376	Microsoft Windows 11 Pro	172.24.232.34	8C:EC:4B:9A:D0:B0	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-45	DRITM-2391	Microsoft Windows 11 Pro	172.24.232.138	8C:EC:4B:9F:CA:43	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-46	DRITM-3010	Microsoft Windows 11 Pro	172.24.232.145	9C:7B:EF:34:49:30	HP	HP Desktop Pro G2	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-47	DRITM-2955	Microsoft Windows 11 Pro	172.24.234.129	F4:39:09:12:FC:7F	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-48	DRITM-2417	Microsoft Windows 11 Pro	172.24.232.29	8C:EC:4B:CF:29:AC	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-49	DRITM-2962	Microsoft Windows 11 Pro	172.24.234.136	F4:39:09:13:26:45	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-50	DRITM-2416	Microsoft Windows 11 Pro	172.24.232.28	8C:EC:4B:79:43:89	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-51	DRITM-1433	Microsoft Windows 11 Pro	172.24.232.44	8C:EC:4B:CE:33:51	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-52	DRITM-2659	Microsoft Windows 11 Pro	172.24.232.186	54:BF:64:67:41:40	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-53	DRITM-2406	Microsoft Windows 11 Pro	172.24.232.21	8C:EC:4B:88:76:89	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-54	DRITM-2951	Microsoft Windows 11 Pro	172.24.234.125	F4:39:09:04:09:11	HP	HP ProDesk 400 G5 SFF	4	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-55	DRITM-452	Microsoft Windows 11 Pro	172.24.232.96	90:B1:1C:A4:05:4C	Dell	OptiPlex 9010	8	DDR3	Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-56	DRITM-2402	Microsoft Windows 11 Pro	172.24.232.20	E4:54:E8:E2:E0:51	Dell	Vostro 3471	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-57	DRITM-2403	Microsoft Windows 11 Pro	172.24.232.18	E4:54:E8:77:5E:D8	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-58	DRITM-1391	Microsoft Windows 11 Pro	172.24.232.51	8C:EC:4B:9F:C8:9E	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-59	DRITM-2392	Microsoft Windows 11 Pro	172.24.232.137	8C:EC:4B:91:17:5F	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-60	DRITM-1478	Microsoft Windows 11 Pro	172.24.232.40	8C:EC:4B:91:16:CC	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-61	DRITM-2400	Microsoft Windows 11 Pro	172.24.232.13	54:BF:64:77:CB:73	Dell	OptiPlex 3060	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-62	DRITM-2475	Microsoft Windows 11 Pro	172.24.232.157	9C:7B:EF:2F:EA:C8	HP	HP Desktop Pro G2	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-63	DRITM-1483	Microsoft Windows 11 Pro	172.24.232.35	E4:54:E8:93:09:0B	Dell	OptiPlex 3070	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-64	DRITM-1390	Microsoft Windows 11 Pro	172.24.232.52	E4:54:E8:93:0A:DE	Dell	OptiPlex 3070	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-65	DRITM-2489	Microsoft Windows 11 Pro	172.24.232.171	9C:7B:EF:4B:6D:9B	HP	HP ProDesk 400 G6 MT	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-66	DRITM-1744	Microsoft Windows 11 Pro	172.24.234.138	E8:D8:D1:B8:75:80	HP	HP ProDesk 600 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (256GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-67	DRITM-2381	Microsoft Windows 11 Pro	172.24.232.128	8C:EC:4B:74:6D:B5	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-68	DRITM-2952	Microsoft Windows 11 Pro	172.24.232.37	9C:7B:EF:B4:82:B2	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-69	DRITM-2804	Microsoft Windows 11 Pro	172.24.234.17	9C:7B:EF:B4:85:11	HP	HP ProDesk 400 G6 SFF	8	DDR4	Intel(R) Core(TM) i5-9500 CPU @ 3.00GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-70	DRITM-947	Microsoft Windows 11 Pro	172.24.234.29	00:E0:4C:68:05:8C	Dell	OptiPlex 990	4	DDR3	Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-71	DRITM-2968	Microsoft Windows 11 Pro	172.24.234.142	F4:39:09:09:EF:13	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9400T CPU @ 1.80GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-72	DRITM-2415	Microsoft Windows 11 Pro	172.24.232.27	8C:EC:4B:91:18:07	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-73	DRITM-2413	Microsoft Windows 11 Pro	172.24.232.25	8C:EC:4B:A8:72:A1	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-74	DRITM-2401	Microsoft Windows 11 Pro	172.24.232.32	8C:EC:4B:88:76:37	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-75	DRITM-2379	Microsoft Windows 11 Pro	172.24.232.130	8C:EC:4B:93:62:5A	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-76	DRITM-2418	Microsoft Windows 11 Pro	172.24.232.30	8C:EC:4B:CE:31:C1	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-77	DRITM-3012	Microsoft Windows 11 Pro	172.24.234.130	9C:7B:EF:34:F8:2F	HP	HP Desktop Pro G2	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-78	DRITM-2409	Microsoft Windows 11 Pro	172.24.232.24	8C:EC:4B:88:78:78	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-79	DRITM-2966	Microsoft Windows 11 Pro	172.24.234.140	F4:39:09:12:FB:FA	HP	HP ProDesk 400 G5 SFF	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-80	DRITM-2451	Microsoft Windows 11 Pro	172.24.232.144	8C:EC:4B:91:14:A6	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-81	Empty Seat											
+JEEVES	6TH	M-82	DRITM-2421	Microsoft Windows 11 Pro	172.24.232.115	8C:EC:4B:88:79:2D	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9500T CPU @ 2.20GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
+JEEVES	6TH	M-83	DRITM-2377	Microsoft Windows 11 Pro	172.24.232.132	8C:EC:4B:9C:DB:7E	Dell	Vostro 3470	8	DDR4	Intel(R) Core(TM) i5-9600 CPU @ 3.10GHz	SSD (128GB)	Encrypted (100.0% - Prot:Protection On)	
